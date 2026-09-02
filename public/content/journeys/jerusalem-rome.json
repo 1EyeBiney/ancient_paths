@@ -107,17 +107,82 @@
   "communityEvents": [
     {
       "id": "caesarea-event",
+      "kind": "relay",
       "milestoneId": "caesarea",
       "title": "The Harbor Gathering",
-      "description": "All teams pause at Herod's harbor for a shared challenge before the roads divide.",
-      "repeatable": false
+      "description": "All teams pause at Herod's harbor for a shared challenge before the roads divide. Teams answer in turn; the room succeeds together.",
+      "repeatable": false,
+      "taskCategory": "community",
+      "successThreshold": 7,
+      "reward": {
+        "type": "grant-resource-every-team",
+        "resource": "choice",
+        "amount": 1
+      }
     },
     {
       "id": "antioch-event",
+      "kind": "contribution",
       "milestoneId": "antioch",
       "title": "The Sending Church",
-      "description": "The whole room joins the church at Antioch in a cooperative challenge before the voyage west.",
-      "repeatable": false
+      "description": "The church at Antioch is sending out missionaries. Teams may pledge resources to equip them; generosity earns Service, and meeting the goal blesses the whole room.",
+      "repeatable": false,
+      "acceptedResources": ["insight", "provision", "courage"],
+      "contributionThreshold": 4,
+      "reward": {
+        "type": "reduce-next-stage-requirement",
+        "amount": 1
+      }
+    }
+  ],
+  "offeringOutcomes": [
+    {
+      "id": "offer-manna",
+      "category": "beneficial",
+      "announcement": "Your gift returns to you like bread on the waters. Choose one resource.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "choice", "amount": 1 }
+    },
+    {
+      "id": "offer-scout-report",
+      "category": "beneficial",
+      "announcement": "A returning traveler shares news of the road ahead. You learn about your next stage.",
+      "effect": { "type": "reveal-next-stage-info" }
+    },
+    {
+      "id": "offer-courage-kindled",
+      "category": "beneficial",
+      "announcement": "Your generosity kindles boldness. Receive one Courage.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "courage", "amount": 1 }
+    },
+    {
+      "id": "offer-shared-feast",
+      "category": "community",
+      "announcement": "The offering becomes a feast, and every team is strengthened. Each team receives one Provision.",
+      "effect": { "type": "grant-resource", "target": "every-team", "resource": "provision", "amount": 1 }
+    },
+    {
+      "id": "offer-encourager",
+      "category": "community",
+      "announcement": "Your gift travels to another camp. A different team receives a clue on its next task.",
+      "effect": { "type": "grant-clue-next-task", "target": "random-other-team" }
+    },
+    {
+      "id": "offer-festival-fund",
+      "category": "community",
+      "announcement": "The gift is set aside for the next great gathering. The next community event will carry a bonus.",
+      "effect": { "type": "boost-next-community-event" }
+    },
+    {
+      "id": "offer-runaway-donkey",
+      "category": "humorous",
+      "announcement": "The donkey carrying your gift bolts through the marketplace, scattering figs everywhere. The crowd cheers. Nothing else happens, but it was magnificent.",
+      "effect": { "type": "none" }
+    },
+    {
+      "id": "offer-quiet-gift",
+      "category": "neutral",
+      "announcement": "The gift is received quietly, and the journey continues. The act of service itself still counts.",
+      "effect": { "type": "none" }
     }
   ]
 }

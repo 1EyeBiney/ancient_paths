@@ -23,9 +23,18 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
   - Test suite: `tests/content.test.ts` — 18 tests covering valid loads
     and §33.2 rejections. All passing.
 
+- **Design finalization for Phase 2 (2026-09-02)**: design doc amended to
+  revision 1.1 (host-as-player; recover replaces retry; reveal precedes
+  ruling). Schemas extended: variant `options` arrays (with answer-present
+  validation), community events as relay/contribution discriminated union
+  with room rewards, journey `offeringOutcomes` weighted pool (all four
+  categories required). Sample journey/pack updated; 24 tests passing.
+  PHASE2_SPEC.md written as the unattended-implementation contract.
+
 ## Active
 
-- (nothing in flight)
+- (nothing in flight — Phase 2 is specified and ready to implement
+  against PHASE2_SPEC.md)
 
 ## Remaining
 

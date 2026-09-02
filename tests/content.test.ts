@@ -93,6 +93,22 @@ describe("pack validation rejects (§33.2)", () => {
     pack.tasks[0].packId = "some-other-pack";
     expect(validateContentPack(pack, "wrong-pack").ok).toBe(false);
   });
+
+  it("multiple-choice options that do not include the answer", () => {
+    const pack = clonePack();
+    pack.tasks[0].assistedVariant.options = ["Silas", "Barnabas", "Timothy"];
+    const result = validateContentPack(pack, "options-no-answer");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/do not include the answer/);
+    }
+  });
+
+  it("fewer than two multiple-choice options", () => {
+    const pack = clonePack();
+    pack.tasks[0].assistedVariant.options = ["Matthias"];
+    expect(validateContentPack(pack, "one-option").ok).toBe(false);
+  });
 });
 
 describe("journey validation rejects (§33.2)", () => {
@@ -134,6 +150,36 @@ describe("journey validation rejects (§33.2)", () => {
     const journey = cloneJourney();
     journey.entries[1].routes = [journey.entries[1].routes[0]];
     expect(validateJourney(journey, "one-route").ok).toBe(false);
+  });
+
+  it("an offering pool missing a weight category", () => {
+    const journey = cloneJourney();
+    journey.offeringOutcomes = journey.offeringOutcomes.filter(
+      (o: any) => o.category !== "humorous",
+    );
+    const result = validateJourney(journey, "no-humor");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/humorous/);
+    }
+  });
+
+  it("a community event with an unknown kind", () => {
+    const journey = cloneJourney();
+    journey.communityEvents[0].kind = "karaoke";
+    expect(validateJourney(journey, "bad-kind").ok).toBe(false);
+  });
+
+  it("a contribution event with a zero threshold", () => {
+    const journey = cloneJourney();
+    journey.communityEvents[1].contributionThreshold = 0;
+    expect(validateJourney(journey, "zero-threshold").ok).toBe(false);
+  });
+
+  it("an offering outcome with an unsupported effect type", () => {
+    const journey = cloneJourney();
+    journey.offeringOutcomes[0].effect = { type: "steal-resources" };
+    expect(validateJourney(journey, "bad-effect").ok).toBe(false);
   });
 });
 

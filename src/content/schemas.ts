@@ -38,8 +38,15 @@ const resourceCostSchema = z.object({
 // Task record (§17.1)
 // ---------------------------------------------------------------------------
 
+// Multiple-choice options are structured data (not prose) so that Insight's
+// eliminate-an-option effect can operate on them. Optional on any variant;
+// when present, one option must match the variant's (or task's) answer —
+// validated in the pack superRefine below.
+const optionsSchema = z.array(z.string().min(1)).min(2).max(6);
+
 const normalVariantSchema = z.object({
   prompt: z.string().min(1),
+  options: optionsSchema.optional(),
   successValue: z.literal(1),
 });
 
@@ -47,6 +54,7 @@ const assistedVariantSchema = z.object({
   available: z.literal(true),
   cost: resourceCostSchema,
   prompt: z.string().min(1),
+  options: optionsSchema.optional(),
   successValue: z.literal(1),
 });
 
@@ -56,6 +64,7 @@ const amplifiedVariantSchema = z.object({
   available: z.literal(true),
   cost: resourceCostSchema,
   prompt: z.string().min(1),
+  options: optionsSchema.optional(),
   answer: z.string().min(1),
   acceptedAnswers: z.array(z.string().min(1)).min(1),
   successValue: z.literal(2),
@@ -124,6 +133,36 @@ export const contentPackSchema = z
           message: `Task "${task.id}" declares packId "${task.packId}" but lives in pack "${pack.packId}".`,
         });
       }
+      // When a variant offers structured options, the correct answer (or an
+      // accepted alternative) must be among them, or the Insight
+      // eliminate-an-option effect could remove the truth.
+      const answerPool = (extra: string[]) =>
+        [task.answer, ...task.acceptedAnswers, ...extra].map((a) => a.toLowerCase());
+      const checkOptions = (
+        options: string[] | undefined,
+        extraAnswers: string[],
+        where: string,
+      ) => {
+        if (!options) return;
+        const pool = answerPool(extraAnswers);
+        const found = options.some((o) => pool.includes(o.toLowerCase()));
+        if (!found) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["tasks", index, where, "options"],
+            message: `Task "${task.id}": ${where} options do not include the answer.`,
+          });
+        }
+      };
+      checkOptions(task.normalVariant.options, [], "normalVariant");
+      checkOptions(task.assistedVariant?.options, [], "assistedVariant");
+      checkOptions(
+        task.amplifiedVariant?.options,
+        task.amplifiedVariant
+          ? [task.amplifiedVariant.answer, ...task.amplifiedVariant.acceptedAnswers]
+          : [],
+        "amplifiedVariant",
+      );
     });
   });
 
@@ -195,12 +234,71 @@ const milestoneSchema = z.object({
   ambientAudioAsset: idSchema.nullable(),
 });
 
-const communityEventSchema = z.object({
+// Room rewards a community event (or offering outcome) can grant. Small,
+// closed union: the engine implements each type; content only combines them.
+const roomRewardSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("grant-resource-every-team"),
+    resource: z.union([z.enum(RESOURCE_TYPES), z.literal("choice")]),
+    amount: z.number().int().min(1).max(2),
+  }),
+  z.object({
+    type: z.literal("reduce-next-stage-requirement"),
+    amount: z.number().int().min(1).max(2),
+  }),
+]);
+
+// Version-one community events come in exactly two authored shapes (ruling
+// 2026-09-02): a RELAY (shared question answered in parts, teams contributing
+// in turn order, room succeeds at a threshold) and a CONTRIBUTION (teams
+// pledge resources toward a threshold; pledging earns Service).
+const communityEventBase = {
   id: idSchema,
   milestoneId: idSchema,
   title: z.string().min(1),
   description: z.string().min(1),
   repeatable: z.boolean().default(false),
+  reward: roomRewardSchema,
+};
+
+const communityEventSchema = z.discriminatedUnion("kind", [
+  z.object({
+    ...communityEventBase,
+    kind: z.literal("relay"),
+    // The relay draws its shared question from this category (the session
+    // builder reserves community tasks); threshold = parts the room must get.
+    taskCategory: z.enum(TASK_CATEGORIES),
+    successThreshold: z.number().int().min(1).max(12),
+  }),
+  z.object({
+    ...communityEventBase,
+    kind: z.literal("contribution"),
+    acceptedResources: z.array(z.enum(RESOURCE_TYPES)).min(1),
+    contributionThreshold: z.number().int().min(1).max(16),
+  }),
+]);
+
+// Offering outcomes (§10): a weighted, curated pool authored in the journey.
+// The engine draws by category weight (§36 offeringWeights) and applies the
+// effect; "none" carries humor or neutral flavor with no mechanical change.
+const offeringEffectSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("grant-resource"),
+    target: z.enum(["offering-team", "every-team", "random-other-team"]),
+    resource: z.union([z.enum(RESOURCE_TYPES), z.literal("choice")]),
+    amount: z.number().int().min(1).max(2),
+  }),
+  z.object({ type: z.literal("reveal-next-stage-info") }),
+  z.object({ type: z.literal("grant-clue-next-task"), target: z.enum(["offering-team", "random-other-team"]) }),
+  z.object({ type: z.literal("boost-next-community-event") }),
+  z.object({ type: z.literal("none") }),
+]);
+
+const offeringOutcomeSchema = z.object({
+  id: idSchema,
+  category: z.enum(["beneficial", "community", "humorous", "neutral"]),
+  announcement: z.string().min(1),
+  effect: offeringEffectSchema,
 });
 
 export const journeySchema = z
@@ -214,6 +312,7 @@ export const journeySchema = z
     milestones: z.array(milestoneSchema).min(2),
     entries: z.array(z.discriminatedUnion("kind", [stageSchema, forkSchema])).min(1),
     communityEvents: z.array(communityEventSchema),
+    offeringOutcomes: z.array(offeringOutcomeSchema).min(1),
   })
   .superRefine((journey, ctx) => {
     const milestoneIds = new Set(journey.milestones.map((m) => m.id));
@@ -274,6 +373,18 @@ export const journeySchema = z
         });
       }
     });
+
+    // The offering pool must be drawable at every weight category (§10/§36).
+    const offeringCategories = new Set(journey.offeringOutcomes.map((o) => o.category));
+    for (const category of ["beneficial", "community", "humorous", "neutral"] as const) {
+      if (!offeringCategories.has(category)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["offeringOutcomes"],
+          message: `Offering pool has no "${category}" outcome; every weight category needs at least one.`,
+        });
+      }
+    }
 
     // Community events must sit on real milestones, one event per milestone.
     const eventMilestones = new Set<string>();

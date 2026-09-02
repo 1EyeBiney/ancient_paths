@@ -10,10 +10,26 @@ for decided amendments + open items. Boot page loads + validates the sample
 General Bible pack and Jerusalem-to-Rome journey, reporting visually and via
 a live region.
 
-Phase 2 scope (design doc §34): headless engine — state machine (§25 states
-in src/engine/types.ts), turn order, stage successes, fork locking,
-resources, amplified outcomes, Journey Tokens, surplus, Service, milestone
-triggers, victory — driven entirely by the §33.1 test list, no UI.
+Phase 2 scope (design doc §34): headless engine — see **PHASE2_SPEC.md**,
+the binding implementation contract (state machine, command API, rule
+details, ~45-test list in groups A–I, definition of done). The design doc
+is now revision 1.1 (host-as-player amendments applied in-place).
+
+## Rules for unattended coding agents (Sonnet sessions)
+
+Brian's workflow: Fable plans and writes specs; Sonnet implements
+unattended. If you are the implementing agent:
+
+1. Read PHASE2_SPEC.md (or the current phase's spec) FIRST; it outranks
+   improvisation. Work test-first, one test group at a time.
+2. Run `npm test` and `npx tsc --noEmit` before every commit; never commit
+   red; commit per green group with a descriptive message.
+3. NEVER modify: the design doc, src/content/schemas.ts, sample content,
+   or specs — if blocked by them, write the problem to OPEN_QUESTIONS.md
+   and continue with another group.
+4. Update IMPLEMENTATION_STATUS.md as groups complete.
+5. No new dependencies without recording the reason in OPEN_QUESTIONS.md.
+6. Push to origin when a session's work is green and committed.
 
 The authoritative spec is `design starter for Ancient Paths - journeys through Bible lands.md`
 (38 sections — read it before doing anything; its §1 binds AI agents: preserve

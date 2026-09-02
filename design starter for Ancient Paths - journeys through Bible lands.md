@@ -3,7 +3,8 @@
 ## Game Design and Technical Requirements
 
 **Working title:** The Way: A Journey Through Bible Lands  
-**Document status:** Initial authoritative design specification  
+**Document status:** Authoritative design specification, revision 1.1 (2026-09-02)  
+**Revision 1.1:** Host-as-player model adopted — the host never learns an answer before the team commits; the reveal precedes the ruling; Provision "retry" is now "recover" (replacement task). Hosting is internet-served (GitHub Pages); mouse and visual play are first-class alongside keyboard and screen reader. Sections 8.2, 14, 15, 20, and 25 amended accordingly.  
 **Primary platform:** Desktop web application  
 **Primary operator:** A single game host using a keyboard  
 **Audience:** Church groups of approximately 20–40 people divided into teams  
@@ -446,15 +447,15 @@ Provision is the flexibility and protection resource.
 
 Possible uses include:
 
-- retry a failed task;
+- recover from a failed task by drawing a replacement task;
 - reduce an authored challenge to its assisted form;
 - replace an eligible challenge;
 - protect against a mild negative random effect;
 - receive a more accessible version of a supported task.
 
-Some Provision effects occur before an answer. A retry occurs after a failed answer.
+Some Provision effects occur before an answer. Recovery occurs after a failed answer.
 
-A retry must use the task’s authored retry rules. The application must not invent an untested variation automatically.
+Recovery draws a replacement task of the same category and difficulty from the session deck's reserves, for the same success opportunity, during the same turn. Because the official answer is revealed to the whole room before the ruling, a failed task is never re-asked. Where content authors an explicit recovery variant for a task, that authored form is used instead. The application must not invent an untested variation automatically.
 
 ## 8.3 Courage
 
@@ -783,24 +784,26 @@ Each task declares:
 - whether amplification is available;
 - the cost of each interaction;
 - the success value;
-- how retries work;
+- how recovery works, when applicable;
 - which assets are required.
 
 ---
 
 # 15. Answer Handling
 
-The host rules on spoken answers.
+The host rules on spoken answers, and the host may also be playing on a team.
+
+**Host-as-player rule (revision 1.1):** the host never receives the official answer before a team commits its answer aloud. The sequence is: the team states its final answer to the room, the host presses one Reveal command, the official answer and accepted alternatives are spoken and displayed to everyone at once, and only then does the host rule. Because the answer is committed publicly before the reveal, the room itself serves as referee — including when the host's own team answers.
 
 The game does not need speech recognition for version one.
 
-The host can mark an answer:
+After the reveal, the host can mark the answer:
 
 - correct;
 - incorrect;
 - skipped.
 
-The interface must display and speak:
+The reveal must display and speak:
 
 - official answer;
 - accepted alternatives;
@@ -809,11 +812,9 @@ The interface must display and speak:
 - optional historical note;
 - host guidance for ambiguous responses.
 
-The host should have one command to reveal the official answer and explanation.
+The host should have one command to perform the reveal.
 
-The answer must remain hidden from the audience display until the host reveals it.
-
-The host interface may privately expose the answer through screen-reader speech only if a secure host mode is implemented. For version one, prefer keeping the answer hidden until the ruling and then revealing it through one command.
+The answer must remain hidden from every display and every speech channel — including the host's — until that command is pressed.
 
 A host correction or undo function must be available in case the wrong ruling key is pressed.
 
@@ -1113,11 +1114,23 @@ Confirm resource spending before applying it.
 
 ## 20.6 Accept Answer
 
-The host indicates that the team has provided its final answer.
+The team states its final answer aloud to the room. The host indicates that the answer has been given.
 
 Resource changes that are not valid after the answer are now locked.
 
-## 20.7 Host Ruling
+## 20.7 Answer Reveal
+
+The host activates the reveal.
+
+The system presents to the entire room at once:
+
+- official answer;
+- accepted alternatives;
+- host guidance for ambiguous responses.
+
+No one, including the host, hears the answer before this moment.
+
+## 20.8 Ruling, Recovery, and Teaching
 
 The host marks:
 
@@ -1125,16 +1138,11 @@ The host marks:
 - incorrect;
 - skipped.
 
-If incorrect and an eligible retry is available, offer the retry before final resolution.
+If incorrect and the team can afford recovery, offer the Provision recovery: a replacement task of the same category and difficulty, drawn from the deck's reserves, attempted during this turn for the same success opportunity.
 
-## 20.8 Reveal and Teaching
-
-The host activates the reveal.
-
-The system presents:
+The system then presents:
 
 - correct or incorrect audio cue;
-- official answer;
 - short teaching reveal;
 - historical note when appropriate.
 
@@ -1442,9 +1450,9 @@ Suggested high-level states:
 - task presentation;
 - resource window;
 - awaiting answer;
-- host ruling;
-- retry decision;
 - answer reveal;
+- host ruling;
+- recover decision;
 - teaching reveal;
 - progress resolution;
 - surplus decision;

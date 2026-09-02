@@ -27,6 +27,7 @@
         "available": true,
         "cost": { "resource": "insight", "amount": 1 },
         "prompt": "Was the replacement Matthias, Silas, or Barnabas?",
+        "options": ["Matthias", "Silas", "Barnabas"],
         "successValue": 1
       },
       "amplifiedVariant": {

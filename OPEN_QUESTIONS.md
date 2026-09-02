@@ -30,6 +30,18 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    self-produced renditions. Narration is text-first; produced recordings
    come later.
 
+8. **DECIDED (2026-09-02, round 2)** — Design doc amended to revision 1.1
+   (host-as-player throughout §8.2/§14/§15/§20/§25). Multiple-choice options
+   are structured data on task variants; Insight's eliminate-option works
+   only where options exist and one option must contain the answer
+   (validated). Community Events ship as exactly two data-driven shapes in
+   v1: relay and contribution (see schemas + PHASE2_SPEC). Offering
+   outcomes are authored data in the journey (weighted pool, every category
+   present, no severe negatives; "none" carries humor). Endgame: the round
+   finishes so all teams get equal turns; same-round finishers share the
+   victory. Duration estimator formula per PHASE2_SPEC (constants are
+   parameters; playtests tune them).
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
@@ -49,3 +61,8 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
 8. Whether the audience display and host controls are one page (current
    assumption: yes, one window, one page) — revisit if playtests want a
    projector-only view without visible controls.
+9. Task-handling defaults set in PHASE2_SPEC pending Brian's veto: answers
+   are never typed (spoken aloud; engine stores no answer text);
+   eliminate-option is repeatable while more than two options remain;
+   decision-strategy tasks are ruled like any other task via hostGuidance;
+   no per-task timers in v1.
