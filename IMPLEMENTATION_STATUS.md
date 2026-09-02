@@ -4,6 +4,45 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 3 — Session Builder — DONE.** All 11 test groups (S1-S11) are
+  green: 34 tests total (on top of Phase 2's 94, for 128 project-wide),
+  `npx tsc --noEmit` clean, `npm run build` clean. Lives in `src/session/`
+  (builder.ts — `buildSessionDeck()`/`SessionDeck`; plan.ts —
+  `planSession()`/`totalRequiredSuccesses()`). See PHASE3_SPEC.md for the
+  full contract this was built against.
+  - `SessionDeck implements TaskSource`, dropping in as a real replacement
+    for `ArrayTaskSource`: seeded per-team category rotation (streak-limit
+    2, fairness within ±2 per category, excluding "community"),
+    focus-stage round-robin with fallthrough to ordinary rotation,
+    difficulty-weighted draws (gentle/standard/challenging) with a
+    deterministic adjacency fallback for empty buckets, a community-event
+    reserve carved out only from relay events (contribution events never
+    draw from the deck), graceful oldest-first exclusion relaxation when
+    over-exclusion would empty a category, and a two-tier (fail below
+    1.0x / warn below 1.5x projected demand) sufficiency check.
+  - `planSession()` wraps Phase 2's `estimateMinutes` with duration
+    targets (short/standard/long/custom), pace (relaxed/standard/quick,
+    scaling avgTaskSeconds), and the §36 tasksPerTurn-by-team-count table;
+    `totalRequiredSuccesses()` sums top-level stages and averages fork
+    routes (a team only ever travels one route, so expected cost is the
+    mean, not the sum).
+  - `tests/session/group-s11-engine-integration.test.ts` proves the deck
+    slots into the real Phase 2 engine end to end: a full 2-team game
+    (reusing the Phase 2 full-game-smoke driving script) against a real
+    `SessionDeck` reaches gameSummary with a `taskHistory` that's
+    identical across two runs of the same seed and diverges across a
+    changed one.
+  - Minor prose-precision note, not a blocking bug: PHASE3_SPEC's own
+    "~59 minutes" reference anchor computes to 60.333... min under the
+    formula exactly as specified; the actual binding requirement (landing
+    inside the standard target's no-warning band) holds regardless —
+    pinned exactly in `tests/session/group-s10-plan-session.test.ts`.
+  - No bugs were found in `src/session/` during test-writing — every
+    test-group failure along the way traced back to test setup, never the
+    implementation. No changes were made to `src/engine/`,
+    `src/content/schemas.ts`, sample content, or any spec file during
+    Phase 3.
+
 - **Phase 2 — Headless Game Engine — DONE.** All 9 test groups (A-I) plus
   the "definition of done" full-game smoke test are green: 94 tests total,
   `npx tsc --noEmit` clean, `npm run build` clean. Engine lives in
@@ -65,19 +104,16 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- (nothing in flight — Phase 2 complete; Phase 3 not yet started)
+- (nothing in flight — Phase 3 complete; Phase 4 not yet started)
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
-    claimed 50-60 min. See OPEN_QUESTIONS.md.
+    claimed 50-60 min. See OPEN_QUESTIONS.md (item 11, RESOLVED — the
+    formula and constants stand as implemented; the design consequence
+    moves to journey authoring, not the estimator).
 
 ## Remaining
 
-- Phase 3 — Session builder (seeded balanced decks; the duration estimator
-  itself already exists in `src/engine/estimator.ts` from Phase 2 — Phase 3
-  wires it into real setup-time deck generation and replaces
-  `ArrayTaskSource` with a real balanced `TaskSource` implementation behind
-  the same interface).
 - Phase 4 — Accessible host interface (dual modality: mouse/visual AND
   keyboard/screen reader).
 - Phase 5 — Audience presentation (same single window per current plan).
