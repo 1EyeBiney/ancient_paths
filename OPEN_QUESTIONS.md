@@ -73,3 +73,19 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    eliminate-option is repeatable while more than two options remain;
    decision-strategy tasks are ruled like any other task via hostGuidance;
    no per-task timers in v1.
+11. **UNRESOLVED — estimator formula vs. its own worked example.**
+    PHASE2_SPEC.md's duration estimator, run exactly as specified against
+    its own worked example (4 teams, 3 tasks/turn, 9 required successes,
+    2 community events, and the formula's own literal default constants),
+    computes ~72.7 minutes — not the "50-60 min" the spec claims for that
+    same example. `turnOverheadSeconds = 50s` is the constant responsible;
+    holding everything else fixed, a value around 5-15s would land the
+    example in the claimed range. The Phase 2 implementation
+    (`src/engine/estimator.ts`) follows the formula literally and is
+    tested against its actual output (see `tests/engine/group-i-undo-log.test.ts`),
+    not the unreachable range — per the rule not to silently alter a spec
+    value. Needs a decision: adjust `turnOverheadSeconds` (or another
+    constant), or accept a longer real-world estimate and adjust the
+    Short/Standard/Long stage-count targets in decision 6 above instead.
+    Either way, revisit once real playtesting gives actual per-task and
+    per-turn timings.

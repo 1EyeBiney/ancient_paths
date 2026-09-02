@@ -1,19 +1,31 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 1 COMPLETE (2026-09-02) — next up: Phase 2, the headless engine
+## Status: PHASE 2 COMPLETE (2026-09-02) — next up: Phase 3, the session builder
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (18/18 passing),
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (94/94 passing),
 `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./" for Pages).
 See IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
-for decided amendments + open items. Boot page loads + validates the sample
-General Bible pack and Jerusalem-to-Rome journey, reporting visually and via
-a live region.
+for decided amendments + open items. Boot page loads + validates the dev
+sample pack and Jerusalem-to-Rome journey, reporting visually and via a
+live region (this predates and is separate from the Phase 2 engine — the
+engine has no UI yet).
 
-Phase 2 scope (design doc §34): headless engine — see **PHASE2_SPEC.md**,
-the binding implementation contract (state machine, command API, rule
-details, ~45-test list in groups A–I, definition of done). The design doc
-is now revision 1.1 (host-as-player amendments applied in-place).
+**Phase 2 (headless engine) is done**, built against **PHASE2_SPEC.md**
+(the binding contract — state machine, command API, rule details, the A-I
+test groups, definition of done) by an unattended Sonnet implementing
+agent per the rules below. Engine lives in `src/engine/`. All 9 groups plus
+a full-game smoke test are green; see IMPLEMENTATION_STATUS.md's Phase 2
+entry for what was actually built, including two test-ergonomics additions
+(`EngineOptions.startingResources`, a few read-API getters) and one
+documented spec discrepancy in the duration estimator that was NOT silently
+patched. The design doc is revision 1.1 (host-as-player amendments applied
+in-place).
+
+Phase 3 scope (design doc §34): session builder — seeded balanced deck
+generation replacing `ArrayTaskSource` behind the same `TaskSource`
+interface the engine already consumes; wiring `estimateMinutes()` (already
+built) into real setup-time duration estimates.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

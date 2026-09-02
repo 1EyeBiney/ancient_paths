@@ -4,6 +4,38 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 2 — Headless Game Engine — DONE.** All 9 test groups (A-I) plus
+  the "definition of done" full-game smoke test are green: 94 tests total,
+  `npx tsc --noEmit` clean, `npm run build` clean. Engine lives in
+  `src/engine/` (engine.ts, types.ts, rng.ts, errors.ts, taskSource.ts,
+  estimator.ts, offering.ts). See PHASE2_SPEC.md for the full contract this
+  was built against, and the group-by-group notes below (kept for
+  traceability) for what each test group actually covers.
+  - `tests/engine/full-game-smoke.test.ts` plays a complete 2-team game
+    against the real testJourney/testPack fixtures — stages, a fork, both
+    community event kinds, surplus/offering, a Journey Token, and Provision
+    recovery — start to gameSummary, in one continuous script driven
+    reactively off `getState()` rather than a hard-coded turn count.
+  - Known spec discrepancy, NOT silently fixed: PHASE2_SPEC's estimator
+    worked example (4 teams, 3 tasks, 9 successes, 2 events) computes
+    ~72.7 min under the formula exactly as specified, not the claimed
+    50-60 min; `turnOverheadSeconds=50s` is the constant driving the gap
+    (dropping it to roughly 5-15s would land the example in range). See
+    OPEN_QUESTIONS.md. The engine implements the formula literally; Group I's
+    test asserts the actual ~72.7 min output, not the unreachable range.
+  - Test-ergonomics additions to the engine beyond PHASE2_SPEC's literal
+    text (all additive, none change real-game defaults):
+    `EngineOptions.startingResources` (real play still starts every team at
+    0/0/0), `getPendingSurplus()`, `getPendingChoicesForTeam()`, and
+    `getEffectiveStageRequirement()` on the read API.
+  - `TeamState.pendingForkId` and 4 endgame/position fields
+    (`stagesBeyondMilestone`, `finishedTeamIds`, `roundNumber`,
+    `finishRoundNumber`) were added to `src/engine/types.ts`; two flat
+    costs the design doc leaves unspecified (`insightEffectCost`,
+    `recoverCostProvision`) were added to `src/config/defaults.ts`. No
+    changes were made to `src/content/schemas.ts`, sample content, or the
+    design doc during Phase 2.
+
 - **Phase 1 — Project Foundation**
   - TypeScript + Vite + Vitest + Zod project scaffold (static build,
     `base: "./"` for GitHub Pages).
@@ -33,38 +65,7 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- **Phase 2 — Headless engine, in progress** (implementing agent: Sonnet,
-  per CLAUDE.md's unattended rules). Engine core built in
-  `src/engine/engine.ts` plus support modules (`rng.ts`, `errors.ts`,
-  `taskSource.ts`, `estimator.ts`, `offering.ts`); `src/engine/types.ts`
-  extended with `stagesBeyondMilestone`, `finishedTeamIds`, `roundNumber`,
-  `finishRoundNumber`. `src/config/defaults.ts` extended with
-  `insightEffectCost` and `recoverCostProvision` (flat costs the design doc
-  leaves as unspecified numbers). Test fixtures in `tests/engine/fixtures.ts`.
-  - Group A (foundation) — DONE, 9 tests passing.
-  - Group B (turns/stages) — DONE, 7 tests passing.
-  - Group C (forks) — DONE, 5 tests passing.
-  - Group D (resources) — DONE, 11 tests passing. Added
-    `EngineOptions.startingResources` (defaults to 0/0/0 for real play; lets
-    tests seed a team with resources to spend without playing through
-    several stages to earn them organically first).
-  - Group E (reveal privacy) — DONE, 5 tests passing.
-  - Group F (tokens/surplus/offering) — DONE, 11 tests passing. Added
-    `getPendingSurplus()` to the read API and a `fixedRng` test double
-    (scripted `Rng` sequence) used to deterministically hit specific
-    offering-pool branches; F7 statistically verifies the weighted draw
-    over 4,000 samples.
-  - Group G (milestones/events) — DONE, 8 tests passing. Added
-    `getPendingChoicesForTeam()` to the read API.
-  - Group H (endgame/service) — DONE, 7 tests passing. Uses two bespoke
-    short journeys (defined locally in the test file) rather than
-    testJourney, to keep full-game traces to the finish readable.
-  - Group I — engine logic (undo/log, estimator) is implemented in
-    engine.ts already, but its dedicated test file is still being written.
-    Do not assume behavior is correct until its tests are green — see
-    PHASE2_SPEC.md test list. Note: the estimator's known spec discrepancy
-    (see Active notes above) still needs a test written against the
-    formula's ACTUAL output, not the spec's claimed 50-60 min.
+- (nothing in flight — Phase 2 complete; Phase 3 not yet started)
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
@@ -72,10 +73,11 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Remaining
 
-- Phase 2 — Headless game engine (state machine, turns, stages, forks,
-  resources, amplified outcomes, Journey Tokens, surplus, Service,
-  milestones, victory) with the §33.1 test list.
-- Phase 3 — Session builder (seeded balanced decks, duration estimator).
+- Phase 3 — Session builder (seeded balanced decks; the duration estimator
+  itself already exists in `src/engine/estimator.ts` from Phase 2 — Phase 3
+  wires it into real setup-time deck generation and replaces
+  `ArrayTaskSource` with a real balanced `TaskSource` implementation behind
+  the same interface).
 - Phase 4 — Accessible host interface (dual modality: mouse/visual AND
   keyboard/screen reader).
 - Phase 5 — Audience presentation (same single window per current plan).
