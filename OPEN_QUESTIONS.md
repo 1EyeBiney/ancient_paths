@@ -72,6 +72,28 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     PHASE4_SPEC). Phase 4 has no persistence — a page refresh loses the
     game until Phase 8.
 
+14. **Found during Phase 4 Group U3, NOT silently patched.** The
+    `GameState` type (`src/engine/types.ts`) declares `taskPreview`,
+    `taskPresentation`, `progressResolution`, `stageCompletion`, and
+    `hostRuling` — part of design doc §25's full suggested state list —
+    but a full read of every `session.state = "..."` assignment in
+    `src/engine/engine.ts` (Phase 2) shows the real dispatch logic never
+    enters any of them: `presentTask` goes straight from `beginTurn` to
+    `resourceWindow`, and progress/stage-completion bookkeeping happens
+    inline within other transitions rather than as its own observable
+    state. The 12 states the engine actually reaches are: `ready`,
+    `beginTurn`, `forkChoice`, `resourceWindow`, `awaitingAnswer`,
+    `answerReveal`, `recoverDecision`, `teachingReveal`,
+    `surplusDecision`, `landmarkIntroduction`, `communityEvent`,
+    `gameSummary`. `src/ui/keys.ts`'s `ENGINE_PLAY_STATES` constant (and
+    every "global" keybinding's legality) is built from this reachable
+    set, not the full type union — documented there and in
+    KEYBOARD_COMMANDS.md rather than fixed, per the rule not to modify
+    `src/engine/`. `src/ui/screens.ts` should follow the same reachable
+    set when it's built. Not a bug to fix, just a real gap between the
+    type's aspirational completeness and what Phase 2 actually built;
+    revisit only if a later phase needs one of the five unused states.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
