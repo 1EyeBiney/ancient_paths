@@ -27,6 +27,11 @@ export const DEFAULTS = {
   },
   // Public name of the Service recognition (design doc §6.3): configurable.
   serviceAwardPublicName: "Barnabas Award",
+
+  // Phase 2 engine costs the design doc leaves unspecified as flat numbers.
+  // Centralized here rather than hard-coded in the engine (§27.6 spirit).
+  insightEffectCost: 1, // extra-clue / eliminate-option / replay, per use
+  recoverCostProvision: 1, // Provision "recover" after an incorrect ruling
 } as const;
 
 export type GameDefaults = typeof DEFAULTS;

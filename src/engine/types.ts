@@ -22,6 +22,11 @@ export interface TeamState {
   resources: Record<ResourceType, number>;
   hasJourneyToken: boolean;
   serviceScore: number;
+
+  // Position bookkeeping for the §21 shortened-ending comparator: how many
+  // stages this team has completed since it last arrived at a milestone.
+  // Reset to 0 on arrival, incremented on each subsequent stage completion.
+  stagesBeyondMilestone: number;
 }
 
 export interface TaskAttempt {
@@ -84,4 +89,9 @@ export interface PlaySession {
   triggeredMilestones: string[];
   taskHistory: TaskAttempt[];
   eventLog: GameEvent[];
+
+  // Endgame bookkeeping (§21 + the 2026-09-02 "finish the round" ruling).
+  finishedTeamIds: string[];
+  roundNumber: number;
+  finishRoundNumber: number | null;
 }

@@ -33,8 +33,25 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- (nothing in flight — Phase 2 is specified and ready to implement
-  against PHASE2_SPEC.md)
+- **Phase 2 — Headless engine, in progress** (implementing agent: Sonnet,
+  per CLAUDE.md's unattended rules). Engine core built in
+  `src/engine/engine.ts` plus support modules (`rng.ts`, `errors.ts`,
+  `taskSource.ts`, `estimator.ts`, `offering.ts`); `src/engine/types.ts`
+  extended with `stagesBeyondMilestone`, `finishedTeamIds`, `roundNumber`,
+  `finishRoundNumber`. `src/config/defaults.ts` extended with
+  `insightEffectCost` and `recoverCostProvision` (flat costs the design doc
+  leaves as unspecified numbers). Test fixtures in `tests/engine/fixtures.ts`.
+  - Group A (foundation) — DONE, 9 tests passing.
+  - Groups B-I — engine logic for all of them is implemented in engine.ts
+    already (turns/stages, forks, resources, reveal privacy, tokens/
+    surplus/offering, milestones/events, endgame/service, undo/log,
+    estimator), but their dedicated test files are still being written and
+    verified one group at a time. Do not assume behavior is correct until
+    its group's tests are green — see PHASE2_SPEC.md test list.
+  - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
+    estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
+    computes ~72.7 min under the formula as literally specified, not the
+    claimed 50-60 min. See OPEN_QUESTIONS.md.
 
 ## Remaining
 
