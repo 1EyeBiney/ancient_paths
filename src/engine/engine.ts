@@ -202,6 +202,7 @@ export interface GameEngine {
   getAvailableRoutes(): RouteInfo[] | null;
   getEffectiveStageRequirement(teamId: string): number | null;
   getPendingSurplus(): number;
+  getPendingChoicesForTeam(teamId: string): number;
   getSummary(): GameSummary | null;
   statusText(): string;
   allPositionsText(): string;
@@ -1134,6 +1135,11 @@ class Engine implements GameEngine {
 
   getPendingSurplus(): number {
     return this.state.pendingSurplus;
+  }
+
+  /** Count of outstanding "choice" resource grants awaiting chooseGrantedResource for this team. */
+  getPendingChoicesForTeam(teamId: string): number {
+    return this.state.pendingChoices.filter((c) => c.teamId === teamId).length;
   }
 
   getSummary(): GameSummary | null {
