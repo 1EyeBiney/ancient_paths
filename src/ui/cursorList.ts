@@ -39,14 +39,23 @@ export class CursorList {
     container.tabIndex = 0;
     if (ariaLabel) container.setAttribute("aria-label", ariaLabel);
     this.rowElements.length = 0;
-    for (const item of items) {
+    items.forEach((item, index) => {
       const row = document.createElement("div");
       row.setAttribute("role", "option");
       row.id = `cursor-item-${item.id}`;
       row.textContent = item.label;
+      // Mouse parity (dual-modality, CLAUDE.md decision #2): a click both
+      // selects and confirms, the mouse equivalent of arrowing-to-it then
+      // pressing Enter.
+      row.addEventListener("click", () => {
+        this.cursor = index;
+        this.applySelection();
+        this.options.present({ visual: `${item.label} chosen.` });
+        this.options.onConfirm(item, index);
+      });
       container.appendChild(row);
       this.rowElements.push(row);
-    }
+    });
     this.applySelection();
   }
 

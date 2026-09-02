@@ -44,6 +44,13 @@ export interface ScreenRendererOptions {
   tasksById: Map<string, Task>;
   present: (input: PresentInput) => void;
   onNewGame?: () => void;
+  /** Called after any action's run() fires (mouse click or keyboard
+   * dispatch alike), so the caller can re-render against the engine's new
+   * state. Without this, only the caller's OWN explicit re-render (as
+   * app.ts does after a keyboard dispatch) would fire — a mouse click,
+   * which calls action.run() directly, would otherwise leave a stale
+   * screen up. */
+  onAfterAction?: () => void;
 }
 
 type JourneyEntry = Journey["entries"][number];
@@ -212,7 +219,11 @@ export class ScreenRenderer {
       container: list,
       items: actions.map((a) => ({ id: a.id, label: a.label })),
       present: (input) => this.present(input),
-      onConfirm: (item) => actions.find((a) => a.id === item.id)?.run(),
+      onConfirm: (item) => {
+        const action = actions.find((a) => a.id === item.id);
+        if (action) this.runActionSafely(action);
+        this.options.onAfterAction?.();
+      },
       ariaLabel: "Route choices",
     });
 
@@ -398,7 +409,11 @@ export class ScreenRenderer {
       },
       { id: "declineRecover", label: "Decline", run: () => engine.dispatch({ type: "declineRecover" }) },
     ];
-    this.renderButtons(container, actions);
+    // A cursor list (not just buttons + a single Enter default) because
+    // there are two genuinely different, non-equivalent choices here and
+    // neither has its own dedicated key — this is how a keyboard-only host
+    // picks between them.
+    this.renderChoiceList(container, actions, "Recovery choice");
     this.present({ visual: `${heading} The team may spend Provision for a fresh task, same turn.` });
     return { heading, actions, primaryActionId: null };
   }
@@ -438,7 +453,7 @@ export class ScreenRenderer {
       })),
       { id: "offerSurplus", label: "Offer as an offering", run: () => engine.dispatch({ type: "offerSurplus" }) },
     ];
-    this.renderButtons(container, actions);
+    this.renderChoiceList(container, actions, "Surplus choice");
     this.present({ visual: `${heading} Keep it as a resource, or offer it.` });
     return { heading, actions, primaryActionId: null };
   }
@@ -485,50 +500,63 @@ export class ScreenRenderer {
     container.appendChild(el("p", { text: event.description }));
 
     const actions: ScreenAction[] = [];
+    const pledgeActions: ScreenAction[] = [];
 
     if (event.kind === "relay") {
       container.appendChild(el("p", { text: `Room progress: ${tracker.roomProgress} of ${event.successThreshold}.` }));
       const remaining = teams.filter((t) => !tracker.answeredTeamIds.includes(t.id));
-      const current = remaining[0] ?? teams[0]!;
-      container.appendChild(el("p", { text: `Now answering: Team ${current.name}.` }));
+      const current = remaining[0];
 
-      const relayRule = (correct: boolean) => {
-        if (correct) tracker.roomProgress++;
-        tracker.answeredTeamIds.push(current.id);
-        engine.dispatch({ type: "relayAnswer", teamId: current.id, correct });
-      };
-      actions.push(
-        { id: "ruleCorrect", label: `Team ${current.name}: correct`, run: () => relayRule(true) },
-        { id: "ruleIncorrect", label: `Team ${current.name}: incorrect`, run: () => relayRule(false) },
-      );
-      this.present({
-        visual: `${heading}. Room progress ${tracker.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
-      });
+      if (current) {
+        container.appendChild(el("p", { text: `Now answering: Team ${current.name}.` }));
+        const relayRule = (correct: boolean) => {
+          if (correct) tracker.roomProgress++;
+          tracker.answeredTeamIds.push(current.id);
+          engine.dispatch({ type: "relayAnswer", teamId: current.id, correct });
+        };
+        actions.push(
+          { id: "ruleCorrect", label: `Team ${current.name}: correct`, run: () => relayRule(true) },
+          { id: "ruleIncorrect", label: `Team ${current.name}: incorrect`, run: () => relayRule(false) },
+        );
+        this.present({
+          visual: `${heading}. Room progress ${tracker.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
+        });
+      } else {
+        container.appendChild(el("p", { text: "Every team has answered." }));
+        this.present({ visual: `${heading}. Every team has answered. Resolve when ready.` });
+      }
     } else {
       const remaining = teams.filter((t) => !(t.id in tracker.pledged));
-      const current = remaining[0] ?? teams[0]!;
-      container.appendChild(
-        el("p", { text: `Now pledging: Team ${current.name}. Accepted: ${event.acceptedResources.join(", ")}.` }),
-      );
-      for (const resource of event.acceptedResources) {
-        actions.push({
-          id: `contribute-${resource}`,
-          label: `Team ${current.name}: contribute 1 ${resource}`,
+      const current = remaining[0];
+
+      if (current) {
+        container.appendChild(
+          el("p", { text: `Now pledging: Team ${current.name}. Accepted: ${event.acceptedResources.join(", ")}.` }),
+        );
+        for (const resource of event.acceptedResources) {
+          pledgeActions.push({
+            id: `contribute-${resource}`,
+            label: `Team ${current.name}: contribute 1 ${resource}`,
+            run: () => {
+              tracker.pledged[current.id] = { resource, amount: 1 };
+              engine.dispatch({ type: "contribute", teamId: current.id, resource, amount: 1 });
+            },
+          });
+        }
+        pledgeActions.push({
+          id: "declineContribution",
+          label: `Team ${current.name}: decline`,
           run: () => {
-            tracker.pledged[current.id] = { resource, amount: 1 };
-            engine.dispatch({ type: "contribute", teamId: current.id, resource, amount: 1 });
+            tracker.pledged[current.id] = "declined";
+            engine.dispatch({ type: "declineContribution", teamId: current.id });
           },
         });
+        actions.push(...pledgeActions);
+        this.present({ visual: `${heading}. Now pledging: Team ${current.name}.` });
+      } else {
+        container.appendChild(el("p", { text: "Every team has responded." }));
+        this.present({ visual: `${heading}. Every team has responded. Resolve when ready.` });
       }
-      actions.push({
-        id: "declineContribution",
-        label: `Team ${current.name}: decline`,
-        run: () => {
-          tracker.pledged[current.id] = "declined";
-          engine.dispatch({ type: "declineContribution", teamId: current.id });
-        },
-      });
-      this.present({ visual: `${heading}. Now pledging: Team ${current.name}.` });
     }
 
     actions.push({
@@ -540,8 +568,21 @@ export class ScreenRenderer {
       },
     });
 
-    this.renderButtons(container, actions);
-    return { heading, actions, primaryActionId: null };
+    if (pledgeActions.length > 0) {
+      // Contribution has no dedicated keys (unlike relay's C/I) — a cursor
+      // list is the keyboard path for choosing among 3+ non-equivalent
+      // pledge/decline options.
+      this.renderChoiceList(container, pledgeActions, "Pledge choice");
+      this.renderButtons(
+        container,
+        actions.filter((a) => a.id === "resolveCommunityEvent"),
+      );
+    } else {
+      this.renderButtons(container, actions);
+    }
+    // Enter resolves (a keyboard-only host's natural "I'm done" action);
+    // C/I remain the per-team relay-ruling shortcuts, unaffected.
+    return { heading, actions, primaryActionId: "resolveCommunityEvent" };
   }
 
   // -- gameSummary -------------------------------------------------------
@@ -574,10 +615,30 @@ export class ScreenRenderer {
     this.present({
       visual: `Game over. Journey winner${summary.journeyWinners.length === 1 ? "" : "s"}: ${winners}. Barnabas Award: ${barnabas || "not awarded"}.`,
     });
-    return { heading, actions, primaryActionId: null };
+    return { heading, actions, primaryActionId: "newGame" };
   }
 
   // -- DOM helpers -------------------------------------------------------
+
+  /** A keyboard-navigable cursor list for a screen with several genuinely
+   * different, non-equivalent choices and no dedicated key for each — the
+   * same pattern as forkChoice's route list. Rows are also clickable
+   * (dual-modality). */
+  private renderChoiceList(container: HTMLElement, actions: ScreenAction[], ariaLabel: string): void {
+    const list = el("div");
+    container.appendChild(list);
+    this.activeCursorList = new CursorList({
+      container: list,
+      items: actions.map((a) => ({ id: a.id, label: a.label })),
+      present: (input) => this.present(input),
+      ariaLabel,
+      onConfirm: (item) => {
+        const action = actions.find((a) => a.id === item.id);
+        if (action) this.runActionSafely(action);
+        this.options.onAfterAction?.();
+      },
+    });
+  }
 
   private renderButtons(container: HTMLElement, actions: ScreenAction[]): void {
     const list = el("div", { className: "actions" });
@@ -586,10 +647,32 @@ export class ScreenRenderer {
       button.type = "button";
       button.textContent = action.label;
       button.dataset.actionId = action.id;
-      button.addEventListener("click", () => action.run());
+      button.addEventListener("click", () => {
+        this.runActionSafely(action);
+        this.options.onAfterAction?.();
+      });
       list.appendChild(button);
     }
     container.appendChild(list);
+  }
+
+  /**
+   * Every action.run() call in this file goes through here, whether it
+   * came from a mouse click or a keyboard-dispatched command (app.ts's own
+   * runAction() has an equivalent catch for actions it runs directly) —
+   * "the engine throws IllegalCommandError and reverts — catch it, present
+   * the message politely, never crash" applies to BOTH input paths
+   * equally, not just the keyboard one.
+   */
+  private runActionSafely(action: ScreenAction): void {
+    try {
+      action.run();
+    } catch (err) {
+      this.present({
+        visual: err instanceof Error ? err.message : "That could not be done right now.",
+        channel: "assertive",
+      });
+    }
   }
 }
 

@@ -37,22 +37,13 @@
 </style>
 </head>
 <body>
-<header>
-  <h1>The Way</h1>
-  <p class="tagline">A Journey Through Bible Lands — engine under construction.</p>
-</header>
-<main>
-  <h2>Content check</h2>
-  <p id="status-line" role="status">Loading content&hellip;</p>
-  <div id="report"></div>
-</main>
-<div id="announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="app">Loading&hellip;</div>
 <script>
   // Opened by double-click (file://), the module script and content JSON
-  // cannot load, so say so instead of hanging at "Loading content".
+  // cannot load, so say so instead of hanging at "Loading...".
   // Served over http (npm run dev, or GitHub Pages), this never fires.
   if (location.protocol === "file:") {
-    document.getElementById("status-line").textContent =
+    document.getElementById("app").textContent =
       "This page needs its local server and cannot run from a double-clicked file. " +
       "Open a terminal in the project folder, run: npm run dev — then open the " +
       "address it prints, usually localhost port 5173. Once the game is published " +
