@@ -48,7 +48,8 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
     `EngineOptions.startingResources` (defaults to 0/0/0 for real play; lets
     tests seed a team with resources to spend without playing through
     several stages to earn them organically first).
-  - Groups E-I — engine logic for all of them is implemented in engine.ts
+  - Group E (reveal privacy) — DONE, 5 tests passing.
+  - Groups F-I — engine logic for all of them is implemented in engine.ts
     already (reveal privacy, tokens/surplus/offering, milestones/events,
     endgame/service, undo/log, estimator), but their dedicated test files
     are still being written and verified one group at a time. Do not assume
