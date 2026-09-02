@@ -1,32 +1,30 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 3 COMPLETE (2026-09-02) — next up: Phase 4, the accessible host interface
+## Status: PHASE 4 COMPLETE (2026-09-02) — next up: Phase 5, audience presentation
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (128/128
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (228/228
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages). See IMPLEMENTATION_STATUS.md for the full inventory and
 OPEN_QUESTIONS.md for decided amendments + open items.
 
-**Phases 2 and 3 are done**, each built against its binding spec
+**Phases 2, 3, and 4 are done**, each built against its binding spec
 (PHASE2_SPEC.md: the headless engine in `src/engine/`, groups A-I plus a
 full-game smoke test; PHASE3_SPEC.md: the session builder in
 `src/session/`, groups S1-S11 including real SessionDeck-in-engine
-integration) by an unattended Sonnet implementing agent per the rules
-below. The design doc is revision 1.1 (host-as-player amendments applied
-in-place). The Phase 2 estimator discrepancy is RESOLVED (the spec's own
-arithmetic error; formula stands — OPEN_QUESTIONS item 11).
+integration; PHASE4_SPEC.md: the accessible host interface in `src/ui/`,
+groups U1-U10 including a complete keyboard-only AND mouse-only game) by
+an unattended Sonnet implementing agent per the rules below. The design
+doc is revision 1.1 (host-as-player amendments applied in-place). The
+Phase 2 estimator discrepancy is RESOLVED (the spec's own arithmetic
+error; formula stands — OPEN_QUESTIONS item 11). The game now has a real
+UI: `index.html`/`src/main.ts` boot `src/ui/app.ts`, replacing the old
+Phase 1 boot page.
 
-**Phase 4 is specified and ready to implement**: see **PHASE4_SPEC.md**
-(the binding contract — presenter/parity rules, keyboard system, setup
-wizard, per-state play screens, ruling flow, undo, modals, U1-U10 test
-groups, definition of done). ACCESSIBILITY_PATTERNS.md is BINDING for
-this phase. Phase 4 replaces the old boot page (index.html/src/main.ts —
-their Phase 3 freeze is over); jsdom is pre-authorized as a devDependency
-for the DOM tests. Note for the implementer: the setup wizard must
-preview on a THROWAWAY deck and build the real one fresh at session
-generation, because SessionDeck.previewPlan() consumes the seeded RNG
-stream (spec'd in PHASE4_SPEC's determinism rule).
+Phase 5 (audience presentation — the visual/map layer over the same DOM,
+per design doc §34) is not yet specified. When ready, Fable writes
+PHASE5_SPEC.md next, following the same review-then-spec handoff pattern
+used for Phases 3 and 4.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

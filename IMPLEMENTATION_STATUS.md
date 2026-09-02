@@ -4,6 +4,69 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 4 — Accessible Host Interface — DONE.** All 10 test groups
+  (U1-U10) are green: 100 tests total (on top of Phase 2+3's 128, for 228
+  project-wide), `npx tsc --noEmit` clean, `npm run build` clean. Lives in
+  `src/ui/` (presenter.ts, speech.ts,
+  keys.ts, cursorList.ts, setup.ts, screens.ts, modal.ts, undo.ts,
+  app.ts); `src/main.ts` and `index.html` were rewritten to boot it,
+  replacing the Phase 1 boot page. See PHASE4_SPEC.md for the full
+  contract this was built against.
+  - `Presenter` is the single funnel for the sighted status line and both
+    live regions (visual/spoken parity is structural, not conventional);
+    `KeyboardController` implements the full ladder (repeat gate, input
+    firewall, native pass-through, state-gated dispatch) plus Brian's
+    help-menu/keyboard-explorer gesture (`?` opens a help menu listing
+    only the current state's legal bindings; a second `?` while it's open
+    closes it and enters an explorer where every key describes its
+    in-game function without executing anything).
+  - `SetupWizard` (pure logic) + `App`'s single-page setup screen cover
+    journey/team-count/team-names/duration/pace/difficulty/seed as real
+    interactive controls; enabled packs/categories, audio settings, and
+    community catch-up stay at sensible defaults this phase (covered by
+    Group U4's unit tests) — a deliberate, noted scope trim for Phase 5's
+    visual pass, not a hidden gap.
+  - `ScreenRenderer` covers all 12 states the Phase 2 engine actually
+    reaches (see OPEN_QUESTIONS item 14 for the 5 declared-but-unused
+    `GameState` members it deliberately doesn't build screens for).
+    `CursorList` is the one reusable accessible selection widget (arrow
+    to move, first-letter type-ahead, Enter confirms, rows also
+    clickable) — used by the setup screen, forkChoice's route list, and
+    (after a real bug was found — see below) recoverDecision,
+    surplusDecision, and a contribution event's pledge choices, none of
+    which had any keyboard path before that fix.
+  - `tests/ui/group-u10-full-game.test.ts` drives a complete 2-team game
+    from the startup screen through real setup to `gameSummary`, once
+    using only dispatched `KeyboardEvent`s and once using only
+    `.click()`, verifying every state actually entered produced at least
+    one announcement — the dual-modality proof.
+  - Three real bugs found and fixed while building Group U10 (not
+    silently worked around in tests): mouse-clicked actions bypassed the
+    illegal-command error handling keyboard-dispatched ones got (fixed by
+    centralizing into one `runActionSafely()`); a contribution community
+    event's screen looped back to team-1 forever once every team had
+    already responded, instead of stopping; recoverDecision,
+    surplusDecision, and contribution pledges had no keyboard path at all
+    (see above).
+  - Two engine-API gaps found and worked around without touching
+    `src/engine/` (OPEN_QUESTIONS item 15): `teachingReveal`'s text isn't
+    in the public read API (worked around via the UI's own loaded
+    content pack, looked up by task id, safe since teaching text only
+    ever shows post-reveal); there's no getter for a community event's
+    live room progress, so the UI tracks it locally from commands it
+    dispatches itself.
+  - Manually smoke-tested in a real browser against the actual
+    dev-sample content: the startup screen, setup wizard, and
+    `SessionBuildError` handling all work correctly live. Starting a
+    real game against the 8-task dev-sample pack correctly fails the
+    sufficiency check (presented politely, not a crash) — expected, since
+    dev-sample is deliberately minimal (CONTENT_AUTHORING.md); a
+    production pack (Phase 9) will have enough content to actually play
+    a full game in the browser.
+  - No changes were made to `src/engine/`, `src/session/`,
+    `src/content/schemas.ts`, sample content, or any spec file during
+    Phase 4. jsdom was added as a devDependency (test-only).
+
 - **Phase 3 — Session Builder — DONE.** All 11 test groups (S1-S11) are
   green: 34 tests total (on top of Phase 2's 94, for 128 project-wide),
   `npx tsc --noEmit` clean, `npm run build` clean. Lives in `src/session/`
@@ -104,10 +167,7 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- Phase 4 — Accessible host interface: PHASE4_SPEC.md written
-  (2026-09-02) and ready for unattended implementation; test groups
-  U1-U10; ACCESSIBILITY_PATTERNS.md binds; jsdom pre-authorized for DOM
-  tests. Implementation not yet started.
+- (nothing in flight — Phase 4 complete; Phase 5 not yet started)
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
@@ -117,8 +177,6 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Remaining
 
-- Phase 4 — Accessible host interface (dual modality: mouse/visual AND
-  keyboard/screen reader).
 - Phase 5 — Audience presentation (same single window per current plan).
 - Phase 6 — Audio system.
 - Phase 7 — Community and offering systems.
