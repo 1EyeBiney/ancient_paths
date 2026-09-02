@@ -56,11 +56,15 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
     over 4,000 samples.
   - Group G (milestones/events) — DONE, 8 tests passing. Added
     `getPendingChoicesForTeam()` to the read API.
-  - Groups H-I — engine logic for both is implemented in engine.ts already
-    (endgame/service, undo/log, estimator), but their dedicated test files
-    are still being written and verified one group at a time. Do not
-    assume behavior is correct until its group's tests are green — see
-    PHASE2_SPEC.md test list.
+  - Group H (endgame/service) — DONE, 7 tests passing. Uses two bespoke
+    short journeys (defined locally in the test file) rather than
+    testJourney, to keep full-game traces to the finish readable.
+  - Group I — engine logic (undo/log, estimator) is implemented in
+    engine.ts already, but its dedicated test file is still being written.
+    Do not assume behavior is correct until its tests are green — see
+    PHASE2_SPEC.md test list. Note: the estimator's known spec discrepancy
+    (see Active notes above) still needs a test written against the
+    formula's ACTUAL output, not the spec's claimed 50-60 min.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
