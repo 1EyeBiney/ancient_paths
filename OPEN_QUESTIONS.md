@@ -53,6 +53,20 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     tasks); the excludeTags/setup-toggle mechanism is designed and shelved.
     ElevenLabs licensing must be confirmed before shipping any voice clip.
 
+13. **DECIDED (2026-09-02, round 5, by the spec author — Brian may veto)**
+    — PHASE4_SPEC.md rulings: ruling keys are C correct / I incorrect /
+    K skipped, SINGLE-press (state-gated, undoable) — press-twice confirm
+    is reserved for undo (Ctrl+Z) and ending the session early. F2 is
+    describe-key mode (F12 stays native for dev tools). Escape opens the
+    game menu when there is nothing to cancel. jsdom is pre-authorized as
+    a devDependency for Phase 4 DOM tests (rule 5 record: needed for
+    headless keyboard/live-region testing; no runtime dependency added).
+    Determinism note: `SessionDeck.previewPlan()` consumes the deck's
+    seeded RNG stream, so setup previews must use a throwaway deck and
+    the real deck is built fresh at session generation (binding in
+    PHASE4_SPEC). Phase 4 has no persistence — a page refresh loses the
+    game until Phase 8.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

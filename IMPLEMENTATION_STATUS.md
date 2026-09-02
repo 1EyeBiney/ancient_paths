@@ -104,7 +104,10 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- (nothing in flight — Phase 3 complete; Phase 4 not yet started)
+- Phase 4 — Accessible host interface: PHASE4_SPEC.md written
+  (2026-09-02) and ready for unattended implementation; test groups
+  U1-U10; ACCESSIBILITY_PATTERNS.md binds; jsdom pre-authorized for DOM
+  tests. Implementation not yet started.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the

@@ -1,34 +1,32 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 2 COMPLETE (2026-09-02) — next up: Phase 3, the session builder
+## Status: PHASE 3 COMPLETE (2026-09-02) — next up: Phase 4, the accessible host interface
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (94/94 passing),
-`npx tsc --noEmit` clean, `npm run build` → dist/ (base "./" for Pages).
-See IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
-for decided amendments + open items. Boot page loads + validates the dev
-sample pack and Jerusalem-to-Rome journey, reporting visually and via a
-live region (this predates and is separate from the Phase 2 engine — the
-engine has no UI yet).
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (128/128
+passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
+for Pages). See IMPLEMENTATION_STATUS.md for the full inventory and
+OPEN_QUESTIONS.md for decided amendments + open items.
 
-**Phase 2 (headless engine) is done**, built against **PHASE2_SPEC.md**
-(the binding contract — state machine, command API, rule details, the A-I
-test groups, definition of done) by an unattended Sonnet implementing
-agent per the rules below. Engine lives in `src/engine/`. All 9 groups plus
-a full-game smoke test are green; see IMPLEMENTATION_STATUS.md's Phase 2
-entry for what was actually built, including two test-ergonomics additions
-(`EngineOptions.startingResources`, a few read-API getters) and one
-documented spec discrepancy in the duration estimator that was NOT silently
-patched. The design doc is revision 1.1 (host-as-player amendments applied
-in-place).
+**Phases 2 and 3 are done**, each built against its binding spec
+(PHASE2_SPEC.md: the headless engine in `src/engine/`, groups A-I plus a
+full-game smoke test; PHASE3_SPEC.md: the session builder in
+`src/session/`, groups S1-S11 including real SessionDeck-in-engine
+integration) by an unattended Sonnet implementing agent per the rules
+below. The design doc is revision 1.1 (host-as-player amendments applied
+in-place). The Phase 2 estimator discrepancy is RESOLVED (the spec's own
+arithmetic error; formula stands — OPEN_QUESTIONS item 11).
 
-**Phase 3 is specified and ready to implement**: see **PHASE3_SPEC.md**
-(the binding contract — deck algorithm, fairness/streak/sufficiency rules,
-planSession duration math with the corrected estimator anchor, S1–S11 test
-groups, definition of done). The estimator discrepancy from Phase 2 is
-RESOLVED (it was the spec's own arithmetic error; formula stands, journey
-authoring absorbs the consequence — see OPEN_QUESTIONS item 11 and the
-correction note in PHASE2_SPEC).
+**Phase 4 is specified and ready to implement**: see **PHASE4_SPEC.md**
+(the binding contract — presenter/parity rules, keyboard system, setup
+wizard, per-state play screens, ruling flow, undo, modals, U1-U10 test
+groups, definition of done). ACCESSIBILITY_PATTERNS.md is BINDING for
+this phase. Phase 4 replaces the old boot page (index.html/src/main.ts —
+their Phase 3 freeze is over); jsdom is pre-authorized as a devDependency
+for the DOM tests. Note for the implementer: the setup wizard must
+preview on a THROWAWAY deck and build the real one fresh at session
+generation, because SessionDeck.previewPlan() consumes the seeded RNG
+stream (spec'd in PHASE4_SPEC's determinism rule).
 
 ## Rules for unattended coding agents (Sonnet sessions)
 
