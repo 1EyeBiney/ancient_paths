@@ -1,0 +1,123 @@
+{
+  "journeyId": "jerusalem-rome",
+  "schemaVersion": 1,
+  "version": "0.1.0",
+  "title": "Jerusalem to Rome",
+  "startMilestoneId": "jerusalem",
+  "destinationMilestoneId": "rome",
+  "milestones": [
+    {
+      "id": "jerusalem",
+      "name": "Jerusalem",
+      "introText": "Jerusalem, the city of the temple, where the church was born at Pentecost and the journey of the gospel begins.",
+      "ambientAudioAsset": null
+    },
+    {
+      "id": "caesarea",
+      "name": "Caesarea",
+      "introText": "Caesarea Maritima, Herod's great harbor on the Mediterranean, gateway between Judea and the wider Roman world.",
+      "ambientAudioAsset": null
+    },
+    {
+      "id": "antioch",
+      "name": "Antioch",
+      "introText": "Antioch on the Orontes, third city of the empire, where believers were first called Christians and missionaries were first sent out.",
+      "ambientAudioAsset": null
+    },
+    {
+      "id": "rome",
+      "name": "Rome",
+      "introText": "Rome, heart of the empire. All roads lead here, and so does the gospel.",
+      "ambientAudioAsset": null
+    }
+  ],
+  "entries": [
+    {
+      "kind": "stage",
+      "id": "judea-road",
+      "name": "The Road from Jerusalem",
+      "requiredSuccesses": 3,
+      "arrivesAtMilestoneId": "caesarea",
+      "taskFocus": ["scripture-knowledge", "bible-reasoning"]
+    },
+    {
+      "kind": "fork",
+      "id": "north-fork",
+      "name": "The Road North Divides",
+      "routes": [
+        {
+          "id": "coastal-route",
+          "name": "Coastal Route",
+          "description": "Four successes required. Easier challenges, primarily listening and general Bible knowledge.",
+          "difficulty": "easy",
+          "taskFocus": ["scripture-knowledge", "audio-listening"],
+          "stages": [
+            {
+              "kind": "stage",
+              "id": "coastal-1",
+              "name": "The Coast Road",
+              "requiredSuccesses": 4,
+              "arrivesAtMilestoneId": "antioch"
+            }
+          ]
+        },
+        {
+          "id": "inland-route",
+          "name": "Inland Route",
+          "description": "Three successes required. Moderate Scripture and reasoning challenges.",
+          "difficulty": "moderate",
+          "taskFocus": ["scripture-knowledge", "bible-reasoning"],
+          "stages": [
+            {
+              "kind": "stage",
+              "id": "inland-1",
+              "name": "The Inland Hills",
+              "requiredSuccesses": 3,
+              "arrivesAtMilestoneId": "antioch"
+            }
+          ]
+        },
+        {
+          "id": "mountain-route",
+          "name": "Mountain Route",
+          "description": "Two successes required. Difficult challenges with greater reward potential.",
+          "difficulty": "hard",
+          "taskFocus": ["bible-reasoning", "historical-context"],
+          "stages": [
+            {
+              "kind": "stage",
+              "id": "mountain-1",
+              "name": "The Mountain Pass",
+              "requiredSuccesses": 2,
+              "arrivesAtMilestoneId": "antioch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "stage",
+      "id": "westward-voyage",
+      "name": "Westward to Rome",
+      "requiredSuccesses": 3,
+      "arrivesAtMilestoneId": "rome",
+      "taskFocus": ["historical-context", "hymn", "decision-strategy"]
+    }
+  ],
+  "communityEvents": [
+    {
+      "id": "caesarea-event",
+      "milestoneId": "caesarea",
+      "title": "The Harbor Gathering",
+      "description": "All teams pause at Herod's harbor for a shared challenge before the roads divide.",
+      "repeatable": false
+    },
+    {
+      "id": "antioch-event",
+      "milestoneId": "antioch",
+      "title": "The Sending Church",
+      "description": "The whole room joins the church at Antioch in a cooperative challenge before the voyage west.",
+      "repeatable": false
+    }
+  ]
+}

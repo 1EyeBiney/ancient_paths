@@ -1,0 +1,15 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Local environment / editor litter
+*.local
+.env
+.env.*
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Audio source masters live outside the repo until curated into content/
+audio_masters/

@@ -1,0 +1,22 @@
+{
+  "name": "the-way",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The Way: A Journey Through Bible Lands — accessible team journey game for church groups.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "zod": "^4.5.4"
+  }
+}

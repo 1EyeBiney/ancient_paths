@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Way: A Journey Through Bible Lands</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --ink: #1c1917;
+    --paper: #faf6ef;
+    --accent: #7c2d12;
+    --ok: #14532d;
+    --bad: #7f1d1d;
+    --line: #d6cfc2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #ece7de; --paper: #171412; --accent: #f3b664;
+            --ok: #86efac; --bad: #fca5a5; --line: #3d3733; }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 4rem;
+    background: var(--paper); color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.125rem; line-height: 1.6;
+  }
+  h1 { color: var(--accent); font-size: 1.9rem; margin-bottom: 0.25rem; }
+  .tagline { margin-top: 0; font-style: italic; }
+  h2 { border-bottom: 1px solid var(--line); padding-bottom: 0.25rem; }
+  ul { padding-left: 1.4rem; }
+  .ok { color: var(--ok); }
+  .bad { color: var(--bad); }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    border: 0; clip: rect(0 0 0 0); overflow: hidden; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Way</h1>
+  <p class="tagline">A Journey Through Bible Lands — engine under construction.</p>
+</header>
+<main>
+  <h2>Content check</h2>
+  <p id="status-line" role="status">Loading content&hellip;</p>
+  <div id="report"></div>
+</main>
+<div id="announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

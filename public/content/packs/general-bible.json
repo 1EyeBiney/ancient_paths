@@ -1,0 +1,279 @@
+{
+  "packId": "general-bible",
+  "schemaVersion": 1,
+  "version": "0.1.0",
+  "title": "General Bible",
+  "description": "Version-one mixed content pack. Development sample: one task per category to prove the schema; the full pack grows in Phase 9.",
+  "tasks": [
+    {
+      "id": "general-bible-acts-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "scripture-knowledge",
+      "title": "Choosing Matthias",
+      "biblePeriods": ["early-church"],
+      "locations": ["jerusalem"],
+      "difficulty": "moderate",
+      "prompt": "Who was chosen to replace Judas among the twelve apostles?",
+      "answer": "Matthias",
+      "acceptedAnswers": ["Matthias"],
+      "hostGuidance": "Accept common pronunciation variations.",
+      "scriptureReferences": ["Acts 1:26"],
+      "normalVariant": {
+        "prompt": "Who was chosen to replace Judas among the twelve apostles?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was the replacement Matthias, Silas, or Barnabas?",
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name the person chosen to replace Judas and the other finalist who was considered.",
+        "answer": "Matthias and Joseph called Barsabbas, also known as Justus",
+        "acceptedAnswers": [
+          "Matthias and Joseph Barsabbas",
+          "Matthias and Justus"
+        ],
+        "successValue": 2
+      },
+      "clues": ["The answer appears in the first chapter of Acts."],
+      "teachingReveal": "Matthias was selected after the believers prayed and cast lots. Joseph called Barsabbas, also known as Justus, was the other candidate.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["apostles", "acts", "people"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "general-bible-acts-002",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "scripture-knowledge",
+      "title": "The Damascus Road",
+      "biblePeriods": ["early-church"],
+      "locations": ["damascus"],
+      "difficulty": "easy",
+      "prompt": "Saul was traveling to which city when he was blinded by a light from heaven?",
+      "answer": "Damascus",
+      "acceptedAnswers": ["Damascus"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Acts 9:3"],
+      "normalVariant": {
+        "prompt": "Saul was traveling to which city when he was blinded by a light from heaven?",
+        "successValue": 1
+      },
+      "assistedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name the city Saul was traveling to, and the disciple the Lord sent to restore his sight.",
+        "answer": "Damascus and Ananias",
+        "acceptedAnswers": ["Damascus and Ananias"],
+        "successValue": 2
+      },
+      "clues": ["Believers there met on a street called Straight."],
+      "teachingReveal": "Saul was confronted by the risen Jesus on the road to Damascus. Ananias, though afraid, obeyed the Lord and laid hands on Saul so that he could see again.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["paul", "conversion", "acts"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 40
+    },
+    {
+      "id": "general-bible-reason-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "bible-reasoning",
+      "title": "Name That City",
+      "biblePeriods": ["early-church"],
+      "locations": ["antioch"],
+      "difficulty": "moderate",
+      "prompt": "Reason it out from three clues. One: this city sat on the Orontes River, north of Judea. Two: Barnabas brought Saul here, and they taught the church a whole year. Three: in this city, the disciples were first called Christians. Name the city.",
+      "answer": "Antioch",
+      "acceptedAnswers": ["Antioch", "Antioch of Syria", "Syrian Antioch"],
+      "hostGuidance": "Any answer identifying Syrian Antioch is correct. Pisidian Antioch is a different city and is incorrect.",
+      "scriptureReferences": ["Acts 11:25-26"],
+      "normalVariant": {
+        "prompt": "Reason it out from three clues. One: this city sat on the Orontes River, north of Judea. Two: Barnabas brought Saul here, and they taught the church a whole year. Three: in this city, the disciples were first called Christians. Name the city.",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "The city is one of these three: Antioch, Tarsus, or Joppa. Which one fits all three clues?",
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["Its name survives today in the Turkish city of Antakya."],
+      "teachingReveal": "Antioch in Syria became the home base for Paul's missionary journeys, and Acts records that the name Christian was first used there.",
+      "historicalNote": "The Orontes River location is well-established historical background rather than a detail stated in Scripture.",
+      "audioAsset": null,
+      "tags": ["antioch", "geography", "reasoning"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 60
+    },
+    {
+      "id": "general-bible-history-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "historical-context",
+      "title": "The Road to Rome",
+      "biblePeriods": ["early-church"],
+      "locations": ["rome"],
+      "difficulty": "moderate",
+      "prompt": "Paul walked the final stretch into Rome along one of the most famous roads of the ancient world. What was this Roman road called?",
+      "answer": "The Appian Way",
+      "acceptedAnswers": ["The Appian Way", "Appian Way", "Via Appia"],
+      "hostGuidance": "Accept either the English or Latin name.",
+      "scriptureReferences": ["Acts 28:15"],
+      "normalVariant": {
+        "prompt": "Paul walked the final stretch into Rome along one of the most famous roads of the ancient world. What was this Roman road called?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it the Appian Way, the Egnatian Way, or the King's Highway?",
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["Believers met Paul at the Forum of Appius, a rest stop named for the road's builder."],
+      "teachingReveal": "Acts says believers traveled out to the Forum of Appius and the Three Taverns to meet Paul, both stations on the Via Appia. Seeing them, Paul thanked God and took courage.",
+      "historicalNote": "Scripture names the meeting places; that they were stations on the Via Appia is widely accepted historical background.",
+      "audioAsset": null,
+      "tags": ["rome", "roads", "travel"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 50
+    },
+    {
+      "id": "general-bible-listen-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Ports of the Voyage",
+      "biblePeriods": ["early-church"],
+      "locations": ["caesarea"],
+      "difficulty": "moderate",
+      "prompt": "Listen carefully, then repeat the three ports in the order Paul's ship visited them at the start of his voyage to Rome: Caesarea. Sidon. Myra. Now, in order, name the three ports.",
+      "answer": "Caesarea, Sidon, Myra",
+      "acceptedAnswers": ["Caesarea, Sidon, Myra", "Caesarea Sidon Myra"],
+      "hostGuidance": "All three ports must be given in the correct order. Minor pronunciation slips are fine.",
+      "scriptureReferences": ["Acts 27:2-5"],
+      "normalVariant": {
+        "prompt": "Listen carefully, then repeat the three ports in the order Paul's ship visited them at the start of his voyage to Rome: Caesarea. Sidon. Myra. Now, in order, name the three ports.",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Hear the sequence once more, slowly: Caesarea. Sidon. Myra. Name the three ports in order.",
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["The first port is where the voyage began, on the Judean coast."],
+      "teachingReveal": "Paul sailed as a prisoner from Caesarea. At Sidon the centurion Julius kindly let him visit friends, and at Myra they changed to an Alexandrian grain ship bound for Italy.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["voyage", "listening", "sequence"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 55
+    },
+    {
+      "id": "general-bible-hymn-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "hymn",
+      "title": "Finish the Lyric: Amazing Grace",
+      "biblePeriods": ["church-history"],
+      "locations": [],
+      "difficulty": "easy",
+      "prompt": "Finish this hymn line: Amazing grace, how sweet the sound, that saved a blank like me.",
+      "answer": "wretch",
+      "acceptedAnswers": ["wretch", "a wretch"],
+      "hostGuidance": null,
+      "scriptureReferences": [],
+      "normalVariant": {
+        "prompt": "Finish this hymn line: Amazing grace, how sweet the sound, that saved a blank like me.",
+        "successValue": 1
+      },
+      "assistedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Finish the line, and name the hymn's author, a former slave-ship sailor turned pastor.",
+        "answer": "Wretch; John Newton",
+        "acceptedAnswers": ["wretch and John Newton", "wretch, John Newton"],
+        "successValue": 2
+      },
+      "clues": ["The author also wrote: I once was lost, but now am found."],
+      "teachingReveal": "Amazing Grace was written by John Newton, published in 1779. Newton had captained slave ships before his conversion and later joined the fight to abolish the slave trade.",
+      "historicalNote": "Text and melody are in the public domain.",
+      "audioAsset": null,
+      "tags": ["hymn", "public-domain"],
+      "resourceInteractions": { "insight": false, "provision": true, "courage": true },
+      "estimatedSeconds": 35
+    },
+    {
+      "id": "general-bible-decide-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "decision-strategy",
+      "title": "The Winter Harbor",
+      "biblePeriods": ["early-church"],
+      "locations": ["crete"],
+      "difficulty": "moderate",
+      "prompt": "Your ship shelters at Fair Havens on Crete, but winter is coming and the harbor is exposed. The pilot wants to risk a short run along the coast to the better harbor at Phoenix. A prisoner aboard, experienced in shipwrecks, warns that sailing now risks the ship and every life. As the centurion, state your decision and one reason for it.",
+      "answer": "Any clear decision with sound reasoning drawn from the situation.",
+      "acceptedAnswers": ["Any clear decision supported by a reason from the scenario"],
+      "hostGuidance": "Judge the reasoning, not the choice. In Acts 27 the centurion sailed and the ship was lost, but this task rewards thoughtful deliberation, not matching history.",
+      "scriptureReferences": ["Acts 27:9-12"],
+      "normalVariant": {
+        "prompt": "Your ship shelters at Fair Havens on Crete, but winter is coming and the harbor is exposed. The pilot wants to risk a short run along the coast to the better harbor at Phoenix. A prisoner aboard, experienced in shipwrecks, warns that sailing now risks the ship and every life. As the centurion, state your decision and one reason for it.",
+        "successValue": 1
+      },
+      "assistedVariant": null,
+      "amplifiedVariant": null,
+      "clues": [],
+      "teachingReveal": "In Acts 27 the centurion trusted the pilot over Paul. A gentle south wind turned into the northeaster that wrecked the ship on Malta, though every life was spared, just as Paul had said.",
+      "historicalNote": "Ancient sailing largely stopped between November and March; the fast, the Day of Atonement, marks the date in the account.",
+      "audioAsset": null,
+      "tags": ["voyage", "decision", "acts"],
+      "resourceInteractions": { "insight": false, "provision": true, "courage": false },
+      "estimatedSeconds": 70
+    },
+    {
+      "id": "general-bible-community-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "community",
+      "title": "Fruit of the Spirit Relay",
+      "biblePeriods": ["early-church"],
+      "locations": [],
+      "difficulty": "moderate",
+      "prompt": "As a room, name the nine qualities Paul lists as the fruit of the Spirit. Teams take turns naming one each; the room succeeds when at least seven are named.",
+      "answer": "Love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control",
+      "acceptedAnswers": [
+        "Love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control"
+      ],
+      "hostGuidance": "Accept common translation variations such as longsuffering for patience and meekness for gentleness.",
+      "scriptureReferences": ["Galatians 5:22-23"],
+      "normalVariant": {
+        "prompt": "As a room, name the nine qualities Paul lists as the fruit of the Spirit. Teams take turns naming one each; the room succeeds when at least seven are named.",
+        "successValue": 1
+      },
+      "assistedVariant": null,
+      "amplifiedVariant": null,
+      "clues": ["The list begins with love."],
+      "teachingReveal": "Paul wrote this list to the churches of Galatia, a region Paul himself walked through on the journeys this game follows.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["community", "galatians"],
+      "resourceInteractions": { "insight": true, "provision": false, "courage": false },
+      "estimatedSeconds": 90
+    }
+  ]
+}
