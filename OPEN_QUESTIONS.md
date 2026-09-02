@@ -42,6 +42,17 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    victory. Duration estimator formula per PHASE2_SPEC (constants are
    parameters; playtests tune them).
 
+12. **DECIDED (2026-09-02, round 4)** — New content shapes: the "Voice
+    Portrait" / Event Scene spoken-clue tasks are defined in
+    CONTENT_AUTHORING.md §3b, with a `clueAudio` parallel array added to
+    the task schema (validated same-length as `clues`; engine untouched).
+    Hymn melodies are DATA (note-sequence JSON) synthesized client-side —
+    variations are parameters, not files (CONTENT_AUTHORING.md §3c); the
+    melody schema and sequencer land with PHASE6_SPEC. Author-known
+    content: Brian chose the HONOR SYSTEM (he plays, sits out his own
+    tasks); the excludeTags/setup-toggle mechanism is designed and shelved.
+    ElevenLabs licensing must be confirmed before shipping any voice clip.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

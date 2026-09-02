@@ -23,6 +23,14 @@ Brian intends to host AND play. Therefore:
   reviewer other than Brian.
 - Playtest logs and event logs contain task ids, not prompts, wherever
   they might be read by Brian before he has played that content.
+- **Amendment (2026-09-02, Brian's ruling — honor system):** tasks whose
+  audio Brian personally produces (Voice Portrait clips, melody data,
+  recorded renditions) are necessarily known to him. He plays anyway and
+  simply does not contribute when such a task comes up for his team. A
+  mechanical alternative was designed and shelved, available if the honor
+  system ever gets old: tag author-known tasks (existing `tags` field,
+  e.g. "author-brian") and add an `excludeTags` option to the session
+  builder plus an "exclude tasks known to the host" setup toggle.
 
 ## 2. Production pack sourcing rules (design doc §13.3, §13.5)
 
@@ -63,6 +71,63 @@ Rules that apply to every audio/hymn task (design doc §13.4/§13.5/§22):
   no reliance on stereo placement.
 - Narration/voice/hymn playback uses HTML5 audio (screen readers duck it);
   synthesized cues use Web Audio (see ACCESSIBILITY_PATTERNS §5).
+
+## 3b. Voice Portrait tasks (defined 2026-09-02)
+
+A speaking-clue identification shape ("Who Am I?"), produced with
+ElevenLabs or recorded voices. A Biblical figure speaks progressive
+first-person clues; teams guess the person. A multi-voice variant, the
+**Event Scene**, has a narrator or several voices describing an event to
+identify.
+
+- Category: `audio-listening` (or `scripture-knowledge` where the guess
+  leans on Bible knowledge more than listening). No new category.
+- Mechanics map directly onto existing machinery:
+  - The task's opening prompt plays the FIRST clue clip (task-level
+    `audioAsset`).
+  - Each entry in `clues` is the transcript of the next spoken clue, and
+    the parallel `clueAudio` array holds the matching clip ids — so
+    spending Insight for an extra clue PLAYS the character's next line.
+  - Amplified form: answer after the first clue only, for two successes
+    (authored variant, typically with no clue access — set
+    `resourceInteractions.insight` appropriately or price it in).
+  - Assisted form: multiple-choice options ("Was it Ruth, Naomi, or
+    Orpah?").
+- Every clip needs a transcript and fallbackText (the game must be
+  playable text-only, as with all audio tasks).
+- Clips are ordinary served audio files (voices cannot be synthesized in
+  the browser). ElevenLabs output requires a plan whose license covers
+  publishing the clips in a publicly served game — confirm before
+  shipping any clip.
+
+## 3c. Melodies as data (decided 2026-09-02)
+
+Hymn tunes for melody tasks are stored as NOTE DATA, not audio files, and
+synthesized in the browser at play time (GitHub Pages serves only static
+files, but all synthesis happens client-side — no server needed).
+
+- Brian authors melodies from his MIDI tools into a small JSON shape,
+  draft (final schema lands with PHASE6_SPEC alongside the sequencer that
+  plays it):
+
+```json
+{
+  "melodyId": "amazing-grace",
+  "title": "Amazing Grace (New Britain)",
+  "tempoBpm": 90,
+  "notes": [ { "midi": 62, "beats": 1 }, { "midi": 67, "beats": 2 } ],
+  "attribution": "Public domain (pre-1929)."
+}
+```
+
+- Every variation is a PARAMETER over the same data, generated live:
+  first N notes (normal 8 / amplified 4), altered tempo, transposition,
+  an authored wrong-note substitution. No per-variant audio production.
+- Recorded renditions remain fully supported as ordinary audio assets
+  wherever richer sound is wanted; note data is the workhorse for
+  identify-the-tune mechanics.
+- Melody data for pre-1929 hymns is public domain by nature; keep the
+  attribution field honest anyway.
 
 ## 4. Version-one content targets (design doc §30.1)
 

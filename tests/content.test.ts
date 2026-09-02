@@ -109,6 +109,23 @@ describe("pack validation rejects (§33.2)", () => {
     pack.tasks[0].assistedVariant.options = ["Matthias"];
     expect(validateContentPack(pack, "one-option").ok).toBe(false);
   });
+
+  it("clueAudio arrays that are not parallel to clues", () => {
+    const pack = clonePack();
+    // task 0 has exactly 1 clue; a 2-entry clueAudio must be rejected.
+    pack.tasks[0].clueAudio = ["some-clip", null];
+    const result = validateContentPack(pack, "bad-clue-audio");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/parallel/);
+    }
+  });
+
+  it("accepts a well-formed clueAudio array", () => {
+    const pack = clonePack();
+    pack.tasks[0].clueAudio = ["ruth-clue-1"];
+    expect(validateContentPack(pack, "good-clue-audio").ok).toBe(true);
+  });
 });
 
 describe("journey validation rejects (§33.2)", () => {

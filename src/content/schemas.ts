@@ -100,6 +100,14 @@ export const taskSchema = z.object({
   assistedVariant: assistedVariantSchema.nullable(),
   amplifiedVariant: amplifiedVariantSchema.nullable(),
   clues: z.array(z.string()),
+  // Optional per-clue audio (the "Voice Portrait" shape: each clue is a
+  // spoken clip — Ruth's next hint — played when that clue is served).
+  // Parallel to `clues`: when present it must be the same length, with
+  // null for any clue that has no clip. Deliberately parallel rather than
+  // restructuring `clues` itself, so the engine's clue handling (which is
+  // text-based and already test-covered) is untouched; the Phase 6 audio
+  // manager reads clueAudio[i] when clue i is revealed.
+  clueAudio: z.array(idSchema.nullable()).optional(),
   teachingReveal: z.string().min(1),
   historicalNote: z.string().nullable(),
   audioAsset: idSchema.nullable(),
@@ -166,6 +174,13 @@ export const contentPackSchema = z
           });
         }
       };
+      if (task.clueAudio && task.clueAudio.length !== task.clues.length) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["tasks", index, "clueAudio"],
+          message: `Task "${task.id}": clueAudio has ${task.clueAudio.length} entries but there are ${task.clues.length} clues; the arrays must be parallel.`,
+        });
+      }
       checkOptions(task.normalVariant.options, [], "normalVariant");
       checkOptions(task.assistedVariant?.options, [], "assistedVariant");
       checkOptions(
