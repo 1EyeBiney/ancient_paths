@@ -1,20 +1,19 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 1 IN PROGRESS — paused mid-build (2026-09-02)
+## Status: PHASE 1 COMPLETE (2026-09-02) — next up: Phase 2, the headless engine
 
-DONE: npm project (TypeScript 7 / Vite 8 / Vitest 4 / Zod 4), tsconfig,
-vite.config (base "./" for Pages), src/config/defaults.ts (§36),
-src/engine/types.ts (§28 + §25 states, incl. "recoverDecision"),
-src/content/schemas.ts (task/pack/journey/audio zod schemas with §33.2
-refinements), src/content/loader.ts (validate + crossValidate + fetchJson),
-sample content in public/content/ (general-bible pack: 8 tasks, one per
-category; jerusalem-rome journey: 4 milestones, 3-route fork, 2 community
-events), tests/content.test.ts — **18/18 passing**.
+Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (18/18 passing),
+`npx tsc --noEmit` clean, `npm run build` → dist/ (base "./" for Pages).
+See IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
+for decided amendments + open items. Boot page loads + validates the sample
+General Bible pack and Jerusalem-to-Rome journey, reporting visually and via
+a live region.
 
-REMAINING for Phase 1: index.html + src/main.ts boot page (load + validate +
-report, dual-modality), OPEN_QUESTIONS.md, IMPLEMENTATION_STATUS.md,
-KEYBOARD_COMMANDS.md stub, `npm run build` sanity check, git init + first
-commit + private GitHub repo (gh CLI is authed) named ancient_paths.
+Phase 2 scope (design doc §34): headless engine — state machine (§25 states
+in src/engine/types.ts), turn order, stage successes, fork locking,
+resources, amplified outcomes, Journey Tokens, surplus, Service, milestone
+triggers, victory — driven entirely by the §33.1 test list, no UI.
 
 The authoritative spec is `design starter for Ancient Paths - journeys through Bible lands.md`
 (38 sections — read it before doing anything; its §1 binds AI agents: preserve
