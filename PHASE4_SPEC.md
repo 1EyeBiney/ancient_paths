@@ -25,7 +25,8 @@ Deliverable per design doc §34 Phase 4.
 
 IN: app shell, presenter, keyboard system, setup wizard, every play-state
 screen, host rulings, reveal, repeat/status/actions/positions commands,
-help + describe-key mode, undo, modals and focus management, game menu.
+help menu + keyboard explorer, undo, modals and focus management, game
+menu.
 
 OUT (do not build): audience visual design/map/animations (Phase 5), all
 audio including the Web Audio sequencer and volume plumbing (Phase 6 —
@@ -98,11 +99,11 @@ else passes through untouched; (3) native pass-through list (F5, F6,
 F11, F12, Ctrl+R, Ctrl+F, Ctrl+W, Ctrl+T) always returns without
 preventDefault; (4) open modal gets the key; (5) state-gated bindings;
 (6) unmapped printable keys in game states answer "X does nothing here.
-Press F1 for help." — silence is a bug.
+Press question mark for help." — silence is a bug.
 
 ONE keybinding table in `keys.ts` (key, label, states, handler id) drives
-the handler, the F1 help text, the describe-key mode, and is what
-KEYBOARD_COMMANDS.md documents. All must change together.
+the handler, the help menu's rows, the keyboard-explorer descriptions,
+and is what KEYBOARD_COMMANDS.md documents. All must change together.
 
 The map (updates KEYBOARD_COMMANDS.md; global keys work in every
 non-editing state):
@@ -113,8 +114,8 @@ non-editing state):
 | S | Speak current game and team status (§23.3 order, see below) |
 | A | Speak available actions and usable resources |
 | T | Speak all team positions |
-| H or F1 | Context-sensitive help |
-| F2 | Describe-key mode: next key is described, not executed |
+| ? | Open the help menu; pressed AGAIN while help is open: close it and enter keyboard explorer |
+| H or F1 | Open the help menu (aliases; plain open/close only) |
 | Enter | Confirm / advance (state-dependent primary action) |
 | Escape | Back or cancel when safe; otherwise opens the game menu |
 | Space | RESERVED for produced-audio pause (Phase 6); does nothing yet, says so |
@@ -126,6 +127,25 @@ non-editing state):
 Rulings are SINGLE-press (decision 4 below). Every command also has a
 visible, clickable control in the current screen — dual-modality parity
 is a test requirement, not a suggestion.
+
+**Help menu and keyboard explorer (Brian's ruling, 2026-09-02):**
+
+- First `?` opens the help menu: a modal listing every binding legal in
+  the CURRENT state (key + function), rendered on screen as a real list
+  and navigable with Up/Down arrows as a cursor list (each row announced
+  tersely: "C. Rules the current answer correct."). Escape closes it
+  normally. `?` is Shift+/ on US layouts — match `event.key === "?"`,
+  not the physical key, so other layouts work.
+- A SECOND `?` while the help menu is open closes the menu and enters
+  KEYBOARD EXPLORER mode, announced as: "Keyboard explorer. Press any
+  key to hear what it does here. Escape to exit." In explorer mode every
+  key is described from the keybinding table (state-aware: a key not
+  legal in the current state says so) and NOTHING executes; Escape is
+  the only exit and is announced on entry. The input firewall still
+  wins: explorer mode cannot be entered from, and never captures, a
+  text field.
+- H and F1 open (or close) the help menu but do NOT chain into explorer
+  mode; the two-press gesture belongs to `?` alone.
 
 Spoken status (S) reports in exactly this order (§23.3): current team;
 location/route; successes earned of required (use
@@ -246,7 +266,10 @@ while it is open.
 1. Ruling keys C/I/K are single-press, state-gated, undoable — no
    press-to-confirm on rulings (kept fast; undo is one gesture away).
    Press-twice confirm is reserved for undo and ending the session.
-2. F2 is describe-key mode (F12 must stay native for dev tools).
+2. (Brian's ruling, not vetoable-by-default like the rest:) `?` opens
+   the help menu; a second `?` while it is open closes it and enters
+   keyboard-explorer mode. H/F1 are plain open/close aliases. There is
+   no F2 binding.
 3. Escape doubles as the game-menu key when there is nothing to cancel.
 4. jsdom is AUTHORIZED as a devDependency for DOM tests (record it in
    OPEN_QUESTIONS.md per CLAUDE.md rule 5 when added).
@@ -275,8 +298,14 @@ team.
 Group U3 — keyboard: `e.repeat` gate; input firewall (keys in a text
 field don't fire, Escape still works); pass-through list untouched;
 unmapped key speaks "does nothing here"; state gating (C in beginTurn
-does not rule); the help text and describe-key output both derive from
-the live keybinding table (change a binding in the table, both follow).
+does not rule); first `?` opens the help menu listing only the current
+state's bindings, Up/Down walk the rows with terse announcements, Escape
+closes; second `?` while help is open closes it and enters keyboard
+explorer (entry announcement includes the Escape exit); in explorer mode
+keys are described state-aware and nothing executes, Escape exits, and a
+text field is never captured; the help rows and explorer descriptions
+both derive from the live keybinding table (change a binding in the
+table, both follow).
 
 Group U4 — setup wizard: full pass through every step produces a valid
 BuildOptions + engine config; team names prefill and are editable; each

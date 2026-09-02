@@ -56,8 +56,13 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
 13. **DECIDED (2026-09-02, round 5, by the spec author — Brian may veto)**
     — PHASE4_SPEC.md rulings: ruling keys are C correct / I incorrect /
     K skipped, SINGLE-press (state-gated, undoable) — press-twice confirm
-    is reserved for undo (Ctrl+Z) and ending the session early. F2 is
-    describe-key mode (F12 stays native for dev tools). Escape opens the
+    is reserved for undo (Ctrl+Z) and ending the session early.
+    Help/explorer per Brian's ruling (2026-09-02, verbatim decision, not
+    vetoable spec-author choice): `?` opens the help menu (on-screen
+    shortcut list, Up/Down navigable); a SECOND `?` while help is open
+    closes it and enters keyboard-explorer mode (keys announce their
+    in-game function, Escape exits); H/F1 remain plain open/close
+    aliases; no F2 binding. Escape opens the
     game menu when there is nothing to cancel. jsdom is pre-authorized as
     a devDependency for Phase 4 DOM tests (rule 5 record: needed for
     headless keyboard/live-region testing; no runtime dependency added).

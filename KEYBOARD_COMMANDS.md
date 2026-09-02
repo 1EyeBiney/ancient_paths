@@ -11,7 +11,8 @@ on-screen control (dual-modality requirement).
 | S | Speak current game and team status |
 | A | Speak available actions and usable resources |
 | T | Speak all team positions |
-| H or F1 | Context-sensitive help |
+| ? | Open help menu (list of shortcuts, Up/Down to browse); a 2nd ? while help is open closes it and enters keyboard explorer (keys describe themselves; Escape exits) |
+| H or F1 | Open/close the help menu (plain aliases; no explorer chaining) |
 | Enter | Confirm or advance |
 | Escape | Back or cancel when safe |
 | Space | Pause or resume produced audio |
