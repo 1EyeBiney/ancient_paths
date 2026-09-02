@@ -255,7 +255,7 @@ class Engine implements GameEngine {
       return base;
     });
     if (firstEntry.kind === "fork") {
-      for (const team of teams) (team as TeamState & { pendingForkId?: string }).pendingForkId = firstEntry.id;
+      for (const team of teams) team.pendingForkId = firstEntry.id;
     }
 
     const session: PlaySession = {
@@ -501,25 +501,17 @@ class Engine implements GameEngine {
     this.state.tasksThisTurn = 0;
     this.state.turnHadFailureOrSkip = false;
     this.log(`Team ${team.name} begins its turn.`);
-    if (this.pendingForkOf(team)) {
+    if (team.pendingForkId) {
       this.state.session.state = "forkChoice";
     } else {
       this.state.session.state = "beginTurn";
     }
   }
 
-  private pendingForkOf(team: TeamState): string | undefined {
-    return (team as TeamState & { pendingForkId?: string }).pendingForkId;
-  }
-
-  private setPendingFork(team: TeamState, forkId: string | undefined): void {
-    (team as TeamState & { pendingForkId?: string }).pendingForkId = forkId;
-  }
-
   getAvailableRoutes(): RouteInfo[] | null {
     if (this.state.session.state !== "forkChoice") return null;
     const team = this.currentTeam();
-    const forkId = this.pendingForkOf(team);
+    const forkId = team.pendingForkId;
     const fork = this.journey.entries.find(
       (e): e is ForkEntry => e.kind === "fork" && e.id === forkId,
     );
@@ -536,7 +528,7 @@ class Engine implements GameEngine {
   private cmdChooseRoute(routeId: string): void {
     this.requireState("chooseRoute", "forkChoice");
     const team = this.currentTeam();
-    const forkId = this.pendingForkOf(team);
+    const forkId = team.pendingForkId;
     const fork = this.journey.entries.find(
       (e): e is ForkEntry => e.kind === "fork" && e.id === forkId,
     );
@@ -544,7 +536,7 @@ class Engine implements GameEngine {
     const route = fork.routes.find((r) => r.id === routeId);
     if (!route) throw new IllegalCommandError("chooseRoute", `unknown route "${routeId}"`);
     team.selectedRouteId = routeId;
-    this.setPendingFork(team, undefined);
+    team.pendingForkId = undefined;
     const firstStage = route.stages[0];
     if (!firstStage) throw new Error("Engine: route has no stages");
     team.currentStageId = firstStage.id;
@@ -922,15 +914,15 @@ class Engine implements GameEngine {
           this.state.session.finishRoundNumber = this.state.session.roundNumber;
         }
       }
-      this.setPendingFork(team, undefined);
+      team.pendingForkId = undefined;
       return;
     }
     if (next.kind === "fork") {
-      this.setPendingFork(team, next.id);
+      team.pendingForkId = next.id;
     } else {
       team.currentStageId = next.id;
       team.stageSuccesses = 0;
-      this.setPendingFork(team, undefined);
+      team.pendingForkId = undefined;
     }
   }
 

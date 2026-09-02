@@ -17,6 +17,9 @@ export interface TeamState {
   currentMilestoneId: string;
   currentStageId: string;
   selectedRouteId?: string;
+  // Set when the team has arrived at a fork and must chooseRoute before any
+  // further task can be presented; cleared once they choose.
+  pendingForkId?: string;
 
   stageSuccesses: number;
   resources: Record<ResourceType, number>;

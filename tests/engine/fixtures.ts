@@ -9,6 +9,7 @@ import { contentPackSchema, journeySchema, type ContentPack, type Journey } from
 import { createEngine, type EngineOptions, type GameEngine, type TeamSetup } from "../../src/engine/engine";
 import { createRng } from "../../src/engine/rng";
 import { ArrayTaskSource } from "../../src/engine/taskSource";
+import type { TaskResult } from "../../src/engine/types";
 
 const rawJourney = {
   journeyId: "test-path",
@@ -368,4 +369,30 @@ export function makeEngine(overrides: Partial<EngineOptions> = {}): GameEngine {
     taskSource: new ArrayTaskSource(testPack.tasks),
     ...overrides,
   });
+}
+
+/**
+ * Drives the CURRENT in-progress task from resourceWindow through to
+ * whatever resting state follows a ruling: acceptAnswer -> reveal -> rule,
+ * declining recovery by default (matching most tests, which aren't
+ * exercising the recovery path itself) and running finishTeaching if the
+ * ruling lands directly at teachingReveal. Group D tests that need to
+ * ACCEPT recovery drive the sequence manually instead of using this helper.
+ */
+export function completeCurrentTask(engine: GameEngine, result: TaskResult): void {
+  engine.dispatch({ type: "acceptAnswer" });
+  engine.dispatch({ type: "reveal" });
+  engine.dispatch({ type: "rule", result });
+  if (engine.getState() === "recoverDecision") {
+    engine.dispatch({ type: "declineRecover" });
+  }
+  if (engine.getState() === "teachingReveal") {
+    engine.dispatch({ type: "finishTeaching" });
+  }
+}
+
+/** presentTask() followed by completeCurrentTask(). */
+export function presentAndComplete(engine: GameEngine, result: TaskResult): void {
+  engine.dispatch({ type: "presentTask" });
+  completeCurrentTask(engine, result);
 }
