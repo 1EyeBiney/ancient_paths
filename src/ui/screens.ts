@@ -88,33 +88,63 @@ export class ScreenRenderer {
     container.innerHTML = "";
 
     const state = engine.getState();
-    switch (state) {
-      case "ready":
-        return this.renderReady(engine, container);
-      case "beginTurn":
-        return this.renderBeginTurn(engine, container);
-      case "forkChoice":
-        return this.renderForkChoice(engine, container);
-      case "resourceWindow":
-        return this.renderResourceWindow(engine, container);
-      case "awaitingAnswer":
-        return this.renderAwaitingAnswer(engine, container);
-      case "answerReveal":
-        return this.renderAnswerReveal(engine, container);
-      case "recoverDecision":
-        return this.renderRecoverDecision(engine, container);
-      case "teachingReveal":
-        return this.renderTeachingReveal(engine, container);
-      case "surplusDecision":
-        return this.renderSurplusDecision(engine, container);
-      case "landmarkIntroduction":
-        return this.renderLandmarkIntroduction(engine, container);
-      case "communityEvent":
-        return this.renderCommunityEvent(engine, container);
-      case "gameSummary":
-        return this.renderGameSummary(engine, container);
-      default:
-        throw new Error(`screens.render: state "${state}" is not built (see OPEN_QUESTIONS.md item 14)`);
+    const base = (() => {
+      switch (state) {
+        case "ready":
+          return this.renderReady(engine, container);
+        case "beginTurn":
+          return this.renderBeginTurn(engine, container);
+        case "forkChoice":
+          return this.renderForkChoice(engine, container);
+        case "resourceWindow":
+          return this.renderResourceWindow(engine, container);
+        case "awaitingAnswer":
+          return this.renderAwaitingAnswer(engine, container);
+        case "answerReveal":
+          return this.renderAnswerReveal(engine, container);
+        case "recoverDecision":
+          return this.renderRecoverDecision(engine, container);
+        case "teachingReveal":
+          return this.renderTeachingReveal(engine, container);
+        case "surplusDecision":
+          return this.renderSurplusDecision(engine, container);
+        case "landmarkIntroduction":
+          return this.renderLandmarkIntroduction(engine, container);
+        case "communityEvent":
+          return this.renderCommunityEvent(engine, container);
+        case "gameSummary":
+          return this.renderGameSummary(engine, container);
+        default:
+          throw new Error(`screens.render: state "${state}" is not built (see OPEN_QUESTIONS.md item 14)`);
+      }
+    })();
+
+    // Granted-choice pickers are cross-cutting: chooseGrantedResource has
+    // no requireState() gate in the engine, and a "choice" grant (from an
+    // offering or a community reward) can land on ANY team, not just the
+    // one whose screen is currently up. Appended to every render so a
+    // pending choice is never stranded behind an unrelated screen.
+    this.appendGrantedChoicePickers(engine, container, base.actions);
+    return base;
+  }
+
+  private appendGrantedChoicePickers(engine: GameEngine, container: HTMLElement, actions: ScreenAction[]): void {
+    for (const team of engine.getSession().teams) {
+      const pending = engine.getPendingChoicesForTeam(team.id);
+      if (pending <= 0) continue;
+      container.appendChild(
+        el("p", { text: `Team ${team.name} may choose a resource (${pending} pending).`, className: "pending-choice" }),
+      );
+      const resources: ResourceType[] = ["insight", "provision", "courage"];
+      for (const resource of resources) {
+        const action: ScreenAction = {
+          id: `chooseGranted-${team.id}-${resource}`,
+          label: `Team ${team.name}: take ${resource}`,
+          run: () => engine.dispatch({ type: "chooseGrantedResource", teamId: team.id, resource }),
+        };
+        actions.push(action);
+      }
+      this.renderButtons(container, actions.filter((a) => a.id.startsWith(`chooseGranted-${team.id}-`)));
     }
   }
 
