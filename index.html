@@ -47,6 +47,18 @@
   <div id="report"></div>
 </main>
 <div id="announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script>
+  // Opened by double-click (file://), the module script and content JSON
+  // cannot load, so say so instead of hanging at "Loading content".
+  // Served over http (npm run dev, or GitHub Pages), this never fires.
+  if (location.protocol === "file:") {
+    document.getElementById("status-line").textContent =
+      "This page needs its local server and cannot run from a double-clicked file. " +
+      "Open a terminal in the project folder, run: npm run dev — then open the " +
+      "address it prints, usually localhost port 5173. Once the game is published " +
+      "to its web address, no server step will be needed.";
+  }
+</script>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
