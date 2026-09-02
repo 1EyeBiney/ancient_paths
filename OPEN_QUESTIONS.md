@@ -73,7 +73,15 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    eliminate-option is repeatable while more than two options remain;
    decision-strategy tasks are ruled like any other task via hostGuidance;
    no per-task timers in v1.
-11. **UNRESOLVED — estimator formula vs. its own worked example.**
+11. **RESOLVED (2026-09-02, by the spec author — it was the spec's own
+    arithmetic error).** The formula and its constants stand exactly as
+    implemented; the worked example's "50-60 min" claim was wrong and has
+    been corrected in PHASE2_SPEC.md to the true ~72.7 min. The design
+    consequence moves to journey authoring: with these constants, a
+    Standard 4-team 55-minute game supports ≈7 total required successes
+    (not 9). Decision 6's working stage guidance is superseded by
+    PHASE3_SPEC.md's Duration-targets table. Constants remain playtest-
+    tunable parameters. Original finding, kept for the record:
     PHASE2_SPEC.md's duration estimator, run exactly as specified against
     its own worked example (4 teams, 3 tasks/turn, 9 required successes,
     2 community events, and the formula's own literal default constants),

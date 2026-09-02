@@ -22,10 +22,13 @@ documented spec discrepancy in the duration estimator that was NOT silently
 patched. The design doc is revision 1.1 (host-as-player amendments applied
 in-place).
 
-Phase 3 scope (design doc §34): session builder — seeded balanced deck
-generation replacing `ArrayTaskSource` behind the same `TaskSource`
-interface the engine already consumes; wiring `estimateMinutes()` (already
-built) into real setup-time duration estimates.
+**Phase 3 is specified and ready to implement**: see **PHASE3_SPEC.md**
+(the binding contract — deck algorithm, fairness/streak/sufficiency rules,
+planSession duration math with the corrected estimator anchor, S1–S11 test
+groups, definition of done). The estimator discrepancy from Phase 2 is
+RESOLVED (it was the spec's own arithmetic error; formula stands, journey
+authoring absorbs the consequence — see OPEN_QUESTIONS item 11 and the
+correction note in PHASE2_SPEC).
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

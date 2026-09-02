@@ -167,9 +167,17 @@ Read API: `getState()`, `getSession()` (deep-readonly PlaySession),
 → rounds ≈ ceil(totalRequiredSuccesses / (tasksPerTurn × successRate));
 minutes ≈ teamCount × rounds × (tasksPerTurn × avgTaskSeconds +
 turnOverheadSeconds) / 60 + communityEventCount × communityEventMinutes +
-fixedOverheadMinutes. Pure function, unit-tested with the worked example:
-4 teams, 3 tasks, 9 required successes, 2 events ≈ 50–60 min. Constants are
-parameters — playtests will tune them.
+fixedOverheadMinutes. Pure function. Constants are parameters — playtests
+will tune them.
+
+> **Correction (2026-09-02, spec author):** this section's original worked
+> example claimed 4 teams / 3 tasks / 9 successes / 2 events ≈ "50–60 min."
+> That was an arithmetic error in the spec, caught during implementation:
+> the formula as written correctly computes ~72.7 minutes for those inputs.
+> The formula and constants STAND as implemented; the design consequence
+> lands on journey authoring instead — a Standard 4-team, 55-minute game
+> supports roughly 7 total required successes, not 9. See PHASE3_SPEC.md
+> §Duration targets and OPEN_QUESTIONS item 11 (resolved).
 
 ## Task-handling specifics (defaults, veto-able by Brian)
 
