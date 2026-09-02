@@ -38,11 +38,11 @@ function addSection(title: string, lines: string[], good: boolean): void {
 async function boot(): Promise<void> {
   try {
     const [packRaw, journeyRaw] = await Promise.all([
-      fetchJson("content/packs/general-bible.json"),
+      fetchJson("content/packs/dev-sample.json"),
       fetchJson("content/journeys/jerusalem-rome.json"),
     ]);
 
-    const pack = validateContentPack(packRaw, "general-bible.json");
+    const pack = validateContentPack(packRaw, "dev-sample.json");
     const journey = validateJourney(journeyRaw, "jerusalem-rome.json");
 
     const problems: string[] = [];

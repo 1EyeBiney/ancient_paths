@@ -7,7 +7,7 @@ import {
   validateContentPack,
   validateJourney,
 } from "../src/content/loader";
-import samplePack from "../public/content/packs/general-bible.json";
+import samplePack from "../public/content/packs/dev-sample.json";
 import sampleJourney from "../public/content/journeys/jerusalem-rome.json";
 
 function clonePack(): any {
@@ -18,8 +18,8 @@ function cloneJourney(): any {
 }
 
 describe("valid sample content", () => {
-  it("accepts the General Bible sample pack", () => {
-    const result = validateContentPack(samplePack, "general-bible.json");
+  it("accepts the development sample pack", () => {
+    const result = validateContentPack(samplePack, "dev-sample.json");
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.tasks.length).toBeGreaterThanOrEqual(8);

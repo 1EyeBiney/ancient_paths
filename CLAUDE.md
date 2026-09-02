@@ -30,6 +30,11 @@ unattended. If you are the implementing agent:
 4. Update IMPLEMENTATION_STATUS.md as groups complete.
 5. No new dependencies without recording the reason in OPEN_QUESTIONS.md.
 6. Push to origin when a session's work is green and committed.
+7. ACCESSIBILITY_PATTERNS.md binds all presentation work (Phases 4–6);
+   CONTENT_AUTHORING.md binds all content work.
+8. **Content secrecy**: Brian plays this game. Never quote production pack
+   prompts or answers to him in any channel (chat, commits, status docs).
+   Only the `dev-sample` pack is safe to discuss openly.
 
 The authoritative spec is `design starter for Ancient Paths - journeys through Bible lands.md`
 (38 sections — read it before doing anything; its §1 binds AI agents: preserve

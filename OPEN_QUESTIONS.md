@@ -61,7 +61,14 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
 8. Whether the audience display and host controls are one page (current
    assumption: yes, one window, one page) — revisit if playtests want a
    projector-only view without visible controls.
-9. Task-handling defaults set in PHASE2_SPEC pending Brian's veto: answers
+9. **DECIDED (2026-09-02, round 3)**: display/speech parity principle and
+   presentation patterns captured in ACCESSIBILITY_PATTERNS.md (distilled
+   from Brian's kc/ag/football projects; The Way stays browse-mode
+   friendly, no role=application trap, one presenter API feeding both
+   channels). Dev-vs-production content policy + hymn/audio task model in
+   CONTENT_AUTHORING.md; sample pack renamed `dev-sample` and marked
+   never-ships; schema gained variant-level audioAsset + maxPlays.
+10. Task-handling defaults set in PHASE2_SPEC pending Brian's veto: answers
    are never typed (spoken aloud; engine stores no answer text);
    eliminate-option is repeatable while more than two options remain;
    decision-strategy tasks are ruled like any other task via hostGuidance;

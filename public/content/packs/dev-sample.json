@@ -1,14 +1,14 @@
 {
-  "packId": "general-bible",
+  "packId": "dev-sample",
   "schemaVersion": 1,
   "version": "0.1.0",
-  "title": "General Bible",
-  "description": "Version-one mixed content pack. Development sample: one task per category to prove the schema; the full pack grows in Phase 9.",
+  "title": "Development Sample",
+  "description": "Throwaway development and testing content. NEVER ships in a real game: Brian reads this file freely, so none of these questions may appear in production packs.",
   "tasks": [
     {
-      "id": "general-bible-acts-001",
+      "id": "dev-acts-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "scripture-knowledge",
       "title": "Choosing Matthias",
       "biblePeriods": ["early-church"],
@@ -50,9 +50,9 @@
       "estimatedSeconds": 45
     },
     {
-      "id": "general-bible-acts-002",
+      "id": "dev-acts-002",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "scripture-knowledge",
       "title": "The Damascus Road",
       "biblePeriods": ["early-church"],
@@ -85,9 +85,9 @@
       "estimatedSeconds": 40
     },
     {
-      "id": "general-bible-reason-001",
+      "id": "dev-reason-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "bible-reasoning",
       "title": "Name That City",
       "biblePeriods": ["early-church"],
@@ -118,9 +118,9 @@
       "estimatedSeconds": 60
     },
     {
-      "id": "general-bible-history-001",
+      "id": "dev-history-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "historical-context",
       "title": "The Road to Rome",
       "biblePeriods": ["early-church"],
@@ -151,9 +151,9 @@
       "estimatedSeconds": 50
     },
     {
-      "id": "general-bible-listen-001",
+      "id": "dev-listen-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "audio-listening",
       "title": "Ports of the Voyage",
       "biblePeriods": ["early-church"],
@@ -184,9 +184,9 @@
       "estimatedSeconds": 55
     },
     {
-      "id": "general-bible-hymn-001",
+      "id": "dev-hymn-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "hymn",
       "title": "Finish the Lyric: Amazing Grace",
       "biblePeriods": ["church-history"],
@@ -219,9 +219,9 @@
       "estimatedSeconds": 35
     },
     {
-      "id": "general-bible-decide-001",
+      "id": "dev-decide-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "decision-strategy",
       "title": "The Winter Harbor",
       "biblePeriods": ["early-church"],
@@ -247,9 +247,9 @@
       "estimatedSeconds": 70
     },
     {
-      "id": "general-bible-community-001",
+      "id": "dev-community-001",
       "schemaVersion": 1,
-      "packId": "general-bible",
+      "packId": "dev-sample",
       "category": "community",
       "title": "Fruit of the Spirit Relay",
       "biblePeriods": ["early-church"],

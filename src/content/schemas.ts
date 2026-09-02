@@ -44,10 +44,20 @@ const resourceCostSchema = z.object({
 // validated in the pack superRefine below.
 const optionsSchema = z.array(z.string().min(1)).min(2).max(6);
 
+// Variants may override the task-level audio asset (a hymn's amplified form
+// plays a SHORTER excerpt — a different clip) and may cap how many times
+// their audio can be played (§14 example: normal hears it twice, amplified
+// once). Absent audioAsset = inherit the task's; absent maxPlays = 2.
+const variantAudio = {
+  audioAsset: idSchema.nullable().optional(),
+  maxPlays: z.number().int().min(1).max(3).optional(),
+};
+
 const normalVariantSchema = z.object({
   prompt: z.string().min(1),
   options: optionsSchema.optional(),
   successValue: z.literal(1),
+  ...variantAudio,
 });
 
 const assistedVariantSchema = z.object({
@@ -56,6 +66,7 @@ const assistedVariantSchema = z.object({
   prompt: z.string().min(1),
   options: optionsSchema.optional(),
   successValue: z.literal(1),
+  ...variantAudio,
 });
 
 // Amplified forms MUST be authored (never generated) and are worth exactly
@@ -68,6 +79,7 @@ const amplifiedVariantSchema = z.object({
   answer: z.string().min(1),
   acceptedAnswers: z.array(z.string().min(1)).min(1),
   successValue: z.literal(2),
+  ...variantAudio,
 });
 
 export const taskSchema = z.object({
