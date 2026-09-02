@@ -53,6 +53,11 @@ export interface EngineOptions {
   rng: Rng;
   taskSource: TaskSource;
   config?: Partial<GameDefaults>;
+  // Every team's opening resource pool. Real play starts every team at 0/0/0
+  // (teams earn everything through play); this exists so tests can seed a
+  // team with resources to spend without needing to play through several
+  // stages first to earn them organically.
+  startingResources?: Record<ResourceType, number>;
 }
 
 export type InsightEffectType = "extra-clue" | "eliminate-option" | "replay";
@@ -238,6 +243,7 @@ class Engine implements GameEngine {
     this.config = { ...DEFAULTS, ...options.config };
 
     const firstEntry = this.journey.entries[0] as JourneyEntry;
+    const startingResources = options.startingResources ?? { insight: 0, provision: 0, courage: 0 };
     const teams: TeamState[] = options.teams.map((t) => {
       const base: TeamState = {
         id: t.id,
@@ -247,7 +253,7 @@ class Engine implements GameEngine {
         currentMilestoneId: this.journey.startMilestoneId,
         currentStageId: firstEntry.kind === "stage" ? firstEntry.id : "",
         stageSuccesses: 0,
-        resources: { insight: 0, provision: 0, courage: 0 },
+        resources: { ...startingResources },
         hasJourneyToken: false,
         serviceScore: 0,
         stagesBeyondMilestone: 0,

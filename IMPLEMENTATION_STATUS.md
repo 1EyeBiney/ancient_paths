@@ -42,12 +42,18 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
   `insightEffectCost` and `recoverCostProvision` (flat costs the design doc
   leaves as unspecified numbers). Test fixtures in `tests/engine/fixtures.ts`.
   - Group A (foundation) — DONE, 9 tests passing.
-  - Groups B-I — engine logic for all of them is implemented in engine.ts
-    already (turns/stages, forks, resources, reveal privacy, tokens/
-    surplus/offering, milestones/events, endgame/service, undo/log,
-    estimator), but their dedicated test files are still being written and
-    verified one group at a time. Do not assume behavior is correct until
-    its group's tests are green — see PHASE2_SPEC.md test list.
+  - Group B (turns/stages) — DONE, 7 tests passing.
+  - Group C (forks) — DONE, 5 tests passing.
+  - Group D (resources) — DONE, 11 tests passing. Added
+    `EngineOptions.startingResources` (defaults to 0/0/0 for real play; lets
+    tests seed a team with resources to spend without playing through
+    several stages to earn them organically first).
+  - Groups E-I — engine logic for all of them is implemented in engine.ts
+    already (reveal privacy, tokens/surplus/offering, milestones/events,
+    endgame/service, undo/log, estimator), but their dedicated test files
+    are still being written and verified one group at a time. Do not assume
+    behavior is correct until its group's tests are green — see
+    PHASE2_SPEC.md test list.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
