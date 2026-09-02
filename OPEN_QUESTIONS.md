@@ -94,6 +94,23 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     type's aspirational completeness and what Phase 2 actually built;
     revisit only if a later phase needs one of the five unused states.
 
+15. **Found while building `src/ui/screens.ts`, worked around without
+    touching `src/engine/`.** Two public-read-API gaps for Phase 4:
+    (a) during `teachingReveal`, nothing in `PublicTask`/`RevealedAnswer`
+    exposes the task's actual `teachingReveal` (or `historicalNote`)
+    text — worked around by having the UI look the task up by id (still
+    valid at that point; `currentTask` isn't cleared until
+    `finishTeaching`) in its OWN copy of the loaded content pack, which is
+    not privacy-sensitive since teaching text is always shown AFTER the
+    reveal. (b) there is no getter for a community event's live
+    `roomProgress`/`pledgedTotal` — `screens.ts` tracks these itself,
+    incremented only by commands the renderer itself dispatches
+    (`relayAnswer`/`contribute`), so the local count can never drift from
+    the engine's own private one. Neither is a functional bug — both
+    produce a fully correct UI — but a future Phase 2 revision could add
+    `getTeachingText()`/`getCommunityEventProgress()`-style getters to
+    remove the workarounds if it's ever touched again.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
