@@ -49,12 +49,16 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
     tests seed a team with resources to spend without playing through
     several stages to earn them organically first).
   - Group E (reveal privacy) — DONE, 5 tests passing.
-  - Groups F-I — engine logic for all of them is implemented in engine.ts
-    already (reveal privacy, tokens/surplus/offering, milestones/events,
-    endgame/service, undo/log, estimator), but their dedicated test files
-    are still being written and verified one group at a time. Do not assume
-    behavior is correct until its group's tests are green — see
-    PHASE2_SPEC.md test list.
+  - Group F (tokens/surplus/offering) — DONE, 11 tests passing. Added
+    `getPendingSurplus()` to the read API and a `fixedRng` test double
+    (scripted `Rng` sequence) used to deterministically hit specific
+    offering-pool branches; F7 statistically verifies the weighted draw
+    over 4,000 samples.
+  - Groups G-I — engine logic for all of them is implemented in engine.ts
+    already (milestones/events, endgame/service, undo/log, estimator), but
+    their dedicated test files are still being written and verified one
+    group at a time. Do not assume behavior is correct until its group's
+    tests are green — see PHASE2_SPEC.md test list.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the

@@ -2,25 +2,12 @@
 
 import { describe, expect, it } from "vitest";
 import { IllegalCommandError } from "../../src/engine/errors";
-import { makeEngine, presentAndComplete } from "./fixtures";
+import { advanceBothTeamsToFork as advanceBothTeamsToForkShared, makeEngine, presentAndComplete } from "./fixtures";
 import type { GameEngine } from "../../src/engine/engine";
 
-/**
- * Drives both teams through s1 (and its community event) so Matthew lands
- * on his SECOND turn sitting in forkChoice, with Mark queued to reach his
- * own forkChoice turn one round later. Matches the exact sequence Group B
- * already proved (stage completion, milestone/event, turn advance).
- */
+// Local wrapper adds the state assertions this file relies on before every use.
 function advanceBothTeamsToFork(engine: GameEngine): void {
-  engine.dispatch({ type: "startGame" });
-  presentAndComplete(engine, "correct");
-  presentAndComplete(engine, "correct"); // Matthew: s1 done -> landmarkIntroduction
-  engine.dispatch({ type: "beginCommunityEvent" });
-  engine.dispatch({ type: "resolveCommunityEvent" }); // ends Matthew's turn -> Mark's turn
-
-  presentAndComplete(engine, "correct");
-  presentAndComplete(engine, "correct"); // Mark: s1 done, event already triggered, turn ends -> Matthew's turn
-
+  advanceBothTeamsToForkShared(engine);
   expect(engine.getState()).toBe("forkChoice");
   expect(engine.getSession().activeTeamIndex).toBe(0); // Matthew
 }

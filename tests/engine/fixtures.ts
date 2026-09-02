@@ -7,7 +7,7 @@
 
 import { contentPackSchema, journeySchema, type ContentPack, type Journey } from "../../src/content/schemas";
 import { createEngine, type EngineOptions, type GameEngine, type TeamSetup } from "../../src/engine/engine";
-import { createRng } from "../../src/engine/rng";
+import { createRng, type Rng } from "../../src/engine/rng";
 import { ArrayTaskSource } from "../../src/engine/taskSource";
 import type { TaskResult } from "../../src/engine/types";
 
@@ -395,4 +395,37 @@ export function completeCurrentTask(engine: GameEngine, result: TaskResult): voi
 export function presentAndComplete(engine: GameEngine, result: TaskResult): void {
   engine.dispatch({ type: "presentTask" });
   completeCurrentTask(engine, result);
+}
+
+/**
+ * Drives both teams through s1 (and its community event) so Matthew lands
+ * on his SECOND turn sitting in forkChoice. Shared by Group C and Group F,
+ * which both need a team actually standing at the fork.
+ */
+export function advanceBothTeamsToFork(engine: GameEngine): void {
+  engine.dispatch({ type: "startGame" });
+  presentAndComplete(engine, "correct");
+  presentAndComplete(engine, "correct"); // Matthew: s1 done -> landmarkIntroduction
+  engine.dispatch({ type: "beginCommunityEvent" });
+  engine.dispatch({ type: "resolveCommunityEvent" }); // ends Matthew's turn -> Mark's turn
+
+  presentAndComplete(engine, "correct");
+  presentAndComplete(engine, "correct"); // Mark: s1 done, event already triggered, turn ends -> Matthew's turn
+}
+
+/**
+ * A test double for Rng that returns a scripted sequence of values instead
+ * of a real pseudo-random stream — gives tests exact control over which
+ * branch a weighted draw (e.g. the offering pool) takes. Repeats the last
+ * value if asked for more draws than were scripted.
+ */
+export function fixedRng(values: number[]): Rng {
+  let i = 0;
+  return {
+    next: () => {
+      const v = values[Math.min(i, values.length - 1)]!;
+      i++;
+      return v;
+    },
+  };
 }

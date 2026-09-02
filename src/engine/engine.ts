@@ -201,6 +201,7 @@ export interface GameEngine {
   getRevealedAnswer(): RevealedAnswer | null;
   getAvailableRoutes(): RouteInfo[] | null;
   getEffectiveStageRequirement(teamId: string): number | null;
+  getPendingSurplus(): number;
   getSummary(): GameSummary | null;
   statusText(): string;
   allPositionsText(): string;
@@ -1130,6 +1131,10 @@ class Engine implements GameEngine {
     const sum = (t: TeamState) => t.resources.insight + t.resources.provision + t.resources.courage;
     return sum(b) - sum(a);
   };
+
+  getPendingSurplus(): number {
+    return this.state.pendingSurplus;
+  }
 
   getSummary(): GameSummary | null {
     if (this.state.session.state !== "gameSummary") return null;
