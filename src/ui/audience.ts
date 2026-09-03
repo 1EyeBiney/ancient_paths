@@ -12,10 +12,15 @@ import { findStage } from "./screens";
 import { communityProgress } from "./communityProgress";
 import { renderTeamBadge } from "./teamBadge";
 import { letterFor } from "./speech";
+import { MapView } from "./mapView";
+import type { MapManifest, MapStyleId } from "./mapProjection";
 
 export interface AudienceViewOptions {
   journey: Journey;
   tasksById: Map<string, Task>;
+  /** Absent = no map (the strip alone) — never an error at render time. */
+  mapManifest?: MapManifest | null;
+  mapStyle?: MapStyleId;
 }
 
 function el(tag: string, opts: { text?: string; className?: string; data?: string } = {}): HTMLElement {
@@ -40,7 +45,11 @@ function progressBar(now: number, max: number, text: string): HTMLElement {
 }
 
 export class AudienceView {
-  constructor(private readonly options: AudienceViewOptions) {}
+  private readonly mapView: MapView;
+
+  constructor(private readonly options: AudienceViewOptions) {
+    this.mapView = new MapView({ journey: options.journey, manifest: options.mapManifest ?? null });
+  }
 
   private milestoneName(id: string): string {
     return this.options.journey.milestones.find((m) => m.id === id)?.name ?? id;
@@ -172,6 +181,11 @@ export class AudienceView {
   private renderJourney(container: HTMLElement, teams: readonly TeamState[]): void {
     const section = el("section", { className: "panel journey", data: "journey" });
     section.appendChild(el("h3", { text: "Journey" }));
+
+    const mapContainer = el("div", { data: "map-container" });
+    section.appendChild(mapContainer);
+    this.mapView.render(mapContainer, teams, this.options.mapStyle ?? "satellite");
+
     const strip = el("ol", { className: "landmark-strip" });
     for (const milestone of this.options.journey.milestones) {
       const item = el("li", { className: "landmark" });
