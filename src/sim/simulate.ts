@@ -36,6 +36,9 @@ export interface SimulateOptions {
   seed: string;
   difficulty?: DeckDifficultySetting;
   turnTaskLimit?: number;
+  /** Passed straight through to buildSessionDeck (PHASE10_SPEC Group X5's
+   * chained-session content-repeat analysis; X6's recent-use memory). */
+  excludeTaskIds?: string[];
   /** One policy for every team, or an array with exactly `teamCount` entries. */
   policies?: TeamPolicy | TeamPolicy[];
   successModel?: SuccessModel;
@@ -95,6 +98,9 @@ export interface SimResult {
   taskIds: string[];
   distinctTasks: number;
   illegalCommands: number;
+  /** buildSessionDeck's own DeckReport.warnings for this session (e.g. an
+   * excludeTaskIds relaxation) — empty when the build had none. */
+  deckWarnings: string[];
   exhausted: { round: number; message: string } | null;
   winners: string[];
   finalPositions: string[];
@@ -379,16 +385,20 @@ export function simulateGame(options: SimulateOptions): SimResult {
   let exhausted: { round: number; message: string } | null = null;
   let steps = 0;
   let engine: GameEngine | null = null;
+  let deckWarnings: string[] = [];
 
   try {
-    const { deck } = buildSessionDeck({
+    const built = buildSessionDeck({
       journey,
       packs,
       teamIds: teams.map((t) => t.id),
       turnTaskLimit,
       seed,
       difficulty,
+      excludeTaskIds: options.excludeTaskIds,
     });
+    const deck = built.deck;
+    deckWarnings = built.report.warnings;
     engine = createEngine({
       journey,
       packs,
@@ -663,6 +673,7 @@ export function simulateGame(options: SimulateOptions): SimResult {
     taskIds,
     distinctTasks: new Set(taskIds).size,
     illegalCommands,
+    deckWarnings,
     exhausted,
     winners: summary?.journeyWinners ?? [],
     finalPositions: summary?.finalPositions ?? [],

@@ -450,6 +450,21 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X5 done (2026-09-03, 5 new tests, 2851 project-wide):**
+  content-repeat analysis, `tests/sim/group-x5-repeats.test.ts` — a
+  four-session chain (4/2/8/4 teams) confirms one-session memory never
+  needs to relax an exclusion in sessions 1-3 and never actually
+  repeats a task; a three-session-memory variant records the chain's
+  shape (first relaxation, first repeat, distinct-task growth) as data
+  for `SIMULATION_REPORT.md` rather than a hard gate, per the spec.
+  `simulateGame` gained an `excludeTaskIds` option and a `deckWarnings`
+  field on `SimResult` so the sim harness can drive chained sessions
+  the same way the app will. One useful distinction the first pass
+  surfaced: `buildSessionDeck` emits two different warning shapes — an
+  actual "exclusion relaxed" (a real problem for repeat-avoidance) and
+  a general "content supply is tight" margin caution (not a sign
+  anything actually repeated) — the test now checks for the former
+  specifically rather than treating any warning as a failure.
   **Group X4 + X4b done (2026-09-03, 20 new tests, 2846 project-wide):**
   `src/session/builder.ts` — a fork route's own `difficulty` now shifts
   its stages' draw weights one step relative to the session setting
