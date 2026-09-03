@@ -944,6 +944,22 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       dedicated per-route outcome comparison once more seed budget (or a
       faster harness) is available.
 
+38. **RESOLVED (2026-09-03) — Group X6's spec text ("the IndexedDB store
+    via the existing fake-IDB path P2 used") described a P2 test that
+    doesn't exist.** Checked directly: no test in this project exercises
+    `IndexedDbSaveStore` at all, and jsdom (this project's test
+    environment) has no `indexedDB` global — `new JSDOM().window.
+    indexedDB` is `undefined`. `store.ts`'s own header comment already
+    says why: "no fake-IndexedDB dependency — the real store is covered
+    by the browser check, P8" (rule 5: no new dependency without a
+    recorded reason, and none was ever taken). So Group X6's new
+    `readRecentTasks`/`writeRecentTasks` on `IndexedDbSaveStore` are, like
+    every other `IndexedDbSaveStore` method before them, exercised only
+    by a manual browser check (folded into Group X11) — not by a unit
+    test. `tests/persistence/group-x6-recent-tasks.test.ts` covers the
+    full round trip against `MemorySaveStore` and every piece of new
+    `SetupWizard`/App logic instead.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,

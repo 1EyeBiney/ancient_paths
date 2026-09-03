@@ -2,7 +2,7 @@
 // 1) for real play; an in-memory store for tests (rule 5: no fake-IndexedDB
 // dependency — the real store is covered by the browser check, P8).
 
-import type { SavedGame } from "./schema";
+import type { RecentTasks, SavedGame } from "./schema";
 
 export interface SaveStore {
   /** Raw, unvalidated — the schema (parseSavedGame) decides what it means. */
@@ -12,6 +12,11 @@ export interface SaveStore {
   clear(): Promise<void>;
   /** Sets a bad or foreign save aside under its own key. Never deletes it. */
   quarantine(raw: unknown): Promise<void>;
+  /** PHASE10_SPEC Group X6: raw, unvalidated — parseRecentTasks decides
+   * what it means. Separate from load()/save(): outlives "Delete saved
+   * game" and any one session (up to 5 remembered games). */
+  readRecentTasks(): Promise<unknown | null>;
+  writeRecentTasks(tasks: RecentTasks): Promise<void>;
 }
 
 /** Tests: a plain in-memory implementation with a few extra knobs for
@@ -19,6 +24,7 @@ export interface SaveStore {
 export class MemorySaveStore implements SaveStore {
   private current: unknown | null = null;
   private quarantined: unknown[] = [];
+  private recentTasks: unknown | null = null;
   /** Every successful save, in order — tests assert on its length/contents. */
   readonly writes: SavedGame[] = [];
   private failNext = false;
@@ -53,12 +59,21 @@ export class MemorySaveStore implements SaveStore {
   getQuarantined(): readonly unknown[] {
     return this.quarantined;
   }
+
+  async readRecentTasks(): Promise<unknown | null> {
+    return this.recentTasks;
+  }
+
+  async writeRecentTasks(tasks: RecentTasks): Promise<void> {
+    this.recentTasks = tasks;
+  }
 }
 
 const DB_NAME = "the-way";
 const DB_VERSION = 1;
 const STORE_NAME = "saves";
 const CURRENT_KEY = "current";
+const RECENT_TASKS_KEY = "recent-tasks";
 
 /** database `the-way`, object store `saves`, key `current` for the live
  * save and `quarantined-<ISO>` for set-aside ones. Opens lazily; every
@@ -119,5 +134,14 @@ export class IndexedDbSaveStore implements SaveStore {
     const key = `quarantined-${new Date().toISOString()}`;
     await this.withStore("readwrite", (s) => s.put(raw, key));
     await this.clear();
+  }
+
+  async readRecentTasks(): Promise<unknown | null> {
+    const value = await this.withStore("readonly", (s) => s.get(RECENT_TASKS_KEY));
+    return value ?? null;
+  }
+
+  async writeRecentTasks(tasks: RecentTasks): Promise<void> {
+    await this.withStore("readwrite", (s) => s.put(tasks, RECENT_TASKS_KEY));
   }
 }

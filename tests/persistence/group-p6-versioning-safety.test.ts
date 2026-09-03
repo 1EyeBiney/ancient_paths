@@ -62,6 +62,8 @@ function minimalValidSave(): SavedGame {
       tasksPerTurnOverride: null,
       reducedMotion: null,
       mapStyle: "satellite",
+      avoidRecentTasks: true,
+      recentGamesToRemember: 3,
     },
     teams: [
       { id: "team-1", name: "Alpha", color: "#c00", symbol: "cross" },

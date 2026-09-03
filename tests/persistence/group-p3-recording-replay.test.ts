@@ -125,6 +125,8 @@ function buildSave(recorder: RecordingEngine, pack: ContentPack, seed: string): 
       tasksPerTurnOverride: null,
       reducedMotion: null,
       mapStyle: "satellite",
+      avoidRecentTasks: true,
+      recentGamesToRemember: 3,
     },
     teams: twoTeams,
     turnTaskLimit: 3,

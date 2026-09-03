@@ -18,7 +18,7 @@ import { createEngine, type Command, type EngineOptions, type GameEngine } from 
 import { createRng } from "../engine/rng";
 import { RecordingEngine } from "../persistence/recorder";
 import { IndexedDbSaveStore, type SaveStore } from "../persistence/store";
-import { SAVE_SCHEMA_VERSION, parseSavedGame, type SavedGame } from "../persistence/schema";
+import { SAVE_SCHEMA_VERSION, parseSavedGame, parseRecentTasks, RECENT_TASKS_SCHEMA_VERSION, type SavedGame, type RecentTasks } from "../persistence/schema";
 import { rebuildFromSave } from "../persistence/replay";
 import { Presenter, type PresenterOptions } from "./presenter";
 import { KeyboardController, type KeyBinding } from "./keys";
@@ -175,6 +175,11 @@ export class App {
   /** `${taskId}::${variantKind}` for the presentation currently auto-played, or null. */
   private lastAudioPresentationKey: string | null = null;
   private lastCluesRevealedCount = 0;
+  /** Every relay's drawn community task id this game (PHASE10_SPEC Group
+   * X6) — collected as they occur, the way N11's test does, since
+   * state.community (and the task it holds) is cleared on resolve and is
+   * not part of the persisted PlaySession either. Reset in enterPlaying(). */
+  private communityTaskIdsThisGame: string[] = [];
 
   constructor(private readonly options: AppOptions) {
     this.root = options.root;
@@ -250,6 +255,57 @@ export class App {
     this.applyReducedMotion();
     this.renderStartup();
     void this.checkForSavedGame();
+    void this.checkForRecentTasks();
+  }
+
+  /** Boot-time load of the remembered-games record (Group X6): feeds the
+   * wizard so setup's exclusion and its estimate-line note are correct
+   * from the first render; a corrupt or missing record is never fatal —
+   * it just means nothing is remembered yet. Re-renders the estimate if
+   * setup is already on screen when this (async) resolves. */
+  private async checkForRecentTasks(): Promise<void> {
+    let raw: unknown = null;
+    try {
+      raw = await this.saveStore.readRecentTasks();
+    } catch {
+      raw = null;
+    }
+    if (raw === null || raw === undefined) return;
+    const parsed = parseRecentTasks(raw);
+    if (!parsed) return; // corrupt: ignored, overwritten next time a session is recorded
+    this.wizard.setRecentSessions(parsed.sessions.map((s) => ({ taskIds: s.taskIds })));
+    if (this.mode === "setup") this.updateEstimate();
+  }
+
+  /** Appends one session's drawn task ids to the remembered-games record
+   * (Group X6): called at gameSummary and at an End-session with >= 10
+   * attempts. Best-effort — a store failure here never blocks play. */
+  private async appendRecentSession(journeyId: string, taskIds: string[]): Promise<void> {
+    if (taskIds.length === 0) return;
+    let raw: unknown = null;
+    try {
+      raw = await this.saveStore.readRecentTasks();
+    } catch {
+      raw = null;
+    }
+    const existing = raw !== null && raw !== undefined ? parseRecentTasks(raw) : null;
+    const sessions = existing ? [...existing.sessions] : [];
+    sessions.push({ endedAt: new Date().toISOString(), journeyId, taskIds });
+    while (sessions.length > 5) sessions.shift();
+    const updated: RecentTasks = { schemaVersion: RECENT_TASKS_SCHEMA_VERSION, sessions };
+    try {
+      await this.saveStore.writeRecentTasks(updated);
+      this.wizard.setRecentSessions(sessions.map((s) => ({ taskIds: s.taskIds })));
+    } catch {
+      // Best-effort; matches the save store's general posture elsewhere.
+    }
+  }
+
+  /** This game's full task-id list so far: taskHistory plus every relay's
+   * drawn community task id (Group X6). */
+  private sessionTaskIds(): string[] {
+    if (!this.engine) return [];
+    return [...this.engine.getSession().taskHistory.map((a) => a.taskId), ...this.communityTaskIdsThisGame];
   }
 
   /** Boot-time check (Group P5): loads the store, validates it, and — if
@@ -806,6 +862,26 @@ export class App {
         this.applyReducedMotion();
       }),
     );
+    this.contentContainer.appendChild(
+      this.checkbox("avoid-recent-tasks", "Avoid tasks from recent games", this.wizard.avoidRecentTasks, (on) => {
+        this.wizard.setAvoidRecentTasks(on);
+        this.updateEstimate();
+      }),
+    );
+    const recentGamesInput = document.createElement("input");
+    recentGamesInput.type = "number";
+    recentGamesInput.min = "1";
+    recentGamesInput.max = "5";
+    recentGamesInput.value = String(this.wizard.recentGamesToRemember);
+    recentGamesInput.setAttribute("aria-label", "Games to remember (1-5)");
+    recentGamesInput.addEventListener("input", () => {
+      this.wizard.setRecentGamesToRemember(clampInt(recentGamesInput.value, 1, 5, 3));
+      this.updateEstimate();
+    });
+    const recentGamesLabel = document.createElement("label");
+    recentGamesLabel.textContent = "Games to remember (1-5)";
+    recentGamesLabel.appendChild(recentGamesInput);
+    this.contentContainer.appendChild(recentGamesLabel);
 
     // Seed
     this.contentContainer.appendChild(el("h2", { text: "Seed" }));
@@ -903,7 +979,23 @@ export class App {
     const el_ = target ?? this.contentContainer.querySelector<HTMLElement>("#estimate");
     const plan = this.wizard.getPlan();
     if (!el_ || !plan) return;
-    const text = `Estimated duration: about ${Math.round(plan.estimatedMinutes)} minutes.${plan.warnings.length > 0 ? " " + plan.warnings.join(" ") : ""}`;
+    let text = `Estimated duration: about ${Math.round(plan.estimatedMinutes)} minutes.${plan.warnings.length > 0 ? " " + plan.warnings.join(" ") : ""}`;
+    // Group X6: a discarded preview build (never used as the real deck —
+    // the determinism rule from beginJourney/attemptSessionGeneration
+    // still applies) checks whether avoiding recent tasks would force a
+    // relaxation. No category names or ids here, and the DeckReport's own
+    // warning text is never itself spoken — one plain sentence only.
+    if (this.wizard.avoidRecentTasks && this.wizard.journey) {
+      try {
+        const preview = attemptSessionGeneration(this.wizard);
+        if (preview.ok && preview.result.report.warnings.some((w) => w.includes("exclusion relaxed"))) {
+          text += " Some tasks from recent games may return: the pack is running low for one category.";
+        }
+      } catch {
+        // Best-effort estimate only; a real build error surfaces properly
+        // when the host actually presses Begin journey.
+      }
+    }
     el_.textContent = text;
   }
 
@@ -958,6 +1050,13 @@ export class App {
     // clip plays once more, from the top, as a fresh presentation.
     this.lastEventLogLength = recordingEngine.getSession().eventLog.length;
     this.lastCluesRevealedCount = recordingEngine.getCurrentTaskPublic()?.cluesRevealed.length ?? 0;
+    // Group X6: a resumed game's PRE-save community draws are not
+    // recoverable (state.community isn't part of the persisted
+    // PlaySession), so this starts empty even on Resume — only draws
+    // from this point forward are recorded. Documented limitation, not a
+    // correctness bug: the same "audio state is never persisted" posture
+    // this codebase already takes elsewhere (§26 "where practical").
+    this.communityTaskIdsThisGame = [];
     this.recordingEngine = recordingEngine;
     this.engine = recordingEngine;
     this.undoController = new UndoController({
@@ -1145,8 +1244,15 @@ export class App {
       const milestoneId = this.engine!.getSession().triggeredMilestones.at(-1);
       const milestone = this.currentJourney?.milestones.find((m) => m.id === milestoneId);
       this.audioManager.playAmbient(milestone?.ambientAudioAsset ?? null);
+    } else if (state === "communityEvent") {
+      // Group X6: capture the relay's drawn task id now — state.community
+      // (and the task it holds) is cleared by resolveCommunityEvent.
+      const communityTask = this.engine!.getCommunityTaskPublic();
+      if (communityTask) this.communityTaskIdsThisGame.push(communityTask.id);
     } else if (state === "gameSummary") {
       this.audioManager.playCue("celebration");
+      const session = this.engine!.getSession();
+      void this.appendRecentSession(session.journeyId, this.sessionTaskIds());
     }
   }
 
@@ -1392,12 +1498,17 @@ export class App {
         deleteSave.textContent = "Delete saved game";
         deleteSave.addEventListener("click", () => this.openDeleteSaveConfirm());
 
+        const forgetRecent = document.createElement("button");
+        forgetRecent.type = "button";
+        forgetRecent.textContent = "Forget recent tasks";
+        forgetRecent.addEventListener("click", () => this.openForgetRecentTasksConfirm());
+
         const endSession = document.createElement("button");
         endSession.type = "button";
         endSession.textContent = "End session";
         endSession.addEventListener("click", () => this.openEndSessionConfirm());
 
-        container.append(resume, status, audio, gameLog, deleteSave, endSession);
+        container.append(resume, status, audio, gameLog, deleteSave, forgetRecent, endSession);
       },
     });
   }
@@ -1461,6 +1572,31 @@ export class App {
     });
   }
 
+  /** Press-twice confirm, same shape as Delete saved game (Group X6).
+   * Deliberately independent of it: "Delete saved game does NOT clear it." */
+  private openForgetRecentTasksConfirm(): void {
+    this.modal.open({
+      title: "Forget recent tasks?",
+      present: (i) => this.presenter.present(i),
+      build: (container) => {
+        const confirmBtn = document.createElement("button");
+        confirmBtn.type = "button";
+        confirmBtn.textContent = "Forget recent tasks";
+        confirmBtn.addEventListener("click", () => {
+          this.modal.close();
+          this.wizard.setRecentSessions([]);
+          void this.saveStore.writeRecentTasks({ schemaVersion: RECENT_TASKS_SCHEMA_VERSION, sessions: [] });
+          this.presenter.present({ visual: "Recent task history forgotten." });
+        });
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.addEventListener("click", () => this.modal.close());
+        container.append(confirmBtn, cancelBtn);
+      },
+    });
+  }
+
   private openEndSessionConfirm(): void {
     this.modal.open({
       title: "End session?",
@@ -1471,6 +1607,12 @@ export class App {
         confirmBtn.textContent = "End session";
         confirmBtn.addEventListener("click", () => {
           this.modal.close();
+          // Group X6: an early end still counts as "played" once there's
+          // enough of a game to be worth avoiding next time.
+          if (this.engine && this.engine.getSession().taskHistory.length >= 10) {
+            const session = this.engine.getSession();
+            void this.appendRecentSession(session.journeyId, this.sessionTaskIds());
+          }
           this.audioManager.killAll();
           this.engine = null;
           this.recordingEngine = null;

@@ -36,6 +36,8 @@ function makeValidSave(): SavedGame {
       tasksPerTurnOverride: null,
       reducedMotion: null,
       mapStyle: "satellite",
+      avoidRecentTasks: true,
+      recentGamesToRemember: 3,
     },
     teams: [
       { id: "matthew", name: "Matthew", color: "#c00", symbol: "cross" },
@@ -65,7 +67,10 @@ describe("P2 — the save schema", () => {
   });
 
   it("rejects a wrong saveSchemaVersion", () => {
-    const save = { ...makeValidSave(), saveSchemaVersion: 2 } as unknown;
+    // PHASE10_SPEC Group X6 bumped SAVE_SCHEMA_VERSION 1 -> 2; a literal
+    // "2" here would stop being wrong the next time it bumps again, so
+    // this is symbolic like P6's own mismatch tests.
+    const save = { ...makeValidSave(), saveSchemaVersion: SAVE_SCHEMA_VERSION + 1 } as unknown;
     expect(savedGameSchema.safeParse(save).success).toBe(false);
     const parsed = parseSavedGame(save);
     expect(parsed.ok).toBe(false);

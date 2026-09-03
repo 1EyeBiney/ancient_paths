@@ -54,6 +54,15 @@ const MIN_TEAMS = 2;
 const MAX_TEAMS = 8;
 const MIN_TASKS_PER_TURN = 1;
 const MAX_TASKS_PER_TURN = 6;
+const MIN_RECENT_GAMES = 1;
+const MAX_RECENT_GAMES = 5;
+
+/** One remembered game's drawn task ids (PHASE10_SPEC Group X6) — the
+ * wizard only needs the ids, oldest session first; App owns loading and
+ * persisting the fuller RecentTasks record via the SaveStore. */
+export interface RecentSession {
+  taskIds: string[];
+}
 
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
@@ -89,6 +98,12 @@ export class SetupWizard {
   /** null = follow the prefers-reduced-motion media query. */
   reducedMotion: boolean | null;
   mapStyle: MapStyleId;
+  // PHASE10_SPEC Group X6.
+  avoidRecentTasks: boolean;
+  recentGamesToRemember: number;
+  /** Loaded by App from the SaveStore, oldest session first; not part of
+   * SetupSnapshot (it's derived play history, not a host choice). */
+  recentSessions: RecentSession[];
 
   private readonly randomSeedSource: () => number;
 
@@ -115,6 +130,9 @@ export class SetupWizard {
     this.tasksPerTurnOverride = null;
     this.reducedMotion = null;
     this.mapStyle = "satellite";
+    this.avoidRecentTasks = true;
+    this.recentGamesToRemember = 3;
+    this.recentSessions = [];
   }
 
   setReducedMotion(v: boolean | null): void {
@@ -209,6 +227,20 @@ export class SetupWizard {
     this.tasksPerTurnOverride = n === null ? null : clamp(Math.round(n), MIN_TASKS_PER_TURN, MAX_TASKS_PER_TURN);
   }
 
+  setAvoidRecentTasks(v: boolean): void {
+    this.avoidRecentTasks = v;
+  }
+
+  setRecentGamesToRemember(n: number): void {
+    this.recentGamesToRemember = clamp(Math.round(n), MIN_RECENT_GAMES, MAX_RECENT_GAMES);
+  }
+
+  /** App calls this once it has loaded (or updated) the remembered-games
+   * record from the SaveStore. */
+  setRecentSessions(sessions: RecentSession[]): void {
+    this.recentSessions = sessions;
+  }
+
   // -- persistence (Phase 8) -------------------------------------------------
 
   /** Every public field, keyed by journey id (not the Journey object itself)
@@ -230,6 +262,8 @@ export class SetupWizard {
       tasksPerTurnOverride: this.tasksPerTurnOverride,
       reducedMotion: this.reducedMotion,
       mapStyle: this.mapStyle,
+      avoidRecentTasks: this.avoidRecentTasks,
+      recentGamesToRemember: this.recentGamesToRemember,
     };
   }
 
@@ -255,6 +289,8 @@ export class SetupWizard {
     this.tasksPerTurnOverride = snapshot.tasksPerTurnOverride;
     this.reducedMotion = snapshot.reducedMotion;
     this.mapStyle = snapshot.mapStyle;
+    this.avoidRecentTasks = snapshot.avoidRecentTasks;
+    this.recentGamesToRemember = snapshot.recentGamesToRemember;
   }
 
   // -- derived --------------------------------------------------------------
@@ -288,9 +324,19 @@ export class SetupWizard {
     });
   }
 
+  /** The union of ids to avoid (PHASE10_SPEC Group X6): the last
+   * `recentGamesToRemember` remembered sessions, oldest first — matching
+   * how excludeTaskIds' own relaxation reads its list (oldest relaxed
+   * first). Empty when the toggle is off or nothing is remembered yet. */
+  recentTaskIdsToExclude(): string[] {
+    if (!this.avoidRecentTasks) return [];
+    return this.recentSessions.slice(-this.recentGamesToRemember).flatMap((s) => s.taskIds);
+  }
+
   toBuildOptions(): BuildOptions {
     if (!this.journey) throw new Error("SetupWizard.toBuildOptions: no journey selected");
     const packs = this.packs.filter((p) => this.enabledPackIds.includes(p.packId));
+    const excludeTaskIds = this.recentTaskIdsToExclude();
     return {
       journey: this.journey,
       packs,
@@ -299,6 +345,7 @@ export class SetupWizard {
       seed: this.seed,
       difficulty: this.difficulty,
       enabledCategories: this.enabledCategories,
+      ...(excludeTaskIds.length > 0 ? { excludeTaskIds } : {}),
     };
   }
 
@@ -320,6 +367,7 @@ export class SetupWizard {
       `Enabled categories: ${this.enabledCategories.join(", ") || "none"}.`,
       `Tasks per turn: ${this.effectiveTasksPerTurn()}${this.tasksPerTurnOverride ? " (overridden)" : " (recommended)"}.`,
       `Community catch-up: ${this.communityCatchup ? "on" : "off"}.`,
+      `Avoid tasks from recent games: ${this.avoidRecentTasks ? `on (${this.recentGamesToRemember} games)` : "off"}.`,
       `Audio: master ${this.audio.master}, music ${this.audio.music}, effects ${this.audio.effects}, narration ${this.audio.narration}.`,
       `Seed: ${this.seed}.`,
       ...(plan ? [`Estimated duration: about ${Math.round(plan.estimatedMinutes)} minutes.`, ...plan.warnings] : []),

@@ -64,5 +64,11 @@ Notes:
   "New game" when a save exists) and the game menu's "Game log…" and
   "Delete saved game" are ordinary Tab-reachable buttons, same precedent
   as Phase 7's above.
+- Phase 10 Group X6 (recent-use memory) added no new keys either: the
+  game menu gained "Forget recent tasks" (press-twice, same shape as
+  "Delete saved game", ordinary Tab-reachable button); setup gained an
+  "Avoid tasks from recent games" checkbox and a "Games to remember
+  (1-5)" number field, both ordinary setup controls navigated the same
+  way as every other setup field.
 - This file is the living record; update it whenever `KEY_BINDINGS`
   changes in `src/ui/keys.ts`.

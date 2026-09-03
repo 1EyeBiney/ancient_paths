@@ -81,6 +81,8 @@ function recordUntil(until: (engine: RecordingEngine) => boolean, setupOverrides
       tasksPerTurnOverride: null,
       reducedMotion: null,
       mapStyle: "satellite",
+      avoidRecentTasks: true,
+      recentGamesToRemember: 3,
       ...setupOverrides,
     },
     teams,

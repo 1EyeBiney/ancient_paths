@@ -450,6 +450,40 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X6 done (2026-09-03, 12 new tests, 2863 project-wide):**
+  recent-use memory across games (Brian ruled yes, item 35).
+  `SaveStore` gains `readRecentTasks`/`writeRecentTasks` (a new
+  `RecentTasks` record, `src/persistence/schema.ts`, up to 5 remembered
+  sessions, oldest dropped; a corrupt record is ignored and overwritten,
+  never fatal — unlike a save, it isn't quarantined). `SetupSnapshot`
+  gained `avoidRecentTasks`/`recentGamesToRemember`, bumping
+  `SAVE_SCHEMA_VERSION` 1 → 2 (existing saves quarantine via the
+  already-tested version-mismatch path — no separate migration needed).
+  `SetupWizard` gained the two fields plus `recentSessions` (loaded by
+  App, not part of the snapshot — it's play history, not a host choice)
+  and `recentTaskIdsToExclude()` (the last N remembered sessions,
+  oldest first); `toBuildOptions()` passes it through as
+  `excludeTaskIds` automatically. `App`: loads the record at boot,
+  records a session's ids (taskHistory plus every relay's drawn
+  community task id, collected as they occur since neither survives in
+  `PlaySession`) at `gameSummary` and at an End-session with ≥ 10
+  attempts; the setup screen gained the "Avoid tasks from recent games"
+  checkbox (default on) and "Games to remember (1-5)" field, plus one
+  plain sentence on the estimate line when a discarded preview build
+  would need to relax an exclusion; the game menu gained "Forget recent
+  tasks" (press-twice, independent of "Delete saved game," which does
+  NOT clear it). `tests/persistence/group-x6-recent-tasks.test.ts`
+  covers the store round trip, the wizard logic, and five full-App
+  scenarios (recording at summary with every id verified short against
+  the REAL pack, a second session appending, Forget vs. Delete, the
+  10-attempt threshold, and the relaxation sentence appearing only when
+  earned). OPEN_QUESTIONS item 38: the spec's claim that P2 already had
+  a "fake-IDB path" for testing `IndexedDbSaveStore` didn't match
+  reality (no test anywhere exercises it — jsdom has no `indexedDB`
+  global, and rule 5 was never invoked for a fake-IndexedDB dependency);
+  `readRecentTasks`/`writeRecentTasks` on the real store are verified by
+  the manual browser check (folded into Group X11) like every other
+  `IndexedDbSaveStore` method already was.
   **Group X5 done (2026-09-03, 5 new tests, 2851 project-wide):**
   content-repeat analysis, `tests/sim/group-x5-repeats.test.ts` — a
   four-session chain (4/2/8/4 teams) confirms one-session memory never

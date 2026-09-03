@@ -6,7 +6,11 @@
 
 import { z } from "zod";
 
-export const SAVE_SCHEMA_VERSION = 1;
+// Bumped 1 -> 2 for PHASE10_SPEC Group X6 (SetupSnapshot gained
+// avoidRecentTasks/recentGamesToRemember): the existing version-mismatch
+// handling in parseSavedGame already quarantines any older-shaped save
+// with a specific message, so no separate migration path is needed.
+export const SAVE_SCHEMA_VERSION = 2;
 
 const RESOURCE_TYPES = ["insight", "provision", "courage"] as const;
 const resourceTypeSchema = z.enum(RESOURCE_TYPES);
@@ -168,6 +172,9 @@ export const setupSnapshotSchema = z.object({
   tasksPerTurnOverride: z.number().nullable(),
   reducedMotion: z.boolean().nullable(),
   mapStyle: z.enum(["satellite", "parchment", "none"]),
+  // PHASE10_SPEC Group X6.
+  avoidRecentTasks: z.boolean(),
+  recentGamesToRemember: z.number(),
 });
 
 const teamSetupSchema = z.object({
@@ -211,6 +218,37 @@ export type SaveParseResult = { ok: true; game: SavedGame } | { ok: false; reaso
  * this path, even though nothing older than v1 exists yet) rather than
  * zod's generic "invalid literal" error.
  */
+// ---------------------------------------------------------------------------
+// Recent tasks (PHASE10_SPEC Group X6). Kept as its own record, separate
+// from SavedGame — it survives "Delete saved game" and outlives any one
+// session (up to 5 remembered games), so a version mismatch here is
+// silently ignored and overwritten rather than quarantined like a save.
+// ---------------------------------------------------------------------------
+
+export const RECENT_TASKS_SCHEMA_VERSION = 1;
+
+const recentSessionSchema = z.object({
+  endedAt: z.string(),
+  journeyId: z.string(),
+  taskIds: z.array(z.string()),
+});
+
+export const recentTasksSchema = z.object({
+  schemaVersion: z.literal(RECENT_TASKS_SCHEMA_VERSION),
+  sessions: z.array(recentSessionSchema),
+});
+
+export type RecentSession = z.infer<typeof recentSessionSchema>;
+export type RecentTasks = z.infer<typeof recentTasksSchema>;
+
+/** A corrupt or foreign record is never fatal here (unlike a save): it is
+ * simply treated as "nothing remembered yet" and overwritten the next time
+ * a session's ids are recorded. */
+export function parseRecentTasks(raw: unknown): RecentTasks | null {
+  const result = recentTasksSchema.safeParse(raw);
+  return result.success ? result.data : null;
+}
+
 export function parseSavedGame(raw: unknown): SaveParseResult {
   if (raw !== null && typeof raw === "object" && "saveSchemaVersion" in raw) {
     const v = (raw as { saveSchemaVersion: unknown }).saveSchemaVersion;

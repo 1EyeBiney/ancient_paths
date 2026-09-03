@@ -71,6 +71,8 @@ function buildValidSave(): SavedGame {
       tasksPerTurnOverride: null,
       reducedMotion: null,
       mapStyle: "satellite",
+      avoidRecentTasks: true,
+      recentGamesToRemember: 3,
     },
     teams,
     turnTaskLimit: 4,
