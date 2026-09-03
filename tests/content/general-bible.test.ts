@@ -61,7 +61,7 @@ const CATEGORY_ID_PREFIX: Record<Task["category"], string> = {
 const TARGET_COUNTS: Record<Task["category"], number> = {
   "scripture-knowledge": 40, // N4, done
   "bible-reasoning": 20, // N5, done
-  "historical-context": 1,
+  "historical-context": 20, // N6, done
   "decision-strategy": 1,
   hymn: 1,
   "audio-listening": 1,

@@ -386,12 +386,11 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
   after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
-  other five categories up to their targets (historical-context 20,
-  decision-strategy 12, hymn 12, audio-listening 12, community 12 —
-  counts and ids only anywhere Brian reads, per the secrecy protocol), a
-  sufficiency matrix, and the §34 deliverable as a test: two full
-  sessions with ≤ 5% task overlap. Groups N6-N12 remain. Rulings in
-  OPEN_QUESTIONS.md item 32.
+  other four categories up to their targets (decision-strategy 12, hymn
+  12, audio-listening 12, community 12 — counts and ids only anywhere
+  Brian reads, per the secrecy protocol), a sufficiency matrix, and the
+  §34 deliverable as a test: two full sessions with ≤ 5% task overlap.
+  Groups N7-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
   **Group N4 done (2026-09-03):** scripture-knowledge authored to its
   target of 40 tasks (16 easy, 16 moderate, 8 hard), ids `gb-sk-001`
   through `gb-sk-040`.
@@ -399,9 +398,16 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   of 20 tasks (8 easy, 8 moderate, 4 hard), ids `gb-br-001` through
   `gb-br-020` — each gives its reasoning material in the prompt itself
   (§13.2: "should not require extensive prior Bible knowledge"), never
-  a bare recall question. All 1047 blind assertions in
+  a bare recall question.
+  **Group N6 done (2026-09-03):** historical-context authored to its
+  target of 20 tasks (8 easy, 8 moderate, 4 hard), ids `gb-hc-001`
+  through `gb-hc-020`, spanning §13.3's subject list (geography, travel,
+  occupations, food, money, Roman government, Jewish customs, cities,
+  archaeology, trade, houses/daily life); every `historicalNote` carries
+  its required "Stated in Scripture:" / "Widely accepted background:" /
+  "Disputed:" prefix. All 1351 blind assertions in
   `tests/content/general-bible.test.ts` pass against the pack as it
-  stands now (1527 tests project-wide).
+  stands now (1831 tests project-wide).
   **Group N3 done (2026-09-03, 119 new tests, 599 project-wide):** the
   `general-bible` pack's scaffolding — id `general-bible`, version
   1.0.0, one accurate seed task per category (`gb-sk-001` through
