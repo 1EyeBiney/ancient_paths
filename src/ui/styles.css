@@ -25,6 +25,14 @@
   --space: 1rem;
   --radius: 0.5rem;
   --motion: 250ms;
+
+  --map-route: #d94f2b;
+  --map-halo: #fff8ec;
+}
+
+[data-map-style="parchment"] {
+  --map-route: #7c2d12;
+  --map-halo: #f3e6c9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -207,6 +215,74 @@ main {
 .audience tr.active-team {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   font-weight: bold;
+}
+
+/* -- map panel (PHASE5B_SPEC "The map panel") ---------------------------- */
+
+.map {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  margin-bottom: var(--space);
+  width: 100%;
+}
+
+.map-bg {
+  position: absolute;
+  max-width: none; /* override the global img{max-width:100%} reset */
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-overlay .route {
+  fill: none;
+  stroke: var(--map-route);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px var(--map-halo));
+}
+
+.map-overlay .landmark circle {
+  fill: var(--map-route);
+  stroke: var(--map-halo);
+  stroke-width: 2;
+}
+
+.map-overlay .landmark text {
+  font-size: 28px;
+  font-weight: bold;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--map-halo);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.map-markers {
+  position: absolute;
+  inset: 0;
+}
+
+.map-marker {
+  position: absolute;
+  left: var(--x, 0%);
+  top: var(--y, 0%);
+  transform: translate(-50%, -100%);
+}
+
+/* Gated behind [data-reduced-motion="false"] like every other motion in
+   this file (§24). Animating left/top (not `transform: translate(%)`,
+   whose percentages resolve against the ELEMENT's own box, not the
+   container) is what actually glides the badge from its old --x/--y to
+   its new one when a stage completes. */
+[data-reduced-motion="false"] .map-marker {
+  transition: left var(--motion) ease, top var(--motion) ease;
 }
 
 .landmark-strip {

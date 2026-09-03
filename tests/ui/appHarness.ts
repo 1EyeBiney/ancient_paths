@@ -70,8 +70,15 @@ export function makeApp(
 
 /** Startup -> setup -> playing, by mouse, accepting every first option. */
 export function beginByMouse(h: AppHarness, teamNames: [string, string] = ["Alpha", "Beta"]): void {
+  findButtonByText(h.root, "New game").click();
+  finishSetupByMouse(h, teamNames);
+}
+
+/** The rest of setup -> playing, by mouse, assuming the setup screen is
+ * ALREADY showing (New game already clicked) — lets a test interact with
+ * a setup control (e.g. Map style) before finishing the wizard. */
+export function finishSetupByMouse(h: AppHarness, teamNames: [string, string] = ["Alpha", "Beta"]): void {
   const { root } = h;
-  findButtonByText(root, "New game").click();
   root.querySelector<HTMLElement>('[aria-label="Journey"] [role="option"]')!.click();
   root.querySelector<HTMLElement>('[aria-label="Number of teams"] [role="option"]')!.click();
   const inputs = root.querySelectorAll<HTMLInputElement>("#team-names input");
