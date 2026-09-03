@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 6 (AUDIO) COMPLETE + REVIEWED (2026-09-03) — awaiting Brian's ear; Phase 7 not yet planned
+## Status: PHASE 6 (AUDIO) COMPLETE, PHASE 7 (COMMUNITY & OFFERINGS) SPECIFIED (2026-09-03) — implement PHASE7_SPEC.md next
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (374/374
@@ -57,9 +57,23 @@ screen off Welcome (every cue and loaded asset, one button each — the
 way to test sounds), a melody sequencer for note-data hymns, synthetic
 placeholder tones/tunes in dev-playtest, and the A7 deliverable: with
 audio entirely broken the whole game still completes on fallback text.
-Awaiting Brian's ear on cue character, the wait/interrupt default, and
-how NVDA's audio ducking interacts with cues (OPEN_QUESTIONS 24-25).
-Open ruling: ambient currently lasts one screen (item 25).
+Brian's verdict: audio works (OPEN_QUESTIONS 24-25); ambient stays
+one-screen until Phase 9 authors real ambience.
+
+**Phase 7 (community and offerings) is specified and ready to
+implement**: see **PHASE7_SPEC.md**. The Phase 2 engine already has
+events, contributions, room rewards, the weighted offering pool, and
+Service; Phase 7 finishes catch-up (setup toggle → engine config,
+success-only, announced), pledge amounts + the exceptional-contribution
+award, sharing a granted resource (Service for choosing the community),
+audible offering outcomes via new `Offering effect:` log lines and a
+general voiced-log-lines table in app.ts, visible Service (audience
+column, status, summary accomplishments, configurable award name), and
+repeatable events. **This phase opens `src/engine/` to the implementer**
+under the spec's rules: existing engine tests untouched, new state
+inside `EngineState`, existing log-line texts frozen (the UI regexes
+them). Schema and sample content stay untouched. Rulings:
+OPEN_QUESTIONS item 26.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

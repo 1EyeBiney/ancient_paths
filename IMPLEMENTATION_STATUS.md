@@ -277,11 +277,20 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-(none — Phase 6 complete; Phase 7 not yet planned)
+- Phase 7 — Community and offering systems: PHASE7_SPEC.md written
+  (2026-09-03) after Brian closed Phase 6 ("audio works"). The Phase 2
+  engine already covers events, contributions, room rewards, offerings,
+  weighted pools, and Service; the spec finishes catch-up (setup toggle
+  → engine, success-only, announced), pledge amounts + the exceptional-
+  contribution award, sharing a granted resource (the "choose the
+  community" Service action), audible offering outcomes, visible Service
+  (audience column, status, summary accomplishments, configurable award
+  name), repeatable events. Test groups C1-C8. Opens `src/engine/` to
+  the implementer under rules in the spec. Implementation not yet
+  started. Rulings in OPEN_QUESTIONS.md item 26.
 
 ## Remaining
 
-- Phase 7 — Community and offering systems.
 - Phase 8 — Persistence and recovery.
 - Phase 9 — Version-one content (full General Bible pack, full journey).
 - Phase 10 — Accessibility and balance audit.

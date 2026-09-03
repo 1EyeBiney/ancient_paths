@@ -365,6 +365,41 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     Phase 9; suggested rule: ambient survives until the next landmark or
     leaving play. Also minor: the first (unconfirmed) Ctrl+Z press already
     kills the current clip.
+    **Brian's verdict (2026-09-03): audio works; everything tested is
+    fine.** The "wait" default stands, the cues stand as tuned, the
+    one-screen ambient stays until Phase 9 authors real ambience. Phase 6
+    closed.
+
+26. **DECIDED (2026-09-03) — Phase 7 scope and rulings (PHASE7_SPEC.md).**
+    The Phase 2 engine already had events, contributions, room rewards,
+    the weighted offering pool, and Service; Phase 7 finishes the rest.
+    Rulings, all reversible and configurable in `src/config/defaults.ts`:
+    - Catch-up (closes open item 3 / §37.5): on a community event's
+      SUCCESS only, every team more than `stagesBehind` (2) entries behind
+      the leader — counting a fork as one entry so route choice never
+      changes rank — may choose one resource. Announced as a `Catch-up:`
+      log line the UI voices. A failed event grants nothing; the leader is
+      never touched. Setup's existing toggle now drives it.
+    - Exceptional contribution (§11's 2-point award): a single team
+      pledging at least `max(2, ceil(50% of threshold))` in one event,
+      awarded whether or not the room succeeds — the generosity happened.
+      The pledge UI now offers 1..min(owned, 3) units.
+    - "Choose a community benefit" (§11's 1-point award) gets its decision
+      point as **sharing a gift**: a team holding a pending "choice" grant
+      may hand it to another team instead (the recipient then chooses).
+      Gifts can't be re-shared, so no Service loops.
+    - Offerings become audible: a second `Offering effect:` log line
+      states what actually happened, and `reveal-next-stage-info` now
+      really names the next stage / fork. Two new cues, `offering` and
+      `serviceEarned`. A general "voiced log lines" table in app.ts
+      replaces the ad-hoc cue matching — the engine's log is the record,
+      the UI speaks designated lines.
+    - Service becomes visible (audience column, S status, summary
+      accomplishments) and the award's public name comes from config.
+    - `repeatable` events fire per team's first arrival.
+    - This phase OPENS `src/engine/` to the implementer under explicit
+      rules (existing tests untouched, state inside `EngineState`, log
+      texts frozen). Schema and sample content stay untouched.
 
 ## Open
 
@@ -372,8 +407,9 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    (current sample uses Jerusalem → Caesarea → Antioch → Rome; Asia Minor
    and Greece milestones to be added when the journey is authored fully).
 2. Exact Journey Token power (spec §37.4) — awaiting balance testing.
-3. Community Event catch-up reward rules (spec §37.5) — configurable;
-   defaults to be set during Phase 7.
+3. **DECIDED (2026-09-03, item 26)** — Community Event catch-up rules:
+   success-only, more-than-two-entries-behind, one resource of choice;
+   configurable in `src/config/defaults.ts`.
 4. Whether a timed endgame / final challenge is offered (spec §37.7).
 5. Whether recent-task history persists between games automatically
    (spec §37.10) — deferred; per-session memory only in version one.
