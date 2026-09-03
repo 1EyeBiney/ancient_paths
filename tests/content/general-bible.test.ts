@@ -60,7 +60,7 @@ const CATEGORY_ID_PREFIX: Record<Task["category"], string> = {
 // Grows as N4-N10 land; never commit a count the pack doesn't yet meet.
 const TARGET_COUNTS: Record<Task["category"], number> = {
   "scripture-knowledge": 40, // N4, done
-  "bible-reasoning": 1,
+  "bible-reasoning": 20, // N5, done
   "historical-context": 1,
   "decision-strategy": 1,
   hymn: 1,
