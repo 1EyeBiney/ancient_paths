@@ -450,6 +450,37 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X10 done (2026-09-03, 3 new tests, 2882 project-wide):** the
+  simulation report. `src/sim/report.ts`'s `generateReport(journey, packs)`
+  is a pure function that runs its OWN smaller batches (length 2/cell vs.
+  X2's 3, economy 5/preset vs. X3's 10, fairness 30 seats-rotated games vs.
+  X4's 120, Service 5/preset vs. X4's 10, repeats one 4-session chain, same
+  as X5) through the SAME `simulateGame`/`summarizeBatch`/
+  `winShareBySeat`/`firstToFinishShareBySeat` this phase's own X2-X5 tests
+  already assert against, and renders `SIMULATION_REPORT.md`: a dated
+  header naming the success-model constants and presets, one table per
+  group, a Findings list, and a Proposals list mirroring OPEN_QUESTIONS
+  items 37/39/40. `tests/sim/group-x10-report.test.ts` checks
+  determinism, that the committed file matches a fresh generation (WRITES
+  + fails with "SIMULATION_REPORT.md regenerated — review it, then
+  commit" on any difference — the next run passes, same idea as the
+  dev-playtest generator's own committed-file test), and that no real
+  task id or prompt string appears anywhere in it. Two things fixed along
+  the way, neither an app defect: the report's header used `new Date()`
+  at first, which would have made the committed file fail its own
+  determinism check every day going forward on pure date drift — replaced
+  with a fixed `REPORT_DATE` constant a human updates on a deliberate
+  regeneration; and the "is deterministic" test's own second
+  `generateReport()` call (~5s) needs a longer per-test timeout once it's
+  contending with the rest of `tests/sim` for CPU in the same run (fine
+  alone, timed out at vitest's default 5000ms otherwise) — given an
+  explicit 20s. Whole `tests/sim` directory: 112 tests, ~13s. One
+  interesting-but-expected number surfaced while reviewing the generated
+  report: the fairness batch's contribution goal-met rate came out at 0%
+  — traced to the rotation's own preset mix (3 of 4 rotated presets have
+  `contribution: "hoarder"`, an always-decline; only GENEROUS ever
+  pledges), not a game-balance defect — the report says so inline rather
+  than reading as unexplained.
   **Group X9 done (2026-09-03):** `NVDA_CHECKLIST.md`, a 17-section
   numbered walkthrough for Brian to run by hand with NVDA in Chrome —
   boot/Welcome, the setup wizard's cursor lists and input firewall, a full
