@@ -544,6 +544,19 @@ export class ScreenRenderer {
     const pledgeActions: ScreenAction[] = [];
 
     if (event.kind === "relay") {
+      // The shared community task (PHASE9_SPEC Group N1) — null when the
+      // task source has none for this category (many synthetic test packs).
+      const communityTask = engine.getCommunityTaskPublic();
+      let promptPrefix = "";
+      if (communityTask) {
+        const promptEl = el("p", { text: communityTask.prompt });
+        promptEl.dataset.communityPrompt = "true";
+        container.appendChild(promptEl);
+        if (communityTask.hostGuidance) {
+          container.appendChild(el("p", { text: `Host guidance: ${communityTask.hostGuidance}` }));
+        }
+        promptPrefix = `${communityTask.prompt} `;
+      }
       container.appendChild(el("p", { text: `Room progress: ${progress.roomProgress} of ${event.successThreshold}.` }));
       const remaining = teams.filter((t) => !progress.answeredTeamIds.includes(t.id));
       const current = remaining[0];
@@ -558,7 +571,7 @@ export class ScreenRenderer {
           { id: "ruleIncorrect", label: `Team ${current.name}: incorrect`, run: () => relayRule(false) },
         );
         this.present({
-          visual: `${heading}. Room progress ${progress.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
+          visual: `${heading}. ${promptPrefix}Room progress ${progress.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
         });
       } else {
         container.appendChild(el("p", { text: "Every team has answered." }));

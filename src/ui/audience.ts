@@ -221,6 +221,12 @@ export class AudienceView {
     section.appendChild(el("h3", { text: "Community event" }));
     section.appendChild(el("p", { text: event.title, className: "big" }));
     section.appendChild(el("p", { text: event.description }));
+    // The shared relay task's prompt (PHASE9_SPEC Group N1) — never the
+    // host guidance (it can hint at judging) and never the answer.
+    const communityTask = event.kind === "relay" ? engine.getCommunityTaskPublic() : null;
+    if (communityTask) {
+      section.appendChild(el("p", { text: communityTask.prompt, data: "community-prompt" }));
+    }
     const [now, max, text] =
       event.kind === "relay"
         ? [progress.roomProgress, event.successThreshold, `${progress.roomProgress} of ${event.successThreshold} correct`]

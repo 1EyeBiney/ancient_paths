@@ -98,6 +98,42 @@ function buildDeck(pack: ContentPack, seed: string) {
   }).deck;
 }
 
+/** Packages a RecordingEngine's current state as a SavedGame, whatever
+ * point in the game it's at — shared by the full-game driver and the
+ * mid-community-event test (PHASE9_SPEC Group N1). */
+function buildSave(recorder: RecordingEngine, pack: ContentPack, seed: string): SavedGame {
+  return {
+    saveSchemaVersion: SAVE_SCHEMA_VERSION,
+    savedAt: new Date().toISOString(),
+    content: {
+      journeyId: testJourney.journeyId,
+      journeyVersion: testJourney.version,
+      packs: { [pack.packId]: pack.version },
+    },
+    setup: {
+      journeyId: testJourney.journeyId,
+      teamCount: 2,
+      teamNames: ["Matthew", "Mark"],
+      duration: "standard",
+      pace: "standard",
+      difficulty: "standard",
+      enabledPackIds: [pack.packId],
+      enabledCategories: [...NON_COMMUNITY_CATEGORIES],
+      audio: { master: 100, music: 70, effects: 70, narration: 100 },
+      communityCatchup: true,
+      seed,
+      tasksPerTurnOverride: null,
+      reducedMotion: null,
+      mapStyle: "satellite",
+    },
+    teams: twoTeams,
+    turnTaskLimit: 3,
+    commands: [...recorder.getCommands()],
+    snapshot: recorder.getSession(),
+    audio: { settings: { master: 100, music: 70, effects: 70, narration: 100 }, speechMode: "wait" },
+  };
+}
+
 /** Plays a full game (fork, offering, community event, share, undo) via a
  * RecordingEngine and returns it plus a SavedGame built from its state. */
 function playRecordedGame(seed = SEED): { recorder: RecordingEngine; save: SavedGame; pack: ContentPack } {
@@ -227,38 +263,7 @@ function playRecordedGame(seed = SEED): { recorder: RecordingEngine; save: Saved
   expect(offeredSurplus).toBe(true);
   expect(sharedGift).toBe(true);
 
-  const save: SavedGame = {
-    saveSchemaVersion: SAVE_SCHEMA_VERSION,
-    savedAt: new Date().toISOString(),
-    content: {
-      journeyId: testJourney.journeyId,
-      journeyVersion: testJourney.version,
-      packs: { [pack.packId]: pack.version },
-    },
-    setup: {
-      journeyId: testJourney.journeyId,
-      teamCount: 2,
-      teamNames: ["Matthew", "Mark"],
-      duration: "standard",
-      pace: "standard",
-      difficulty: "standard",
-      enabledPackIds: [pack.packId],
-      enabledCategories: [...NON_COMMUNITY_CATEGORIES],
-      audio: { master: 100, music: 70, effects: 70, narration: 100 },
-      communityCatchup: true,
-      seed,
-      tasksPerTurnOverride: null,
-      reducedMotion: null,
-      mapStyle: "satellite",
-    },
-    teams: twoTeams,
-    turnTaskLimit: 3,
-    commands: [...recorder.getCommands()],
-    snapshot: recorder.getSession(),
-    audio: { settings: { master: 100, music: 70, effects: 70, narration: 100 }, speechMode: "wait" },
-  };
-
-  return { recorder, save, pack };
+  return { recorder, save: buildSave(recorder, pack, seed), pack };
 }
 
 describe("P3 — RecordingEngine records only committed commands", () => {
@@ -349,5 +354,43 @@ describe("P3 — rebuildFromSave", () => {
     const result = rebuildFromSave(save, { journeys: [], packs: [pack] });
     expect("error" in result).toBe(true);
     if ("error" in result) expect(result.error).toBe("content changed");
+  });
+});
+
+describe("PHASE9_SPEC Group N1 — the drawn community task survives a save-and-replay", () => {
+  it("getCommunityTaskPublic()?.id matches after replay, saved mid-event (before resolve)", () => {
+    const pack = offerablePack();
+    const deck = buildDeck(pack, SEED);
+    const inner = createEngine({
+      journey: testJourney,
+      packs: [pack],
+      teams: twoTeams,
+      turnTaskLimit: 3,
+      rng: createRng(SEED),
+      taskSource: deck,
+    });
+    const recorder = new RecordingEngine({ engine: inner });
+    recorder.dispatch({ type: "startGame" });
+
+    let steps = 0;
+    while (recorder.getState() !== "communityEvent" && steps++ < 200) {
+      const state = recorder.getState();
+      if (state === "beginTurn") recorder.dispatch({ type: "presentTask" });
+      else if (state === "resourceWindow") recorder.dispatch({ type: "acceptAnswer" });
+      else if (state === "awaitingAnswer") recorder.dispatch({ type: "reveal" });
+      else if (state === "answerReveal") recorder.dispatch({ type: "rule", result: "correct" });
+      else if (state === "teachingReveal") recorder.dispatch({ type: "finishTeaching" });
+      else if (state === "landmarkIntroduction") recorder.dispatch({ type: "beginCommunityEvent" });
+      else throw new Error(`N1 driver: unhandled state "${state}"`);
+    }
+    expect(recorder.getState()).toBe("communityEvent");
+    const communityTaskId = recorder.getCommunityTaskPublic()?.id;
+    expect(communityTaskId).toBeDefined();
+
+    const save = buildSave(recorder, pack, SEED);
+    const result = rebuildFromSave(save, { journeys: [testJourney], packs: [pack] });
+    if ("error" in result) throw new Error(`rebuild failed: ${result.error}`);
+    expect(result.engine.getState()).toBe("communityEvent");
+    expect(result.engine.getCommunityTaskPublic()?.id).toBe(communityTaskId);
   });
 });

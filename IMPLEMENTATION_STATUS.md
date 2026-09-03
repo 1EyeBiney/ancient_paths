@@ -385,17 +385,35 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. Group N1 first: the relay prompt —
-  PHASE2_SPEC's "shared prompt comes from `nextCommunityTask`" was never
-  implemented, so a relay asks nothing today; N1 draws the community
-  task, shows it on both screens, reveals the answer on resolve. Then the
-  full journey (five milestones, 7 required successes, 4 events, 20
-  offerings), the `general-bible` pack (128 tasks across seven
-  categories, authored under the secrecy protocol — counts and ids only
-  anywhere Brian reads), `dev-*` packs excluded from production builds,
-  blind content tests, a sufficiency matrix, and the §34 deliverable as a
-  test: two full sessions with ≤ 5% task overlap. Groups N1-N12.
-  Implementation not yet started. Rulings in OPEN_QUESTIONS.md item 32.
+  after Fable's review of Phase 8. Then the full journey (five
+  milestones, 7 required successes, 4 events, 20 offerings), the
+  `general-bible` pack (128 tasks across seven categories, authored under
+  the secrecy protocol — counts and ids only anywhere Brian reads),
+  `dev-*` packs excluded from production builds, blind content tests, a
+  sufficiency matrix, and the §34 deliverable as a test: two full
+  sessions with ≤ 5% task overlap. Groups N2-N12 remain. Rulings in
+  OPEN_QUESTIONS.md item 32.
+  **Group N1 done (2026-09-03, 12 new tests, 472 project-wide):** the
+  relay prompt. PHASE2_SPEC's "shared prompt comes from
+  `nextCommunityTask`" was never implemented — a relay asked nothing.
+  `CommunityEventRuntime` gained `task: Task | null`, drawn in
+  `cmdBeginCommunityEvent` for relay events only (contribution events
+  draw nothing); a new `getCommunityTaskPublic()` read method (id,
+  title, prompt, hostGuidance — no answer, host-as-player privacy) is on
+  `GameEngine` and forwarded by `RecordingEngine`. Resolving a relay logs
+  `Community answer: …` then the teaching line right after the
+  success/failure line, win or lose (the task was still asked); the
+  reveal is voiced (`EVENT_LOG_VOICE` in app.ts), the teaching line is
+  not (keeps the reveal moment short). `screens.ts`'s relay branch and
+  `audience.ts`'s community panel both show the prompt (never the host
+  guidance on the audience side, never the answer on either before
+  resolve). `TaskSource.nextCommunityTask` widened to `Task | null`;
+  `ArrayTaskSource` returns null instead of throwing and draws from its
+  own cursor so it never shifts `nextTask`'s sequence — every existing
+  relay test (C1, C2, C4, C5, G, U8, V6) stayed green unchanged, and a
+  dedicated test proves the two cursors are independent. A mid-event
+  save-and-replay (`tests/persistence/group-p3-recording-replay.test.ts`)
+  confirms the drawn task's id survives a rebuild.
 
 ## Remaining
 

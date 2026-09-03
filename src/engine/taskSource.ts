@@ -7,7 +7,11 @@ import type { Task } from "../content/schemas";
 export interface TaskSource {
   nextTask(teamId: string, stageId: string): Task;
   nextReplacement(category: Task["category"], difficulty: Task["difficulty"]): Task | null;
-  nextCommunityTask(category: Task["category"]): Task;
+  // null when the source has no task for this category (PHASE9_SPEC Group
+  // N1) — a relay simply has no shared prompt that turn rather than
+  // erroring; SessionDeck still throws SessionBuildError on real content
+  // insufficiency, which already satisfies this wider return type.
+  nextCommunityTask(category: Task["category"]): Task | null;
 }
 
 /**
@@ -18,6 +22,11 @@ export interface TaskSource {
  */
 export class ArrayTaskSource implements TaskSource {
   private cursor = 0;
+  // A separate cursor for community draws (PHASE9_SPEC Group N1): drawing a
+  // relay's shared task must never shift which task nextTask()/
+  // nextReplacement() serve next — many existing tests assert an exact
+  // ordinary draw sequence around a relay event.
+  private communityCursor = 0;
 
   constructor(private readonly tasks: readonly Task[]) {}
 
@@ -38,13 +47,11 @@ export class ArrayTaskSource implements TaskSource {
     return task;
   }
 
-  nextCommunityTask(category: Task["category"]): Task {
+  nextCommunityTask(category: Task["category"]): Task | null {
     const pool = this.tasks.filter((t) => t.category === category);
-    if (pool.length === 0) {
-      throw new Error(`ArrayTaskSource.nextCommunityTask: no task for category "${category}"`);
-    }
-    const task = pool[this.cursor % pool.length] as Task;
-    this.cursor++;
+    if (pool.length === 0) return null;
+    const task = pool[this.communityCursor % pool.length] as Task;
+    this.communityCursor++;
     return task;
   }
 }

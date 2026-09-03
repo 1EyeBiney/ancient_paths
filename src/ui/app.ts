@@ -91,6 +91,10 @@ const EVENT_LOG_VOICE: EventLogVoiceRow[] = [
   { pattern: /^Team .+ shares its gift with Team /, present: true },
   { pattern: /^Team .+ made an exceptional contribution\.$/, present: true },
   { pattern: /^Team .+ receives a free clue from an earlier gift\.$/, present: true },
+  // PHASE9_SPEC Group N1: a relay's shared answer, revealed on resolve.
+  // The teaching line right after it is deliberately NOT voiced — keeps
+  // the reveal moment short; the host can read it from the Game log.
+  { pattern: /^Community answer: /, present: true },
 ];
 
 export interface AppOptions {

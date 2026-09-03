@@ -99,6 +99,16 @@ export interface RevealedAnswer {
   hostGuidance: string | null;
 }
 
+// The pre-reveal read view of a relay's shared community task (PHASE9_SPEC
+// Group N1). No answer/acceptedAnswers — host-as-player: nobody hears the
+// answer before every team has answered.
+export interface CommunityTaskPublic {
+  id: string;
+  title: string;
+  prompt: string;
+  hostGuidance: string | null;
+}
+
 export interface GameSummary {
   journeyWinners: string[];
   barnabasAwardRecipients: string[];
@@ -180,6 +190,11 @@ interface CommunityEventRuntime {
   // Contribution events only: per-team running pledge total, for the
   // exceptional-contribution Service award at resolve time.
   pledgedByTeam: Record<string, number>;
+  // Relay events only (PHASE9_SPEC Group N1): the shared task drawn from
+  // nextCommunityTask(), or null when the source has none for this
+  // category (ArrayTaskSource in many tests). Undo-tracked for free via
+  // dispatch()'s structuredClone snapshot.
+  task: Task | null;
 }
 
 interface EngineState {
@@ -214,6 +229,7 @@ export interface GameEngine {
   getTeam(id: string): Readonly<TeamState> | undefined;
   getCurrentTaskPublic(): PublicTask | null;
   getRevealedAnswer(): RevealedAnswer | null;
+  getCommunityTaskPublic(): CommunityTaskPublic | null;
   getAvailableRoutes(): RouteInfo[] | null;
   getEffectiveStageRequirement(teamId: string): number | null;
   getPendingSurplus(): number;
@@ -1123,10 +1139,11 @@ class Engine implements GameEngine {
     this.requireState("beginCommunityEvent", "landmarkIntroduction");
     const eventId = this.state.pendingCommunityEventId;
     if (!eventId) throw new IllegalCommandError("beginCommunityEvent", "no community event is pending");
-    this.state.community = { eventId, roomProgress: 0, pledgedTotal: 0, pledgedByTeam: {} };
+    const event = this.journey.communityEvents.find((e) => e.id === eventId);
+    const task = event?.kind === "relay" ? this.taskSource.nextCommunityTask(event.taskCategory) : null;
+    this.state.community = { eventId, roomProgress: 0, pledgedTotal: 0, pledgedByTeam: {}, task };
     this.state.pendingCommunityEventId = null;
     this.state.session.state = "communityEvent";
-    const event = this.journey.communityEvents.find((e) => e.id === eventId);
     this.log(`The room begins ${event?.title ?? eventId}.`);
   }
 
@@ -1187,6 +1204,13 @@ class Engine implements GameEngine {
       this.applyCatchUp();
     } else {
       this.log(`The room does not meet the goal for ${event.title}.`);
+    }
+
+    if (event.kind === "relay" && community.task) {
+      // No forced trailing period: `answer` is authored as a complete,
+      // punctuated phrase (matches screens.ts's own `Answer: ${answer}`).
+      this.log(`Community answer: ${community.task.answer}`);
+      this.log(community.task.teachingReveal);
     }
 
     // Exceptional contributions (success OR failure — the generosity
@@ -1425,6 +1449,17 @@ class Engine implements GameEngine {
       answer: ct.task.answer,
       acceptedAnswers: ct.task.acceptedAnswers,
       hostGuidance: ct.task.hostGuidance,
+    };
+  }
+
+  getCommunityTaskPublic(): CommunityTaskPublic | null {
+    const task = this.state.community?.task;
+    if (!task) return null;
+    return {
+      id: task.id,
+      title: task.title,
+      prompt: task.normalVariant.prompt,
+      hostGuidance: task.hostGuidance,
     };
   }
 

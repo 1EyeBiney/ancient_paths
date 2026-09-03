@@ -6,6 +6,7 @@
 
 import type {
   Command,
+  CommunityTaskPublic,
   GameEngine,
   GameSummary,
   PublicTask,
@@ -67,6 +68,10 @@ export class RecordingEngine implements GameEngine {
 
   getRevealedAnswer(): RevealedAnswer | null {
     return this.inner.getRevealedAnswer();
+  }
+
+  getCommunityTaskPublic(): CommunityTaskPublic | null {
+    return this.inner.getCommunityTaskPublic();
   }
 
   getAvailableRoutes(): RouteInfo[] | null {
