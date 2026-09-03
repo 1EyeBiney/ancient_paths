@@ -318,6 +318,54 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       A3 (`tests/ui/audio/group-a3-manager.test.ts`) lock this in. No
       other discrepancies found.
 
+25. **RESOLVED (2026-09-03) — Fable's review of Phase 6 + Brian's first
+    live test.** Brian reached an audio-capable task and every transport
+    button reported "Nothing is playing" / "Nothing to replay yet" — which
+    was correct: only every 10th `audio-listening` task in dev-playtest
+    carries a clip, and nothing on screen says which, so he was pressing
+    working controls on a silent task. He heard one cue and then none,
+    which fits NVDA's audio ducking lowering all of Chrome while NVDA
+    speaks — every cue fires at the instant an announcement starts. (Try
+    NVDA+Shift+D to turn ducking off when judging cues.) Fixes, all with
+    tests in `tests/ui/audio/group-a9-review-fixes.test.ts`:
+    - **Bug**: the failsafe timer kept counting while a clip was paused
+      (`BrowserAudioBackend` armed it once, in wall-clock time). Pausing
+      longer than the 1.5 s slack past the clip's own length declared it
+      "ended": deferred speech flushed, the queue moved on, and Space could
+      no longer resume the orphaned, still-paused element. Now the
+      failsafe is suspended on pause and re-armed with the remaining time
+      on resume; `FakeAudioBackend.advanceClock` ignores time while paused
+      to match. Invisible on the ≤1 s placeholder WAVs; would have bitten
+      the first real narration clip.
+    - **Gap**: `grantReplay()` was implemented and tested but unreachable —
+      the engine supports `spendInsight`/`useJourneyToken` with effect
+      `"replay"`, but Phase 4 never rendered it (nothing to replay then).
+      `resourceWindow` now offers "Spend Insight to hear the audio again"
+      and "Use Journey Token to hear the audio again" whenever the task or
+      its active variant has audio and Insight interacts (mirroring the
+      engine's own `can*` gating — interaction and structure, not
+      affordability); `ScreenRenderer` gained `onReplayGranted`, which
+      app.ts wires to `grantReplay` + `replay()`.
+    - The transport bar was a `div` with `aria-label` and no role, so the
+      label was never announced; now `role="group"`.
+    - **New: a Sound check screen** off Welcome (a host feature — check the
+      speakers before the session — not a dev back door). One button per
+      cue and per audio asset from every loaded pack and journey, a
+      "first four notes, faster" excerpt for each tune (exercises the
+      sequencer's variation path), the same transport buttons, and the
+      Audio settings (volumes + wait/interrupt) live. Cue buttons announce
+      nothing on purpose — a 200 ms cue would be spoken over by its own
+      label; clips announce "Finished: <id>." when they end. The Sound
+      check click is the unlock gesture, so nothing is needed from the
+      game first. Buttons only (no Space/L/X/N keys there; the game ladder
+      is attached only while playing).
+    Still open from the review, for Brian's ruling: ambient audio stops on
+    the next engine state change (`killAll` stops it), so a landmark's
+    ambience lasts exactly one screen. No ambient assets exist until
+    Phase 9; suggested rule: ambient survives until the next landmark or
+    leaving play. Also minor: the first (unconfirmed) Ctrl+Z press already
+    kills the current clip.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

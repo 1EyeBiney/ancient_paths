@@ -30,9 +30,26 @@ import type { SessionDuration, SessionPace } from "../session/plan";
 import type { MapManifest, MapStyleId } from "./mapProjection";
 import { BrowserAudioBackend, type AudioBackend } from "./audio/backend";
 import { AudioManager, type SpeechMode } from "./audio/manager";
+import { CUES, type CueId } from "./audio/cues";
 import type { GameState, TaskVariantKind } from "../engine/types";
 
-export type AppMode = "startup" | "setup" | "playing";
+export type AppMode = "startup" | "setup" | "soundCheck" | "playing";
+
+type AudioCommandId = "audioPause" | "audioStop" | "audioSkip" | "audioReplay";
+
+/** Human labels for the Sound check screen (cues.ts is data; names live here). */
+const CUE_LABELS: Record<CueId, string> = {
+  correct: "Correct answer",
+  incorrect: "Incorrect answer",
+  skipped: "Skipped answer",
+  stageComplete: "Stage complete",
+  journeyToken: "Journey Token earned",
+  communitySuccess: "Community event succeeded",
+  communityFail: "Community event fell short",
+  arrival: "Arrival",
+  celebration: "Celebration",
+  menuOpen: "Menu opened",
+};
 
 export interface AppOptions {
   root: HTMLElement;
@@ -291,7 +308,147 @@ export class App {
     startButton.textContent = "New game";
     startButton.addEventListener("click", () => this.renderSetup());
     this.contentContainer.appendChild(startButton);
-    this.presenter.present({ visual: "Ready. Press Enter, or choose New game, to set up a session." });
+
+    const soundCheckButton = document.createElement("button");
+    soundCheckButton.type = "button";
+    soundCheckButton.textContent = "Sound check";
+    soundCheckButton.addEventListener("click", () => this.renderSoundCheck());
+    this.contentContainer.appendChild(soundCheckButton);
+
+    this.presenter.present({ visual: "Ready. Press Enter, or choose New game, to set up a session. Sound check tests your speakers." });
+  }
+
+  // -- sound check ----------------------------------------------------------
+
+  /** A host feature, not a dev back door: check the speakers (and how NVDA
+   * and the game's sounds sit together) before a session, one cue or clip
+   * at a time, with the same transport controls and Audio settings as play.
+   * Every audio asset from every loaded pack and journey is listed. */
+  private renderSoundCheck(): void {
+    this.mode = "soundCheck";
+    this.detachKeyboard();
+    this.disposeCursorLists();
+    this.hideAudience();
+    this.audioManager.killAll();
+    const assets = new Map<string, AudioAsset>();
+    for (const pack of this.options.packs) for (const asset of pack.audioAssets ?? []) assets.set(asset.assetId, asset);
+    for (const journey of this.options.journeys) for (const asset of journey.audioAssets ?? []) assets.set(asset.assetId, asset);
+    this.audioAssets = assets;
+    this.audioManager.unlock(); // the Sound check click IS a user gesture
+
+    const c = this.contentContainer;
+    c.innerHTML = "";
+    c.appendChild(el("h2", { text: "Sound check" }));
+    c.appendChild(
+      el("p", {
+        text:
+          "Tab to a sound and press Enter to play it. Cues play at once; clips and tunes announce when they finish. " +
+          "If cues are faint under a screen reader, turn its audio ducking off (NVDA: NVDA+Shift+D).",
+      }),
+    );
+
+    c.appendChild(el("h2", { text: "Cues" }));
+    const cueGroup = el("div", { className: "actions" });
+    cueGroup.setAttribute("role", "group");
+    cueGroup.setAttribute("aria-label", "Cues");
+    for (const cueId of Object.keys(CUES) as CueId[]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = CUE_LABELS[cueId];
+      button.dataset.cueId = cueId;
+      // Deliberately no announcement: a cue is ~200 ms and would be spoken
+      // over by its own label. The sound IS the feedback; a sighted
+      // co-tester sees which button was pressed.
+      button.addEventListener("click", () => this.audioManager.playCue(cueId));
+      cueGroup.appendChild(button);
+    }
+    c.appendChild(cueGroup);
+
+    c.appendChild(el("h2", { text: "Clips and tunes" }));
+    const clipGroup = el("div", { className: "actions" });
+    clipGroup.setAttribute("role", "group");
+    clipGroup.setAttribute("aria-label", "Clips and tunes");
+    if (assets.size === 0) clipGroup.appendChild(el("p", { text: "No audio assets are loaded." }));
+    for (const asset of assets.values()) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${asset.assetId} (${asset.assetType}${asset.melody ? ", tune" : ""})`;
+      button.dataset.assetId = asset.assetId;
+      button.addEventListener("click", () =>
+        this.audioManager.playAsset(asset.assetId, {
+          onDone: () => this.presenter.present({ visual: `Finished: ${asset.assetId}.` }),
+        }),
+      );
+      clipGroup.appendChild(button);
+      if (asset.melody) {
+        const excerpt = document.createElement("button");
+        excerpt.type = "button";
+        excerpt.textContent = `${asset.assetId}: first four notes, faster`;
+        excerpt.dataset.assetId = asset.assetId;
+        excerpt.dataset.variation = "excerpt";
+        excerpt.addEventListener("click", () => this.audioManager.playMelody(asset.assetId, { firstN: 4, tempoFactor: 1.25 }));
+        clipGroup.appendChild(excerpt);
+      }
+    }
+    c.appendChild(clipGroup);
+
+    c.appendChild(el("h2", { text: "Controls" }));
+    this.renderAudioControls(c, { listenAgain: false, dispatch: (id) => this.runAudioCommand(id) });
+
+    c.appendChild(el("h2", { text: "Audio settings" }));
+    this.buildAudioSettings(c);
+
+    const back = document.createElement("button");
+    back.type = "button";
+    back.textContent = "Back";
+    back.addEventListener("click", () => {
+      this.audioManager.killAll();
+      this.renderStartup();
+    });
+    c.appendChild(back);
+
+    this.presenter.present({ visual: "Sound check. Tab to a cue or clip and press Enter to play it." });
+  }
+
+  /** The four live volume inputs and the speech-mode choice — shared by
+   * the Audio… game-menu dialog and the Sound check screen. */
+  private buildAudioSettings(container: HTMLElement): void {
+    for (const key of ["master", "music", "effects", "narration"] as const) {
+      const label = document.createElement("label");
+      label.textContent = `${key} volume (0-100)`;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.max = "100";
+      input.value = String(this.wizard.audio[key]);
+      input.setAttribute("aria-label", `${key} volume`);
+      input.addEventListener("input", () => {
+        const value = clampInt(input.value, 0, 100, this.wizard.audio[key]);
+        this.wizard.setAudio({ [key]: value });
+        this.audioManager.setSettings({ [key]: value });
+      });
+      label.appendChild(input);
+      container.appendChild(label);
+    }
+
+    const speechLabel = document.createElement("label");
+    speechLabel.textContent = "Interface speech";
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", "Interface speech behavior");
+    const modes: { value: SpeechMode; text: string }[] = [
+      { value: "wait", text: "Wait for audio to finish" },
+      { value: "interrupt", text: "Interrupt audio immediately" },
+    ];
+    for (const mode of modes) {
+      const option = document.createElement("option");
+      option.value = mode.value;
+      option.textContent = mode.text;
+      if (this.audioManager.getSpeechMode() === mode.value) option.selected = true;
+      select.appendChild(option);
+    }
+    select.addEventListener("change", () => this.audioManager.setSpeechMode(select.value as SpeechMode));
+    speechLabel.appendChild(select);
+    container.appendChild(speechLabel);
   }
 
   // -- setup ---------------------------------------------------------------
@@ -432,27 +589,11 @@ export class App {
     }
     this.contentContainer.appendChild(categoriesBox);
 
-    // Audio settings
+    // Audio settings (the same controls as the Audio… dialog and Sound check)
     this.contentContainer.appendChild(el("h2", { text: "Audio" }));
     const audioBox = el("div");
     audioBox.id = "audio";
-    for (const key of ["master", "music", "effects", "narration"] as const) {
-      const label = document.createElement("label");
-      label.textContent = `${key} volume (0-100)`;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.min = "0";
-      input.max = "100";
-      input.value = String(this.wizard.audio[key]);
-      input.setAttribute("aria-label", `${key} volume`);
-      input.addEventListener("input", () => {
-        const value = clampInt(input.value, 0, 100, 100);
-        this.wizard.setAudio({ [key]: value });
-        this.audioManager.setSettings({ [key]: value });
-      });
-      label.appendChild(input);
-      audioBox.appendChild(label);
-    }
+    this.buildAudioSettings(audioBox);
     this.contentContainer.appendChild(audioBox);
 
     // Community catch-up, reduced motion
@@ -613,6 +754,10 @@ export class App {
         this.renderSetup();
       },
       onAfterAction: () => this.renderCurrentScreen(),
+      onReplayGranted: (taskId) => {
+        this.audioManager.grantReplay(taskId);
+        this.audioManager.replay();
+      },
     });
     this.audience = new AudienceView({
       journey,
@@ -643,7 +788,11 @@ export class App {
     // Same pass, same state: this is what keeps host and audience in sync.
     this.audience?.render(this.engine, this.audienceContainer);
     this.lastRender = this.renderer.render(this.engine, this.contentContainer);
-    this.renderAudioControls();
+    const state = this.engine.getState();
+    this.renderAudioControls(this.contentContainer, {
+      listenAgain: state === "resourceWindow" || state === "awaitingAnswer",
+      dispatch: (id) => this.dispatchCommand(id),
+    });
     this.syncAudioHooks(silent);
     const heading = this.contentContainer.querySelector<HTMLElement>("h2");
     if (heading) {
@@ -769,43 +918,78 @@ export class App {
     if (clueAudioId) this.audioManager.playAsset(clueAudioId, { category: "narration" });
   }
 
+  /** Where the transport bar currently lives, so an audio command can
+   * refresh its Pause/Resume label in place without a full re-render. */
+  private audioControlsHost: { target: HTMLElement; listenAgain: boolean; dispatch: (id: AudioCommandId) => void } | null =
+    null;
+
   /** The dual-modality twin of the audio keys (§22.3): visible, clickable
    * buttons alongside Space/L/X/N. "Listen again" only appears in the two
-   * states where L is legal — the others are always available. */
-  private renderAudioControls(): void {
-    if (!this.engine) return;
-    this.contentContainer.querySelector(".audio-controls")?.remove();
+   * states where L is legal — the others are always available. Also used
+   * by the Sound check screen, which has no engine. */
+  private renderAudioControls(
+    target: HTMLElement,
+    options: { listenAgain: boolean; dispatch: (id: AudioCommandId) => void },
+  ): void {
+    this.audioControlsHost = { target, ...options };
+    target.querySelector(".audio-controls")?.remove();
     const bar = el("div", { className: "audio-controls" });
+    bar.setAttribute("role", "group");
     bar.setAttribute("aria-label", "Audio controls");
 
-    const pauseButton = document.createElement("button");
-    pauseButton.type = "button";
-    pauseButton.textContent = this.audioManager.isPaused() ? "Resume audio" : "Pause audio";
-    pauseButton.addEventListener("click", () => this.dispatchCommand("audioPause"));
-    bar.appendChild(pauseButton);
+    const button = (text: string, id: AudioCommandId) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = text;
+      b.addEventListener("click", () => options.dispatch(id));
+      bar.appendChild(b);
+    };
+    button(this.audioManager.isPaused() ? "Resume audio" : "Pause audio", "audioPause");
+    if (options.listenAgain) button("Listen again", "audioReplay");
+    button("Stop audio", "audioStop");
+    button("Skip narration", "audioSkip");
 
-    const state = this.engine.getState();
-    if (state === "resourceWindow" || state === "awaitingAnswer") {
-      const replayButton = document.createElement("button");
-      replayButton.type = "button";
-      replayButton.textContent = "Listen again";
-      replayButton.addEventListener("click", () => this.dispatchCommand("audioReplay"));
-      bar.appendChild(replayButton);
+    target.appendChild(bar);
+  }
+
+  private refreshAudioControls(): void {
+    const host = this.audioControlsHost;
+    if (host && host.target.isConnected) this.renderAudioControls(host.target, host);
+  }
+
+  /** Space/L/X/N and their buttons, in play or in the Sound check. */
+  private runAudioCommand(id: AudioCommandId): void {
+    switch (id) {
+      case "audioPause":
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        if (this.audioManager.isPaused()) this.audioManager.resume();
+        else this.audioManager.pause();
+        break;
+      case "audioStop":
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        this.audioManager.stop();
+        break;
+      case "audioSkip":
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        this.audioManager.skip();
+        break;
+      case "audioReplay":
+        // Deliberately not gated on isPlaying(): its purpose is replaying a
+        // clip that has already finished. replay() itself announces
+        // "Nothing to replay yet." or "No replays left." as appropriate.
+        this.audioManager.replay();
+        break;
     }
-
-    const stopButton = document.createElement("button");
-    stopButton.type = "button";
-    stopButton.textContent = "Stop audio";
-    stopButton.addEventListener("click", () => this.dispatchCommand("audioStop"));
-    bar.appendChild(stopButton);
-
-    const skipButton = document.createElement("button");
-    skipButton.type = "button";
-    skipButton.textContent = "Skip narration";
-    skipButton.addEventListener("click", () => this.dispatchCommand("audioSkip"));
-    bar.appendChild(skipButton);
-
-    this.contentContainer.appendChild(bar);
+    this.refreshAudioControls();
   }
 
   private dispatchCommand(id: string): void {
@@ -847,36 +1031,10 @@ export class App {
         this.renderCurrentScreen(true);
         return;
       case "audioPause":
-        if (!this.audioManager.isPlaying()) {
-          this.presenter.present({ visual: "Nothing is playing." });
-          return;
-        }
-        if (this.audioManager.isPaused()) this.audioManager.resume();
-        else this.audioManager.pause();
-        this.renderAudioControls();
-        return;
       case "audioStop":
-        if (!this.audioManager.isPlaying()) {
-          this.presenter.present({ visual: "Nothing is playing." });
-          return;
-        }
-        this.audioManager.stop();
-        this.renderAudioControls();
-        return;
       case "audioSkip":
-        if (!this.audioManager.isPlaying()) {
-          this.presenter.present({ visual: "Nothing is playing." });
-          return;
-        }
-        this.audioManager.skip();
-        this.renderAudioControls();
-        return;
       case "audioReplay":
-        // Deliberately not gated on isPlaying(): its purpose is replaying a
-        // clip that has already finished. replay() itself announces
-        // "Nothing to replay yet." or "No replays left." as appropriate.
-        this.audioManager.replay();
-        this.renderAudioControls();
+        this.runAudioCommand(id);
         return;
       case "confirm": {
         const primaryId = this.lastRender?.primaryActionId;
@@ -941,44 +1099,7 @@ export class App {
     this.modal.open({
       title: "Audio",
       present: (i) => this.presenter.present(i),
-      build: (container) => {
-        for (const key of ["master", "music", "effects", "narration"] as const) {
-          const label = document.createElement("label");
-          label.textContent = `${key} volume (0-100)`;
-          const input = document.createElement("input");
-          input.type = "number";
-          input.min = "0";
-          input.max = "100";
-          input.value = String(this.wizard.audio[key]);
-          input.setAttribute("aria-label", `${key} volume`);
-          input.addEventListener("input", () => {
-            const value = clampInt(input.value, 0, 100, this.wizard.audio[key]);
-            this.wizard.setAudio({ [key]: value });
-            this.audioManager.setSettings({ [key]: value });
-          });
-          label.appendChild(input);
-          container.appendChild(label);
-        }
-
-        const speechLabel = document.createElement("label");
-        speechLabel.textContent = "Interface speech";
-        const select = document.createElement("select");
-        select.setAttribute("aria-label", "Interface speech behavior");
-        const modes: { value: SpeechMode; text: string }[] = [
-          { value: "wait", text: "Wait for audio to finish" },
-          { value: "interrupt", text: "Interrupt audio immediately" },
-        ];
-        for (const mode of modes) {
-          const option = document.createElement("option");
-          option.value = mode.value;
-          option.textContent = mode.text;
-          if (this.audioManager.getSpeechMode() === mode.value) option.selected = true;
-          select.appendChild(option);
-        }
-        select.addEventListener("change", () => this.audioManager.setSpeechMode(select.value as SpeechMode));
-        speechLabel.appendChild(select);
-        container.appendChild(speechLabel);
-      },
+      build: (container) => this.buildAudioSettings(container),
     });
   }
 

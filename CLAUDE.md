@@ -1,9 +1,9 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 5B COMPLETE, PHASE 6 (AUDIO) SPECIFIED (2026-09-02) — implement PHASE6_SPEC.md next
+## Status: PHASE 6 (AUDIO) COMPLETE + REVIEWED (2026-09-03) — awaiting Brian's ear; Phase 7 not yet planned
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (297/297
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (374/374
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
@@ -42,19 +42,24 @@ in both states, not just in tests). Manually browser-checked; findings
 and one small clarity fix (a class-name collision between the map's own
 landmark groups and the Phase 5 strip's) are in OPEN_QUESTIONS item 21.
 
-**Phase 6 (audio) is specified and ready to implement**: see
-**PHASE6_SPEC.md** — an AudioManager behind a fake-able backend seam
-(voice via HTML5 audio, cues/melodies via Web Audio, per
-ACCESSIBILITY_PATTERNS §5, which is BINDING), a one-clip-at-a-time queue
-with a presenter gate (polite announcements defer until a clip ends;
-assertive interrupts), completion-driven handoffs with failsafes,
-cancellation tokens + one kill switch, play caps (the engine does NOT
-enforce `maxPlays` — the manager does), Space/L/X/N controls and an
-Audio dialog, a melody sequencer for note-data hymns, placeholder tones
-in dev-playtest, and Group A7 as the deliverable: with audio entirely
-broken, the whole game still completes on fallback text. The schema
-already has audio-asset records, melody data, and reference validation
-(Fable added them with the spec) — implementers must not touch it.
+**Phase 6 (audio) is done** (PHASE6_SPEC.md, groups A1-A8 by Sonnet,
+then Fable's review fixes; 374 tests): an `AudioManager` in
+`src/ui/audio/` behind a fake-able backend seam (voice via HTML5 audio,
+cues/melodies via Web Audio, per ACCESSIBILITY_PATTERNS §5), a
+one-clip-at-a-time queue with a presenter gate (polite announcements
+defer until a clip ends — "wait", the default — or "interrupt"),
+completion-driven handoffs with a failsafe that pauses with the clip,
+cancellation tokens + `killAll()` on every engine state change, play
+caps enforced by the manager (the engine does NOT enforce `maxPlays`),
+Space/L/X/N controls with visible buttons, "hear the audio again"
+Insight/Journey-Token actions, an Audio… dialog, a **Sound check**
+screen off Welcome (every cue and loaded asset, one button each — the
+way to test sounds), a melody sequencer for note-data hymns, synthetic
+placeholder tones/tunes in dev-playtest, and the A7 deliverable: with
+audio entirely broken the whole game still completes on fallback text.
+Awaiting Brian's ear on cue character, the wait/interrupt default, and
+how NVDA's audio ducking interacts with cues (OPEN_QUESTIONS 24-25).
+Open ruling: ambient currently lasts one screen (item 25).
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

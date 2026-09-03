@@ -49,5 +49,8 @@ Notes:
 - The setup wizard's own cursor lists (journey/duration/pace/etc.) use
   arrow keys, Enter, Escape, and first-letter type-ahead locally; those
   are screen-specific selection UI, not part of this global table.
+- The audio keys (Space/L/X/N) work only while playing. The Sound check
+  screen (Welcome → Sound check) uses ordinary Tab + Enter on its buttons,
+  including the same Pause/Stop/Skip transport buttons.
 - This file is the living record; update it whenever `KEY_BINDINGS`
   changes in `src/ui/keys.ts`.

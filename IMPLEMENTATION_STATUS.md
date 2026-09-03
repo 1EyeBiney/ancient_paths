@@ -32,6 +32,15 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
   volume-dialog edit wasn't reaching a clip already mid-playback —
   `AudioBackend` gained `setClipGain()`, now called from
   `AudioManager.setSettings()`. No other discrepancies.
+  **Review addendum (Fable, 2026-09-03, 8 more tests, 374 project-wide;
+  OPEN_QUESTIONS item 25):** fixed the failsafe timer running through a
+  pause (a clip paused past its slack was declared ended and could not
+  be resumed); made the engine's Insight / Journey Token "replay" effect
+  reachable ("hear the audio again" actions in `resourceWindow`, wired to
+  `grantReplay`); `role="group"` on the transport bar; and a **Sound
+  check** screen off Welcome that plays every cue and every loaded audio
+  asset one at a time with the live Audio settings — the intended way to
+  test sounds without random-walking the game.
 
 - **Phase 5B — The Map — DONE.** All 6 test groups (M1-M6) are green: 41
   tests total (297 project-wide), `npx tsc --noEmit` clean, `npm run

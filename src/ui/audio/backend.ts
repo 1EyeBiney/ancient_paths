@@ -182,9 +182,11 @@ export class FakeAudioBackend implements AudioBackend {
   }
 
   /** Advances the fake clock; if it crosses the failsafe threshold, the
-   * failsafe timer fires (rescuing a swallowed `ended`). */
+   * failsafe timer fires (rescuing a swallowed `ended`). Like the real
+   * backend, the failsafe measures playback time: a paused clip's clock
+   * does not advance. */
   advanceClock(ms: number): void {
-    if (!this.active) return;
+    if (!this.active || this.paused) return;
     this.clockMs += ms;
     if (this.clockMs >= this.active.failsafeMs) this.fireOnce();
   }
@@ -209,6 +211,12 @@ export class BrowserAudioBackend implements AudioBackend {
   private currentAudio: HTMLAudioElement | null = null; // file clips
   private currentMelodyGain: GainNode | null = null; // melody clips (paused via ctx.suspend)
   private currentFailsafeId: ReturnType<typeof setTimeout> | null = null;
+  // The failsafe pauses with the clip (Fable's Phase 6 review): it must
+  // measure playback time, not wall-clock time, or a clip paused longer
+  // than its slack is declared "ended" while still paused and resume dies.
+  private failsafeFire: (() => void) | null = null;
+  private failsafeDeadlineMs = 0;
+  private failsafeRemainingMs = 0;
   private generation = 0; // bumped by every playClip/stopClip; guards a stale event from a discarded clip
 
   private ambientAudio: HTMLAudioElement | null = null;
@@ -289,10 +297,8 @@ export class BrowserAudioBackend implements AudioBackend {
       fn();
     };
 
-    this.currentFailsafeId = setTimeout(
-      () => fire(() => callbacks.onEnded()),
-      (request.durationSeconds + FAILSAFE_SLACK_SEC) * 1000,
-    );
+    this.failsafeFire = () => fire(() => callbacks.onEnded());
+    this.armFailsafe((request.durationSeconds + FAILSAFE_SLACK_SEC) * 1000);
 
     if (request.source.kind === "file") {
       const audio = new Audio(request.source.filePath);
@@ -319,22 +325,44 @@ export class BrowserAudioBackend implements AudioBackend {
     playSchedule(schedule, this.ctx, gainNode, 1);
   }
 
-  pauseClip(): void {
-    if (this.currentAudio) this.currentAudio.pause();
-    else if (this.currentMelodyGain && this.ctx && this.ctx.state === "running") void this.ctx.suspend();
+  private armFailsafe(ms: number): void {
+    this.failsafeRemainingMs = ms;
+    this.failsafeDeadlineMs = Date.now() + ms;
+    this.currentFailsafeId = setTimeout(() => this.failsafeFire?.(), ms);
   }
 
-  resumeClip(): void {
-    if (this.currentAudio) void this.currentAudio.play().catch(() => {});
-    else if (this.currentMelodyGain && this.ctx && this.ctx.state === "suspended") void this.ctx.resume();
+  private suspendFailsafe(): void {
+    if (this.currentFailsafeId === null) return;
+    clearTimeout(this.currentFailsafeId);
+    this.currentFailsafeId = null;
+    this.failsafeRemainingMs = Math.max(0, this.failsafeDeadlineMs - Date.now());
   }
 
-  stopClip(): void {
-    this.generation++; // any pending native event or failsafe from the old clip becomes a no-op
+  private clearFailsafe(): void {
     if (this.currentFailsafeId !== null) {
       clearTimeout(this.currentFailsafeId);
       this.currentFailsafeId = null;
     }
+    this.failsafeFire = null;
+  }
+
+  pauseClip(): void {
+    if (!this.hasActiveClip() || this.isClipPaused()) return;
+    if (this.currentAudio) this.currentAudio.pause();
+    else if (this.currentMelodyGain && this.ctx && this.ctx.state === "running") void this.ctx.suspend();
+    this.suspendFailsafe();
+  }
+
+  resumeClip(): void {
+    if (!this.hasActiveClip() || !this.isClipPaused()) return;
+    if (this.currentAudio) void this.currentAudio.play().catch(() => {});
+    else if (this.currentMelodyGain && this.ctx && this.ctx.state === "suspended") void this.ctx.resume();
+    if (this.failsafeFire && this.currentFailsafeId === null) this.armFailsafe(this.failsafeRemainingMs);
+  }
+
+  stopClip(): void {
+    this.generation++; // any pending native event or failsafe from the old clip becomes a no-op
+    this.clearFailsafe();
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;

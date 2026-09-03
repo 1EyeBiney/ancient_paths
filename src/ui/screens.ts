@@ -52,6 +52,10 @@ export interface ScreenRendererOptions {
    * which calls action.run() directly, would otherwise leave a stale
    * screen up. */
   onAfterAction?: () => void;
+  /** The Insight (or Journey Token) "replay" effect was just spent on this
+   * task: the caller raises the audio play cap and replays (PHASE6_SPEC
+   * `grantReplay`). Fired after the engine has accepted the spend. */
+  onReplayGranted?: (taskId: string) => void;
 }
 
 type JourneyEntry = Journey["entries"][number];
@@ -295,7 +299,40 @@ export class ScreenRenderer {
         run: () => engine.dispatch({ type: "spendCourage" }),
       });
     }
+    // Hear-it-again (the engine's Insight/Journey-Token "replay" effect):
+    // only meaningful when the active variant (or the task) actually has
+    // audio — PublicTask carries no audio ids, so look the full Task up.
+    // Mirrors the engine's own can* gating (interaction + structure, not
+    // affordability; an unaffordable spend is refused at dispatch).
+    const fullTask = this.options.tasksById.get(task.id);
+    const activeVariantAudio =
+      task.activeVariant.kind === "normal"
+        ? fullTask?.normalVariant.audioAsset
+        : task.activeVariant.kind === "assisted"
+          ? fullTask?.assistedVariant?.audioAsset
+          : fullTask?.amplifiedVariant?.audioAsset;
+    const canReplayAudio = !!fullTask?.resourceInteractions.insight && !!(activeVariantAudio ?? fullTask?.audioAsset);
+    if (canReplayAudio) {
+      actions.push({
+        id: "spendInsightReplay",
+        label: "Spend Insight to hear the audio again",
+        run: () => {
+          engine.dispatch({ type: "spendInsight", effect: "replay" });
+          this.options.onReplayGranted?.(task.id);
+        },
+      });
+    }
     if (team.hasJourneyToken) {
+      if (canReplayAudio) {
+        actions.push({
+          id: "journeyTokenReplay",
+          label: "Use Journey Token to hear the audio again",
+          run: () => {
+            engine.dispatch({ type: "useJourneyToken", effect: "replay" });
+            this.options.onReplayGranted?.(task.id);
+          },
+        });
+      }
       if (task.canExtraClue) {
         actions.push({
           id: "journeyTokenExtraClue",
