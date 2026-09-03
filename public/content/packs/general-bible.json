@@ -1,0 +1,272 @@
+{
+  "packId": "general-bible",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "title": "General Bible",
+  "description": "Version-one General Bible task pack for The Way: A Journey Through Bible Lands. Authored under CONTENT_AUTHORING.md; grows across PHASE9_SPEC.md's Groups N4-N10.",
+  "tasks": [
+    {
+      "id": "gb-sk-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "scripture-knowledge",
+      "title": "The Exodus Leader",
+      "biblePeriods": ["exodus-wilderness"],
+      "locations": ["egypt"],
+      "difficulty": "easy",
+      "prompt": "Who led the Israelites out of slavery in Egypt?",
+      "answer": "Moses",
+      "acceptedAnswers": ["Moses"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Exodus 3:10"],
+      "normalVariant": { "prompt": "Who led the Israelites out of slavery in Egypt?", "successValue": 1 },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it Moses, Aaron, or Joshua?",
+        "options": ["Moses", "Aaron", "Joshua"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name the leader who led Israel out of Egypt and the brother who spoke for him.",
+        "answer": "Moses and Aaron",
+        "acceptedAnswers": ["Moses and Aaron"],
+        "successValue": 2
+      },
+      "clues": ["He grew up in Pharaoh's household.", "God spoke to him from a burning bush."],
+      "teachingReveal": "Moses led Israel out of Egypt after God called him at the burning bush; his brother Aaron served as his spokesman before Pharaoh.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "exodus", "moses"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 30
+    },
+    {
+      "id": "gb-br-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "bible-reasoning",
+      "title": "Counting the Days of Rest",
+      "biblePeriods": ["creation-patriarchs"],
+      "locations": [],
+      "difficulty": "moderate",
+      "prompt": "According to the creation account, God worked for six days and then rested. Following that same pattern of six days of work, on which day would the rest occur?",
+      "answer": "The seventh day",
+      "acceptedAnswers": ["The seventh day", "Seventh day", "Day seven"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Genesis 2:2"],
+      "normalVariant": {
+        "prompt": "According to the creation account, God worked for six days and then rested. Following that same pattern of six days of work, on which day would the rest occur?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it the seventh day, the sixth day, or the eighth day?",
+        "options": ["The seventh day", "The sixth day", "The eighth day"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name which day the rest occurred on, and what this pattern is later called as a commanded day of rest.",
+        "answer": "The seventh day, the Sabbath",
+        "acceptedAnswers": ["The seventh day, the Sabbath", "Seventh day, Sabbath"],
+        "successValue": 2
+      },
+      "clues": ["Count from the first day of work to find the day of rest."],
+      "teachingReveal": "The creation account describes six days of work followed by rest on the seventh day. This pattern of a seventh-day rest is later called the Sabbath.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "creation", "sabbath"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 35
+    },
+    {
+      "id": "gb-hc-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "historical-context",
+      "title": "The Road to Rome",
+      "biblePeriods": ["pauline-journeys"],
+      "locations": ["rome"],
+      "difficulty": "hard",
+      "prompt": "In New Testament times, what was the name of the major Roman road connecting the port of Brundisium to the city of Rome, used by travelers arriving from the eastern Mediterranean?",
+      "answer": "The Appian Way",
+      "acceptedAnswers": ["The Appian Way", "Appian Way", "Via Appia"],
+      "hostGuidance": null,
+      "scriptureReferences": [],
+      "normalVariant": {
+        "prompt": "In New Testament times, what was the name of the major Roman road connecting the port of Brundisium to the city of Rome, used by travelers arriving from the eastern Mediterranean?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it the Appian Way, the King's Highway, or the Via Maris?",
+        "options": ["The Appian Way", "The King's Highway", "The Via Maris"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name this road and the Italian port city it connected to Rome.",
+        "answer": "The Appian Way, connecting Rome to Brundisium",
+        "acceptedAnswers": ["The Appian Way and Brundisium", "Appian Way, Brundisium"],
+        "successValue": 2
+      },
+      "clues": [
+        "It was one of the oldest and most strategically important roads of the Roman Republic.",
+        "Its name honors the Roman censor who first commissioned it."
+      ],
+      "teachingReveal": "The Appian Way was a major Roman road linking Rome to the southeastern port of Brundisium, used by travelers arriving from the eastern Mediterranean.",
+      "historicalNote": "Widely accepted background: the Appian Way (Via Appia) was one of the earliest and most strategically important roads of the Roman Republic, connecting Rome to the port of Brundisium.",
+      "audioAsset": null,
+      "tags": ["general-bible", "travel", "rome"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 60
+    },
+    {
+      "id": "gb-al-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "The Parable of the Sower, Retold",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": ["galilee"],
+      "difficulty": "easy",
+      "prompt": "The host reads this sequence aloud: 'The sower went out to sow. Some seed fell on the path, some on rocky ground, some among thorns, and some on good soil.' How many different types of ground are described in this sequence?",
+      "answer": "Four",
+      "acceptedAnswers": ["Four", "4"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Matthew 13:3-8"],
+      "normalVariant": {
+        "prompt": "The host reads this sequence aloud: 'The sower went out to sow. Some seed fell on the path, some on rocky ground, some among thorns, and some on good soil.' How many different types of ground are described in this sequence?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it four, three, or five?",
+        "options": ["Four", "Three", "Five"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name all the types of ground described in the sequence, in the order given.",
+        "answer": "The path, rocky ground, thorns, and good soil",
+        "acceptedAnswers": ["Path, rocky ground, thorns, good soil", "The path, the rocky ground, the thorns, and the good soil"],
+        "successValue": 2
+      },
+      "clues": ["Count the types of ground named: path, rocky ground, thorns, and one more."],
+      "teachingReveal": "The Parable of the Sower describes seed falling on four types of ground: the path, rocky ground, thorns, and good soil — each representing a different response to the message.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "parables"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 40
+    },
+    {
+      "id": "gb-hy-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "hymn",
+      "title": "A Sound So Sweet",
+      "biblePeriods": [],
+      "locations": [],
+      "difficulty": "easy",
+      "prompt": "Complete this hymn lyric: 'Amazing grace, how sweet the sound, that saved a wretch like ___.'",
+      "answer": "me",
+      "acceptedAnswers": ["me"],
+      "hostGuidance": null,
+      "scriptureReferences": [],
+      "normalVariant": {
+        "prompt": "Complete this hymn lyric: 'Amazing grace, how sweet the sound, that saved a wretch like ___.'",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it 'me', 'them', or 'us'?",
+        "options": ["me", "them", "us"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name the word that completes the line, and the year this hymn was first published.",
+        "answer": "me, 1779",
+        "acceptedAnswers": ["me and 1779", "me, 1779"],
+        "successValue": 2
+      },
+      "clues": [],
+      "teachingReveal": "This line is from 'Amazing Grace,' written by John Newton and first published in 1779.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "hymn", "amazing-grace"],
+      "resourceInteractions": { "insight": false, "provision": true, "courage": true },
+      "estimatedSeconds": 25
+    },
+    {
+      "id": "gb-ds-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "decision-strategy",
+      "title": "A Traveler on the Road",
+      "biblePeriods": ["pauline-journeys"],
+      "locations": [],
+      "difficulty": "hard",
+      "prompt": "Your team is traveling and a stranger asks to join you, but you don't know if they can be trusted. What is one wise consideration you would weigh before deciding, and why?",
+      "answer": "Any clear, reasoned consideration weighing safety and discernment (for example: ancient roads were safer traveled in company, but Scripture also commends discernment about strangers).",
+      "acceptedAnswers": [
+        "Any clear, reasoned consideration weighing safety and discernment (for example: ancient roads were safer traveled in company, but Scripture also commends discernment about strangers)."
+      ],
+      "hostGuidance": "Judge the reasoning, not the choice. Accept any answer that weighs a real tradeoff — safety in numbers versus trusting an unknown stranger — with a clear reason.",
+      "scriptureReferences": ["Hebrews 13:2", "Matthew 10:16"],
+      "normalVariant": {
+        "prompt": "Your team is traveling and a stranger asks to join you, but you don't know if they can be trusted. What is one wise consideration you would weigh before deciding, and why?",
+        "successValue": 1
+      },
+      "assistedVariant": null,
+      "amplifiedVariant": null,
+      "clues": [
+        "Ancient roads were often unsafe for a lone traveler.",
+        "Scripture repeatedly commends hospitality to strangers, but also commends discernment."
+      ],
+      "teachingReveal": "There is no single right answer here — the goal is reasoned judgment. Ancient travel was often safer in groups, so companionship had real value, but Scripture also commends discernment (Matthew 10:16), so weighing both the value of numbers and the risk of an unknown companion is wise.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "wisdom", "travel"],
+      "resourceInteractions": { "insight": true, "provision": false, "courage": false },
+      "estimatedSeconds": 70
+    },
+    {
+      "id": "gb-cm-001",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "community",
+      "title": "Naming the Twelve",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": ["galilee"],
+      "difficulty": "easy",
+      "prompt": "Name one of the twelve apostles of Jesus.",
+      "answer": "Any of the twelve: Peter, Andrew, James son of Zebedee, John, Philip, Bartholomew, Thomas, Matthew, James son of Alphaeus, Thaddaeus, Simon the Zealot, or Judas Iscariot.",
+      "acceptedAnswers": ["Any of the twelve: Peter, Andrew, James son of Zebedee, John, Philip, Bartholomew, Thomas, Matthew, James son of Alphaeus, Thaddaeus, Simon the Zealot, or Judas Iscariot."],
+      "hostGuidance": "Accept any true, correctly named apostle from the traditional twelve; no repeats from teams that already answered this round.",
+      "scriptureReferences": ["Matthew 10:2-4"],
+      "normalVariant": { "prompt": "Name one of the twelve apostles of Jesus.", "successValue": 1 },
+      "assistedVariant": null,
+      "amplifiedVariant": null,
+      "clues": [],
+      "teachingReveal": "The twelve apostles were Peter, Andrew, James son of Zebedee, John, Philip, Bartholomew, Thomas, Matthew, James son of Alphaeus, Thaddaeus, Simon the Zealot, and Judas Iscariot.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "apostles", "twelve"],
+      "resourceInteractions": { "insight": false, "provision": false, "courage": false },
+      "estimatedSeconds": 25
+    }
+  ]
+}

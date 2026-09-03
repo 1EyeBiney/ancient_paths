@@ -12,6 +12,13 @@ import type { TeamSetup } from "../engine/engine";
 import type { MapStyleId } from "./mapProjection";
 import type { SetupSnapshot } from "../persistence/schema";
 
+// PHASE9_SPEC Group N3: a pack whose id starts with "dev-" is
+// development-only by convention (no schema flag) — dev-sample and
+// dev-playtest, never loaded into a production build (see main.ts).
+export function isDevPack(packId: string): boolean {
+  return packId.startsWith("dev-");
+}
+
 export type NonCommunityCategory = Exclude<Task["category"], "community">;
 
 export const NON_COMMUNITY_CATEGORIES: NonCommunityCategory[] = TASK_CATEGORIES.filter(
@@ -96,7 +103,11 @@ export class SetupWizard {
     this.duration = "standard";
     this.pace = "standard";
     this.difficulty = "standard";
-    this.enabledPackIds = options.packs.map((p) => p.packId);
+    // Dev packs default OFF whenever at least one non-dev pack is loaded
+    // (PHASE9_SPEC Group N3); a wizard built from dev packs alone (many
+    // existing tests) still defaults every one of them on.
+    const nonDevPacks = options.packs.filter((p) => !isDevPack(p.packId));
+    this.enabledPackIds = (nonDevPacks.length > 0 ? nonDevPacks : options.packs).map((p) => p.packId);
     this.enabledCategories = [...NON_COMMUNITY_CATEGORIES];
     this.audio = { master: 100, music: 70, effects: 70, narration: 100 };
     this.communityCatchup = true;

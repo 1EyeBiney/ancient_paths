@@ -385,13 +385,31 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. Remaining: the `general-bible` pack
-  (128 tasks across seven categories, authored under the secrecy
-  protocol — counts and ids only anywhere Brian reads), `dev-*` packs
-  excluded from production builds, blind content tests, a sufficiency
-  matrix, and the §34 deliverable as a test: two full sessions with
-  ≤ 5% task overlap. Groups N3-N12 remain. Rulings in OPEN_QUESTIONS.md
-  item 32.
+  after Fable's review of Phase 8. Remaining: authoring `general-bible`
+  up to its full 128-task target across seven categories (currently 7
+  seed tasks, one per category — counts and ids only anywhere Brian
+  reads, per the secrecy protocol), a sufficiency matrix, and the §34
+  deliverable as a test: two full sessions with ≤ 5% task overlap.
+  Groups N4-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N3 done (2026-09-03, 119 new tests, 599 project-wide):** the
+  `general-bible` pack's scaffolding — id `general-bible`, version
+  1.0.0, one accurate seed task per category (`gb-sk-001` through
+  `gb-cm-001`) so the pack is schema-valid and every blind rule has
+  something to check against. `main.ts` now loads `general-bible.json`
+  always and the two `dev-*` packs only under `import.meta.env.DEV`; a
+  new `isDevPack()` convention (id starts with `"dev-"`, no schema flag)
+  drives `SetupWizard`'s default `enabledPackIds` (dev packs default off
+  whenever a non-dev pack is present; unchanged for a wizard built from
+  dev packs alone) and the setup screen's " (development only)" label
+  suffix. `tests/content/general-bible.test.ts` encodes every blind rule
+  from the spec (id convention, answer/prompt/clue containment with an
+  options-bearing exemption for multiple-choice prompts, MC option
+  counts, the three `resourceInteractions` gates, hard-difficulty
+  minimums, category-specific requirements, the two vocabularies, and
+  pack-wide difficulty/variant/duplicate-answer ratios) plus a
+  per-category count table that N4-N10 will raise one commit at a time;
+  every assertion's failure message carries only a task id and a rule
+  name, never task text.
   **Group N2 done (2026-09-03, 8 new tests, 480 project-wide):** the
   real Jerusalem-to-Rome journey, version 1.0.0 (every existing save now
   correctly quarantines on the version bump). Five milestones (Jerusalem,

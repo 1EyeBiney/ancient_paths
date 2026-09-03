@@ -26,7 +26,7 @@ import { ModalManager } from "./modal";
 import { UndoController } from "./undo";
 import { ScreenRenderer, type ScreenRender } from "./screens";
 import { AudienceView } from "./audience";
-import { SetupWizard, attemptSessionGeneration, NON_COMMUNITY_CATEGORIES } from "./setup";
+import { SetupWizard, attemptSessionGeneration, NON_COMMUNITY_CATEGORIES, isDevPack } from "./setup";
 import { CursorList } from "./cursorList";
 import { buildStatus, buildActionsSummary, buildPositions } from "./speech";
 import type { DeckDifficultySetting } from "../session/builder";
@@ -755,8 +755,9 @@ export class App {
     const packsBox = el("div");
     packsBox.id = "packs";
     for (const pack of this.wizard.packs) {
+      const label = isDevPack(pack.packId) ? `${pack.title} (development only)` : pack.title;
       packsBox.appendChild(
-        this.checkbox(`pack-${pack.packId}`, pack.title, this.wizard.enabledPackIds.includes(pack.packId), (on) => {
+        this.checkbox(`pack-${pack.packId}`, label, this.wizard.enabledPackIds.includes(pack.packId), (on) => {
           const ids = new Set(this.wizard.enabledPackIds);
           if (on) ids.add(pack.packId);
           else ids.delete(pack.packId);

@@ -1,8 +1,10 @@
 // Boots the app shell (PHASE4_SPEC "App shell and startup", PHASE5_SPEC
-// "Content"). Loads the dev-sample pack (never ships, 8 tasks) and the
-// generated dev-playtest pack (never ships, 420 placeholder tasks — enough
-// to actually play the real journey) plus the Jerusalem-to-Rome journey,
-// validates all of them, and hands any problems to the startup screen.
+// "Content"). Loads the general-bible production pack plus the
+// Jerusalem-to-Rome journey always; the dev-sample pack (never ships, 8
+// tasks) and the generated dev-playtest pack (never ships, 420 placeholder
+// tasks) only in a dev build (PHASE9_SPEC Group N3 — a pack whose id
+// starts with "dev-" is development-only by convention, no schema flag).
+// Validates all of them, and hands any problems to the startup screen.
 
 import "./ui/styles.css";
 import { crossValidate, fetchJson, validateContentPack, validateJourney } from "./content/loader";
@@ -11,7 +13,9 @@ import { App } from "./ui/app";
 import { mapManifestSchema, type MapManifest } from "./ui/mapProjection";
 import { IndexedDbSaveStore } from "./persistence/store";
 
-const PACK_FILES = ["content/packs/dev-sample.json", "content/packs/dev-playtest.json"];
+const PACK_FILES = import.meta.env.DEV
+  ? ["content/packs/general-bible.json", "content/packs/dev-sample.json", "content/packs/dev-playtest.json"]
+  : ["content/packs/general-bible.json"];
 const JOURNEY_FILES = ["content/journeys/jerusalem-rome.json"];
 const MAP_MANIFEST_FILE = "map/mediterranean.json";
 
