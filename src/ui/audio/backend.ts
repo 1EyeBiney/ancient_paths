@@ -45,6 +45,11 @@ export interface AudioBackend {
   stopClip(): void;
   isClipPaused(): boolean;
   hasActiveClip(): boolean;
+  /** Live gain change on the currently loaded clip (a volume-dialog edit
+   * mid-playback) — a no-op if nothing is loaded. Melody clips ignore this
+   * (their gain node isn't re-touched after scheduling; a live gain change
+   * takes effect on their next play). */
+  setClipGain(gain: number): void;
 
   /** A single looped ambient/music channel, independent of the clip queue. */
   playAmbient(filePath: string, gain: number): void;
@@ -140,6 +145,10 @@ export class FakeAudioBackend implements AudioBackend {
     return this.active !== null;
   }
 
+  setClipGain(gain: number): void {
+    this.record("setClipGain", gain);
+  }
+
   playAmbient(filePath: string, gain: number): void {
     this.record("playAmbient", filePath, gain);
     this.ambientPlaying = true;
@@ -203,6 +212,7 @@ export class BrowserAudioBackend implements AudioBackend {
   private generation = 0; // bumped by every playClip/stopClip; guards a stale event from a discarded clip
 
   private ambientAudio: HTMLAudioElement | null = null;
+  private debugOscillatorCount = 0;
 
   unlock(): void {
     if (this.unlockedFlag) return;
@@ -210,9 +220,29 @@ export class BrowserAudioBackend implements AudioBackend {
     try {
       this.ctx = new AudioContext();
       if (this.ctx.state === "suspended") void this.ctx.resume();
+      this.installDebugHook();
     } catch {
       this.ctx = null; // no AudioContext available; cues/melodies degrade to silence + fallback text
     }
+  }
+
+  /** Group A8's manual browser check reads this — dev builds only (Vite
+   * dead-code-eliminates the `import.meta.env.DEV` branch in production). */
+  private installDebugHook(): void {
+    if (!this.ctx || !import.meta.env?.DEV) return;
+    const ctx = this.ctx;
+    const originalCreateOscillator = ctx.createOscillator.bind(ctx);
+    ctx.createOscillator = () => {
+      this.debugOscillatorCount++;
+      return originalCreateOscillator();
+    };
+    (window as unknown as { __audioDebug: unknown }).__audioDebug = {
+      contextState: () => ctx.state,
+      oscillatorCount: () => this.debugOscillatorCount,
+      unlocked: () => this.unlockedFlag,
+      currentAudioPaused: () => this.currentAudio?.paused ?? null,
+      currentAudioVolume: () => this.currentAudio?.volume ?? null,
+    };
   }
 
   isUnlocked(): boolean {
@@ -324,6 +354,11 @@ export class BrowserAudioBackend implements AudioBackend {
 
   hasActiveClip(): boolean {
     return this.currentAudio !== null || this.currentMelodyGain !== null;
+  }
+
+  setClipGain(gain: number): void {
+    if (this.currentAudio) this.currentAudio.volume = Math.max(0, Math.min(1, gain));
+    else if (this.currentMelodyGain) this.currentMelodyGain.gain.value = Math.max(0, Math.min(1, gain));
   }
 
   playAmbient(filePath: string, gain: number): void {

@@ -106,6 +106,10 @@ export class AudioManager {
 
   setSettings(partial: Partial<AudioManagerSettings>): void {
     this.settings = { ...this.settings, ...partial };
+    if (this.currentItem) {
+      const asset = this.getAssets().get(this.currentItem.assetId);
+      if (asset) this.backend.setClipGain(this.gainFor(this.currentItem.category, asset));
+    }
   }
 
   getSettings(): AudioManagerSettings {

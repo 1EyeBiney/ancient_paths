@@ -34,6 +34,7 @@ class AlwaysFailingBackend implements AudioBackend {
   hasActiveClip(): boolean {
     return false;
   }
+  setClipGain(): void {}
   playAmbient(): void {}
   stopAmbient(): void {}
 }

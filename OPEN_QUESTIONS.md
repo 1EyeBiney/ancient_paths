@@ -276,6 +276,48 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     available on request if he prefers exporting from his own tools.
     Placeholder tunes in dev-playtest stay synthetic regardless.
 
+24. **RESOLVED (2026-09-02) — Phase 6 Group A8 browser check (Sonnet,
+    Chrome via the dev server; Sonnet cannot hear — Brian's ear is still
+    the final check on tone/pitch/timing quality).** Ran the dev-playtest
+    pack end to end at `npm run dev`, reading results through a dev-only
+    `window.__audioDebug` hook exposed by `BrowserAudioBackend` (oscillator
+    count, AudioContext state, the current `<audio>` element's `paused`/
+    `volume`). All confirmed working:
+    - Start game (the unlock gesture) brings the AudioContext to
+      `"running"` immediately.
+    - Presenting a hymn task and using the Journey Token to amplify it
+      schedules a real Web Audio melody: the oscillator counter jumped by
+      exactly the tune's note count (+8 for an 8-note placeholder tune),
+      context stayed `"running"`. Cues (correct/incorrect/stageComplete/
+      journeyToken/celebration/…) also confirmed as real oscillators —
+      66 created over the course of ordinary play before the melody even
+      played.
+    - The amplified variant's `maxPlays: 1` cap enforced correctly: the
+      very first "Listen again" press after the automatic first play
+      announced "No replays left." and created no further oscillators.
+    - Space paused a placeholder WAV task clip: `<audio>.paused` flipped
+      `false` -> `true` on the same clip instance.
+    - Two full games (one with both packs and every category, one
+      restricted to just `audio-listening` at Long/dev-playtest-only to
+      reliably reach a task-level WAV clip) played to `gameSummary`
+      through real UI clicks with zero console errors and zero dev-server
+      errors; the celebration cue fired at the end both times.
+    - **Bug found and fixed, not just documented**: the Audio dialog's
+      volume inputs updated `AudioManager`'s stored settings correctly
+      (already covered by Group A5's tests) but did **not** reach a clip
+      already mid-playback — `<audio>.volume` stayed unchanged until the
+      *next* clip started. Root cause: `AudioManager.setSettings()` only
+      updated its own settings object; nothing pushed the recomputed gain
+      down to the backend for the currently active clip. Fixed by adding
+      `AudioBackend.setClipGain(gain)` (sets `<audio>.volume` or the
+      melody `GainNode`'s live value) and having `setSettings()` call it
+      whenever a clip is currently loaded. Reproduced in the browser
+      before the fix (`before: 1, after: 1` on a 30% master-volume edit
+      mid-playback), fixed, then reproduced again to confirm
+      (`before: 1, after: 0.3`). Two new regression tests added to Group
+      A3 (`tests/ui/audio/group-a3-manager.test.ts`) lock this in. No
+      other discrepancies found.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

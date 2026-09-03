@@ -225,4 +225,18 @@ describe("A3 — gain math", () => {
     const calls = backend.calls.filter((c) => c.method === "playCue");
     expect(calls.at(-1)?.args[1]).toBeCloseTo(0.6, 5);
   });
+
+  it("a live setSettings change while a clip is playing applies to that clip immediately (the Audio dialog case)", () => {
+    const { backend, manager } = makeManager([asset({ assetId: "a" })], { master: 100, music: 100, effects: 100, narration: 100 });
+    manager.playAsset("a", { category: "narration" });
+    manager.setSettings({ master: 30 });
+    const call = backend.calls.find((c) => c.method === "setClipGain");
+    expect(call?.args[0]).toBeCloseTo(0.3, 5);
+  });
+
+  it("setSettings with nothing playing never touches the backend clip gain", () => {
+    const { backend, manager } = makeManager([asset({ assetId: "a" })]);
+    manager.setSettings({ master: 30 });
+    expect(backend.calls.some((c) => c.method === "setClipGain")).toBe(false);
+  });
 });

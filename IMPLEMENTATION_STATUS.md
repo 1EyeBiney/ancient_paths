@@ -4,6 +4,35 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 6 — Audio System — DONE.** All 8 test groups (A1-A8) are green:
+  61 new tests (364 project-wide), `npx tsc --noEmit` clean, `npm run
+  build` clean. Built against PHASE6_SPEC.md (written 2026-09-02 after
+  Fable's review of Phase 5B; the schema's audio-asset records, melody-
+  as-data, and reference validation shipped with the spec). New: `src/ui/
+  audio/backend.ts` (the `AudioBackend` seam — `BrowserAudioBackend` real,
+  `FakeAudioBackend` for every test), `src/ui/audio/manager.ts`
+  (`AudioManager`: categories, the produced-clip queue, play caps,
+  pause/replay/stop/skip, fallbacks, cancellation tokens, killAll, and
+  the presenter gate), `src/ui/audio/cues.ts` + `sequencer.ts` (pure,
+  tested without sound). `src/ui/presenter.ts` gained an optional
+  `PresenterGate` (3 methods, extending the spec's literal 2-method
+  sketch to avoid re-entrant flush handling). `src/ui/app.ts` wires the
+  manager for its whole lifetime, unlocks it on the Begin-journey click,
+  drives every game hook (task audio autoplay, extra-clue audio, ruling/
+  stage/community/celebration cues via event-log text matching — the
+  engine exposes none of these as direct getters — landmark ambient,
+  killAll on every real state change and on leaving play), adds the
+  Space/L/X/N controls with visible buttons, and an Audio… game-menu
+  dialog (four live volume inputs, wait/interrupt speech mode).
+  `scripts/make-placeholder-audio.mjs` (dependency-free WAV writer) and
+  an extended `scripts/make-dev-playtest.mjs` give the dev-playtest pack
+  10 audio assets (6 file, 4 synthetic melody) wired onto specific tasks.
+  KEYBOARD_COMMANDS.md updated. Manual browser check (Group A8, recorded
+  in OPEN_QUESTIONS.md item 24) found and fixed one real bug: a live
+  volume-dialog edit wasn't reaching a clip already mid-playback —
+  `AudioBackend` gained `setClipGain()`, now called from
+  `AudioManager.setSettings()`. No other discrepancies.
+
 - **Phase 5B — The Map — DONE.** All 6 test groups (M1-M6) are green: 41
   tests total (297 project-wide), `npx tsc --noEmit` clean, `npm run
   build` clean (map assets copied into `dist/`). New: `src/ui/
@@ -239,20 +268,10 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- Phase 6 — Audio system: PHASE6_SPEC.md written (2026-09-02) after
-  Fable's review of Phase 5B; schema gained audio-asset records on packs
-  and journeys, melody-as-data, and reference validation (6 new content
-  tests, 303 total). Test groups A1-A8. Implementation not yet started.
-  - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
-    estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
-    computes ~72.7 min under the formula as literally specified, not the
-    claimed 50-60 min. See OPEN_QUESTIONS.md (item 11, RESOLVED — the
-    formula and constants stand as implemented; the design consequence
-    moves to journey authoring, not the estimator).
+(none — Phase 6 complete; Phase 7 not yet planned)
 
 ## Remaining
 
-- Phase 6 — Audio system.
 - Phase 7 — Community and offering systems.
 - Phase 8 — Persistence and recovery.
 - Phase 9 — Version-one content (full General Bible pack, full journey).
