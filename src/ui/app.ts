@@ -14,7 +14,7 @@
 // to give them their own on-screen controls too.
 
 import type { AudioAsset, ContentPack, Journey, Task } from "../content/schemas";
-import { createEngine, type GameEngine } from "../engine/engine";
+import { createEngine, type EngineOptions, type GameEngine } from "../engine/engine";
 import { createRng } from "../engine/rng";
 import { Presenter, type PresenterOptions } from "./presenter";
 import { KeyboardController, type KeyBinding } from "./keys";
@@ -30,6 +30,7 @@ import type { SessionDuration, SessionPace } from "../session/plan";
 import type { MapManifest, MapStyleId } from "./mapProjection";
 import { BrowserAudioBackend, type AudioBackend } from "./audio/backend";
 import { AudioManager, type SpeechMode } from "./audio/manager";
+import type { GameState, TaskVariantKind } from "../engine/types";
 
 export type AppMode = "startup" | "setup" | "playing";
 
@@ -46,6 +47,9 @@ export interface AppOptions {
   matchMedia?: (query: string) => { matches: boolean };
   /** Injectable so tests exercise the audio system against a fake, never real audio APIs. */
   audioBackend?: AudioBackend;
+  /** Test-ergonomics only (matches EngineOptions.startingResources from Phase 2):
+   * real play always starts every team at zero. */
+  startingResources?: EngineOptions["startingResources"];
 }
 
 function el(tag: string, opts: { text?: string; className?: string } = {}): HTMLElement {
@@ -85,6 +89,14 @@ export class App {
   private windowKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
   private lastRender: ScreenRender | null = null;
   private activeCursorLists: CursorList[] = [];
+
+  private currentJourney: Journey | null = null;
+  private tasksById: Map<string, Task> | null = null;
+  private lastEngineState: GameState | null = null;
+  private lastEventLogLength = 0;
+  /** `${taskId}::${variantKind}` for the presentation currently auto-played, or null. */
+  private lastAudioPresentationKey: string | null = null;
+  private lastCluesRevealedCount = 0;
 
   constructor(private readonly options: AppOptions) {
     this.root = options.root;
@@ -572,6 +584,8 @@ export class App {
     for (const pack of packs) for (const asset of pack.audioAssets ?? []) assets.set(asset.assetId, asset);
     for (const asset of journey.audioAssets ?? []) assets.set(asset.assetId, asset);
     this.audioAssets = assets;
+    this.currentJourney = journey;
+    this.tasksById = tasksById;
     this.audioManager.unlock(); // the Begin-journey click IS the user gesture; no audio before this
 
     this.engine = createEngine({
@@ -581,6 +595,7 @@ export class App {
       turnTaskLimit: this.wizard.effectiveTasksPerTurn(),
       rng: createRng(this.wizard.seed),
       taskSource: outcome.result.deck,
+      ...(this.options.startingResources ? { startingResources: this.options.startingResources } : {}),
     });
     this.undoController = new UndoController({
       engine: this.engine,
@@ -591,6 +606,7 @@ export class App {
       tasksById,
       present: (i) => this.presenter.present(i),
       onNewGame: () => {
+        this.audioManager.killAll();
         this.engine = null;
         this.renderer = null;
         this.undoController = null;
@@ -619,17 +635,138 @@ export class App {
    * non-user-initiated renders), so moving focus to the new screen's
    * heading is consistent with "focus moves only when the user acts" —
    * and without it, wiping the container drops focus to <body>. */
-  private renderCurrentScreen(): void {
+  /** `silent` skips every audio side effect (cues, auto-play, ambient) but
+   * still resyncs the tracking fields to the post-action engine state — the
+   * undo path (PHASE6_SPEC: "killAll() and nothing else"). */
+  private renderCurrentScreen(silent = false): void {
     if (!this.engine || !this.renderer) return;
     // Same pass, same state: this is what keeps host and audience in sync.
     this.audience?.render(this.engine, this.audienceContainer);
     this.lastRender = this.renderer.render(this.engine, this.contentContainer);
     this.renderAudioControls();
+    this.syncAudioHooks(silent);
     const heading = this.contentContainer.querySelector<HTMLElement>("h2");
     if (heading) {
       heading.tabIndex = -1;
       heading.focus();
     }
+  }
+
+  // -- audio game hooks (PHASE6_SPEC "Game hooks") --------------------------
+
+  /** The presentation key (task + active variant) currently auto-played in
+   * resourceWindow, or null outside it / with no current task. */
+  private presentationKey(): string | null {
+    const publicTask = this.engine?.getCurrentTaskPublic();
+    return publicTask ? `${publicTask.id}::${publicTask.activeVariant.kind}` : null;
+  }
+
+  private syncAudioHooks(silent: boolean): void {
+    if (!this.engine) return;
+    const session = this.engine.getSession();
+    const state = this.engine.getState();
+    const stateChanged = state !== this.lastEngineState;
+    const previousLogLength = this.lastEventLogLength;
+
+    if (silent) {
+      this.lastAudioPresentationKey = state === "resourceWindow" ? this.presentationKey() : null;
+      this.lastCluesRevealedCount = this.engine.getCurrentTaskPublic()?.cluesRevealed.length ?? 0;
+    } else {
+      if (stateChanged) this.audioManager.killAll();
+      for (let i = previousLogLength; i < session.eventLog.length; i++) {
+        this.matchEventLogCue(session.eventLog[i]!.text);
+      }
+      if (stateChanged) this.handleAudioStateEntry(state);
+      this.syncTaskAudioPresentation(state);
+      this.syncClueAudio();
+    }
+
+    this.lastEngineState = state;
+    this.lastEventLogLength = session.eventLog.length;
+  }
+
+  private matchEventLogCue(text: string): void {
+    if (/'s answer is ruled correct:/.test(text) || /answers for the room: correct\.$/.test(text)) {
+      this.audioManager.playCue("correct");
+    } else if (/'s answer is ruled incorrect:/.test(text) || /answers for the room: incorrect\.$/.test(text)) {
+      this.audioManager.playCue("incorrect");
+    } else if (/'s answer is ruled skipped:/.test(text)) {
+      this.audioManager.playCue("skipped");
+    } else if (/earns a Journey Token for a perfect stage\.$/.test(text)) {
+      this.audioManager.playCue("journeyToken");
+    } else if (/ has reached .+\.$/.test(text) || /has completed the journey!$/.test(text)) {
+      // Deliberately narrower than "every stage completion": a fork-route
+      // stage that completes without arriving at a milestone logs nothing
+      // distinct (OPEN_QUESTIONS), so it gets no stageComplete cue either.
+      this.audioManager.playCue("stageComplete");
+    } else if (/^The room succeeds at /.test(text)) {
+      this.audioManager.playCue("communitySuccess");
+    } else if (/^The room does not meet the goal for /.test(text)) {
+      this.audioManager.playCue("communityFail");
+    }
+  }
+
+  private handleAudioStateEntry(state: GameState): void {
+    if (state === "landmarkIntroduction") {
+      const milestoneId = this.engine!.getSession().triggeredMilestones.at(-1);
+      const milestone = this.currentJourney?.milestones.find((m) => m.id === milestoneId);
+      this.audioManager.playAmbient(milestone?.ambientAudioAsset ?? null);
+    } else if (state === "gameSummary") {
+      this.audioManager.playCue("celebration");
+    }
+  }
+
+  private resolveTaskVariant(task: Task, kind: TaskVariantKind): { audioAsset?: string | null; maxPlays?: number } | null {
+    if (kind === "normal") return task.normalVariant;
+    if (kind === "assisted") return task.assistedVariant;
+    return task.amplifiedVariant;
+  }
+
+  /** resourceWindow entry, or a variant change (assist/amplify) within it:
+   * plays the active variant's (or task's) audio once and resets its cap. */
+  private syncTaskAudioPresentation(state: GameState): void {
+    if (state !== "resourceWindow") {
+      this.lastAudioPresentationKey = null;
+      return;
+    }
+    const publicTask = this.engine!.getCurrentTaskPublic();
+    if (!publicTask) {
+      this.lastAudioPresentationKey = null;
+      return;
+    }
+    const key = this.presentationKey();
+    if (key === this.lastAudioPresentationKey) return;
+    this.lastAudioPresentationKey = key;
+    this.lastCluesRevealedCount = publicTask.cluesRevealed.length;
+
+    const task = this.tasksById?.get(publicTask.id);
+    if (!task) return;
+    const variant = this.resolveTaskVariant(task, publicTask.activeVariant.kind);
+    const assetId = variant?.audioAsset ?? task.audioAsset;
+    if (!assetId) return;
+    this.audioManager.presentTask(publicTask.id, publicTask.activeVariant.kind, variant?.maxPlays ?? 2);
+    this.audioManager.playAsset(assetId, {
+      category: "narration",
+      task: { taskId: publicTask.id, variantKind: publicTask.activeVariant.kind },
+    });
+  }
+
+  /** A newly revealed clue (cluesRevealed grew) plays its parallel clueAudio entry. */
+  private syncClueAudio(): void {
+    const publicTask = this.engine!.getCurrentTaskPublic();
+    if (!publicTask) {
+      this.lastCluesRevealedCount = 0;
+      return;
+    }
+    const revealed = publicTask.cluesRevealed.length;
+    if (revealed <= this.lastCluesRevealedCount) {
+      this.lastCluesRevealedCount = revealed;
+      return;
+    }
+    const task = this.tasksById?.get(publicTask.id);
+    const clueAudioId = task?.clueAudio?.[revealed - 1];
+    this.lastCluesRevealedCount = revealed;
+    if (clueAudioId) this.audioManager.playAsset(clueAudioId, { category: "narration" });
   }
 
   /** The dual-modality twin of the audio keys (§22.3): visible, clickable
@@ -704,8 +841,10 @@ export class App {
         this.presenter.present(buildPositions(this.engine.allPositionsText()));
         return;
       case "undo":
+        // PHASE6_SPEC: undo is killAll() and nothing else — no cue replays.
+        this.audioManager.killAll();
         this.undoController?.press();
-        this.renderCurrentScreen();
+        this.renderCurrentScreen(true);
         return;
       case "audioPause":
         if (!this.audioManager.isPlaying()) {
@@ -766,6 +905,7 @@ export class App {
   }
 
   private openGameMenu(): void {
+    this.audioManager.playCue("menuOpen");
     this.modal.open({
       title: "Game menu",
       present: (i) => this.presenter.present(i),
@@ -852,6 +992,7 @@ export class App {
         confirmBtn.textContent = "End session";
         confirmBtn.addEventListener("click", () => {
           this.modal.close();
+          this.audioManager.killAll();
           this.engine = null;
           this.renderer = null;
           this.undoController = null;
