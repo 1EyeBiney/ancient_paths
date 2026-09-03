@@ -133,8 +133,20 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     added so the browser build is actually playable — `dev-sample`'s 8
     tasks cannot pass the sufficiency check for the real journey.
 
-17. **Brian's visual vision (2026-09-02) — direction recorded, build
-    order agreed: game first, map after Phase 5.** Brian wants the
+17. **DECIDED (2026-09-02) — the map.** Brian chose Tiers 2 AND 3 with
+    a host-selectable background (satellite imagery or period/parchment
+    style), built as its own phase after Phase 5. Requirements added by
+    the ruling: the map must serve MORE THAN ONE journey (further Pauline
+    trips and "Paul's Voyage to Rome" are coming), so the imagery covers
+    the whole eastern Mediterranean / Near East once and each journey
+    declares its own viewport (bounding box) plus per-milestone
+    latitude/longitude — never a per-journey hand-cropped picture.
+    Hardware baseline: an "average" laptop must run it; the test fleet is
+    Brian's two ~6-year-old laptops (target) and his Dell Inspiron 16
+    Plus 7630 (i7-13700H, 32 GB, Iris Xe — the strong case; see
+    C:\nbs\sysinfo.txt). Static image + SVG animation fits that budget;
+    the Tier 1 live globe stays a stretch goal. Original vision, kept for
+    the record: Brian wants the
     audience screen to feel like a game, not decorated text: ideally a
     photorealistic satellite-style map of the region with each team's
     route animating as it progresses; failing that, a period/"ancient"

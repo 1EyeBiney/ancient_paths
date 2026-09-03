@@ -97,6 +97,14 @@ These are Brian's rulings; where they conflict with the design doc, THESE win:
 8. **Process**: git + private GitHub repo, proper .gitignore from first
    commit. Stack: Claude recommends TypeScript + Vite static build (fits
    Pages deploy), framework-light hand-owned DOM — pending confirmation.
+9. **The map (2026-09-02)**: after Phase 5, a dedicated map phase — a
+   shipped public-domain map image (NASA Blue Marble satellite OR a
+   parchment/Natural Earth period style, host-selectable) with an SVG
+   route/team-badge overlay animated on progress (reduced motion →
+   jump). One imagery set covers the whole eastern Mediterranean; each
+   journey declares its viewport and per-milestone lat/long (schema
+   change, Fable-spec'd). Must run on a ~6-year-old laptop. Live 3D
+   globe = stretch only. Details: OPEN_QUESTIONS item 17.
 - Naming: "The Way" = game title; Ancient Paths = project/workspace name.
 
 ## Related context
