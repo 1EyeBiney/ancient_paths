@@ -687,6 +687,64 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     deliverable's real intent — proving back-to-back sessions draw fresh
     content with minimal repetition — is fully exercised either way.
 
+34. **RESOLVED (2026-09-03) — Phase 9 Group N12 browser check (Sonnet,
+    the in-app Browser tool).** No task text below, per the secrecy
+    protocol — counts, ids, and observations only.
+    - `npm run dev`, Welcome → New game: three packs listed (General
+      Bible, Development Sample, Dev Playtest); only General Bible's
+      checkbox was actually checked (confirmed via the DOM, not just the
+      accessibility tree's generic "on" role state); both dev packs
+      carried the "(development only)" suffix. Began a 2-team session
+      (Cross, Lion), General Bible only.
+    - Played 6 team-turns plus both Caesarea (relay) and Antioch
+      (contribution) community events. Real tasks appeared throughout
+      with clean, correctly-interpolated prompt/answer/teaching text (no
+      broken placeholders). An assisted form was reached and used
+      successfully (an audio-listening task, multiple choice, funded by
+      Insight) and an amplified form was reached and used successfully
+      (a hymn task, funded by Courage, yielding a surplus success routed
+      to a resource choice) — both confirmed live, not just present in
+      code. The Caesarea relay showed its prompt and host guidance to
+      both teams in turn (room progress ticking 0 of 2 → 1 of 2 → 2 of
+      2) and, on resolve, the aria-live region spoke a "Community
+      answer: …" line followed by the teaching reveal — Group N1's
+      engine work confirmed end-to-end in a real browser, not just
+      tests. The map rendered one SVG with exactly 5 landmark markers
+      (Jerusalem, Caesarea, Antioch, Ephesus, Rome) and a visible route
+      line through them (screenshot-verified: satellite imagery,
+      Rome/Ephesus labels legible); team badges tracked each team's
+      current milestone correctly in both the journey strip and the map.
+      Zero console errors throughout.
+    - `npm run build && npm run preview` (a new `ancient-paths-preview`
+      entry was added to `.claude/launch.json` for this — `vite preview`
+      on port 4173, no other files touched): Welcome → New game's
+      Content packs section listed **only** General Bible — the dev
+      packs are absent entirely in a production build (not merely
+      unchecked), confirming `main.ts`'s `import.meta.env.DEV` gate.
+      Sound check listed exactly the 11 built-in cues and reported
+      "No audio assets are loaded" under Clips and tunes — no production
+      audio assets exist, as expected (item 32). Zero console errors.
+    - **One observation, not fixed (pre-existing, not new to Phase 9)**:
+      the host controls' "Spend Provision for the assisted form" button
+      (`src/ui/screens.ts`) is a fixed label that always dispatches
+      `spendProvision`, but `cmdSpendProvision` (`src/engine/engine.ts`)
+      deducts whatever resource the task's own `assistedVariant.cost`
+      declares — and every assisted-form task in both `dev-sample.json`
+      and `general-bible.json` declares that cost as Insight, not
+      Provision. In practice the button works (confirmed above: it
+      correctly required and spent Insight), but a host reading the
+      button literally would expect it to need Provision, and would see
+      an "Illegal command… needs 1 insight" message if they had Provision
+      but not Insight on hand — encountered live during this check. The
+      amplified-form button has no such mismatch (`amplifiedVariant.cost`
+      is consistently Courage everywhere, matching its label). Since this
+      predates Phase 9 and touching `src/ui/screens.ts`'s button wiring
+      or the established Insight-funds-assist authoring convention is
+      outside this phase's scope, it's flagged here for Brian/Fable to
+      rule on (either make the button's resource name dynamic, or treat
+      Provision-funds-assist as the intended convention and correct the
+      content instead).
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,

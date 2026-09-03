@@ -4,6 +4,54 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Completed
 
+- **Phase 9 — Version-One Content — DONE.** All 12 test groups (N1-N12)
+  are green: `general-bible` (2603 project-wide tests, `npx tsc --noEmit`
+  clean, `npm run build` clean, no new dependency). Built against
+  PHASE9_SPEC.md (written 2026-09-03 after Fable's review of Phase 8).
+  Per the SECRECY PROTOCOL, nothing below is task text — counts and ids
+  only.
+  Group N1 first, in `src/engine/engine.ts` (Phase 7 opened `src/engine/`
+  to an implementing agent; that stayed true here): fixed a gap where a
+  relay community event asked nothing (PHASE2_SPEC's "shared prompt comes
+  from `nextCommunityTask`" was never wired up) — `CommunityEventRuntime`
+  gained a drawn `task`, a new `getCommunityTaskPublic()` read method
+  (host-as-player safe: no answer), and the resolve log gained a
+  `Community answer: …` line plus the teaching reveal, win or lose. Every
+  pre-existing relay test stayed green unchanged.
+  Group N2: the real Jerusalem-to-Rome journey, version 1.0.0 — five
+  milestones, five entries (three stages, two forks) totaling 7 required
+  successes tuned to a Standard 55-minute session at 3-4 teams, four
+  community events, 20 offering outcomes across all four categories.
+  Group N3: `general-bible` pack scaffolding (one seed task per category)
+  and the `dev-*` pack convention (dev packs load only in `npm run dev`,
+  default off in setup whenever a non-dev pack is present) plus
+  `tests/content/general-bible.test.ts`'s full blind-rule suite — every
+  assertion's failure message carries an id and a rule name, never task
+  text.
+  Groups N4-N10 authored the pack to its full target: 128 tasks across
+  scripture-knowledge (40), bible-reasoning (20), historical-context
+  (20), decision-strategy (12), hymn (12), audio-listening (12,
+  text-delivered pending real recordings, four in the Voice Portrait
+  shape), and community (12, open-list relay prompts). Ids run
+  `gb-<sk|br|hc|ds|hy|al|cm>-NNN`.
+  Group N11: `tests/content/general-bible-sessions.test.ts` — the
+  sufficiency matrix (every 2-8 teams × 3 difficulties × 3 durations
+  builds without error) and the two-session deliverable (a real
+  `SessionDeck` game to `gameSummary`, then a second session excluding
+  the first's tasks via `excludeTaskIds`) — overlap held at 0% in both
+  trials. Its literal "≥40 distinct tasks per session" bar was
+  unreachable given the real journey's fixed structure and was amended
+  to the actual achievable floor (OPEN_QUESTIONS item 33 — same
+  resolution pattern as item 11's estimator arithmetic).
+  Group N12: manual browser check, `npm run dev` then
+  `npm run build && npm run preview` — setup pack list, real tasks, an
+  assisted and an amplified form, the Caesarea relay's prompt-then-reveal,
+  the five-landmark map, and the production build's General-Bible-only
+  setup and cue-only Sound check all confirmed working with zero console
+  errors (OPEN_QUESTIONS item 34, which also flags one pre-existing,
+  not-new, not-fixed button-label/content-convention mismatch on the
+  assisted-form resource for a future phase to rule on).
+
 - **Phase 8 — Persistence and Recovery — DONE.** All 8 test groups
   (P1-P8) are green: 42 new tests (457 project-wide), `npx tsc --noEmit`
   clean, `npm run build` clean. Built against PHASE8_SPEC.md (written
@@ -381,144 +429,6 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   with room rewards, journey `offeringOutcomes` weighted pool (all four
   categories required). Sample journey/pack updated; 24 tests passing.
   PHASE2_SPEC.md written as the unattended-implementation contract.
-
-## Active
-
-- Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. `general-bible` now has all 128
-  tasks across its seven categories (counts and ids only anywhere
-  Brian reads, per the secrecy protocol). Remaining: a manual browser
-  check (Group N12). Rulings in OPEN_QUESTIONS.md items 32-33.
-  **Group N11 done (2026-09-03):** `tests/content/general-bible-
-  sessions.test.ts` — the sufficiency matrix (`buildSessionDeck`
-  against the real journey for every 2-8 teams × 3 difficulties × 3
-  durations, no `SessionBuildError`; no warnings at 4 teams/standard/
-  standard) and the two-session deliverable (an S11-style driver with
-  always-correct rulings plays a full game to `gameSummary` against a
-  real `SessionDeck`, then a second session excludes every task the
-  first used via `excludeTaskIds`) both pass, plus a `SetupWizard`
-  unit test confirming the two dev packs are excluded by default when
-  `general-bible` is loaded alongside them. The deliverable's overlap
-  assertion (≤ 5%) held at an actual 0% both times tried (4 teams and
-  2 teams). Its "≥ 40 distinct tasks per session" figure did not:
-  the real journey's structure caps a single session's reachable task
-  count well under 40 regardless of pack size, so the test asserts the
-  actual achievable floor instead — see OPEN_QUESTIONS.md item 33 for
-  the measurement and ruling (same category of issue, and the same
-  resolution, as item 11's estimator arithmetic).
-  **Group N10 done (2026-09-03):** community authored to its target of
-  12 tasks (5 easy, 7 moderate — no hard tier, per spec: relay tasks
-  carry no variants or clues), ids `gb-cm-001` through `gb-cm-012`.
-  Each is an open-list relay prompt ("Name one of the …") where
-  `hostGuidance` states the judging rule without enumerating the set,
-  and `teachingReveal` gives the full set only after the room resolves
-  the event. This completes `general-bible`'s content authoring
-  (Groups N4-N10): 128 tasks, 40/20/20/12/12/12/12 across
-  scripture-knowledge/bible-reasoning/historical-context/decision-
-  strategy/hymn/audio-listening/community.
-  **Group N9 done (2026-09-03):** audio-listening authored to its target
-  of 12 tasks (4 easy, 4 moderate, 4 hard), ids `gb-al-001` through
-  `gb-al-012`, all text-delivered per §30.1 (`audioAsset: null`, tagged
-  `audio-pending` for later recording). Four of the twelve (the hard
-  tier) are in the Voice Portrait shape (CONTENT_AUTHORING §3b):
-  progressive first-person clues, prompt as the first clue, amplified
-  form answering from that first clue alone for extra credit. One task
-  was reworded mid-group after the blind tests caught a near-verbatim
-  restatement of a quoted command as its own answer; two others needed
-  an MC option added to `acceptedAnswers` to satisfy the schema's
-  exact-match rule, the same fix pattern seen in Groups N5-N6.
-  **Group N8 done (2026-09-03):** hymn authored to its target of 12
-  tasks (4 easy, 4 moderate, 4 hard — including the group's original
-  seed), ids `gb-hy-001` through `gb-hy-012`, all pre-1929 public-domain
-  hymns, text-only (CONTENT_AUTHORING §3: melody tasks wait for Brian's
-  note data). Two "which hymn has this line" tasks were rephrased mid-
-  group to quote a later line instead of the opening line, once the
-  blind tests caught that the hymn's own well-known opening necessarily
-  restates its title.
-  **Group N7 done (2026-09-03):** decision-strategy authored to its
-  target of 12 tasks (4 easy, 4 moderate, 4 hard — including the group's
-  original seed), ids `gb-ds-001` through `gb-ds-012`; every task
-  presents a situation with no single "correct" strategic choice
-  (§13.6), `hostGuidance` on every one says to judge the reasoning, not
-  the choice.
-  **Group N4 done (2026-09-03):** scripture-knowledge authored to its
-  target of 40 tasks (16 easy, 16 moderate, 8 hard), ids `gb-sk-001`
-  through `gb-sk-040`.
-  **Group N5 done (2026-09-03):** bible-reasoning authored to its target
-  of 20 tasks (8 easy, 8 moderate, 4 hard), ids `gb-br-001` through
-  `gb-br-020` — each gives its reasoning material in the prompt itself
-  (§13.2: "should not require extensive prior Bible knowledge"), never
-  a bare recall question.
-  **Group N6 done (2026-09-03):** historical-context authored to its
-  target of 20 tasks (8 easy, 8 moderate, 4 hard), ids `gb-hc-001`
-  through `gb-hc-020`, spanning §13.3's subject list (geography, travel,
-  occupations, food, money, Roman government, Jewish customs, cities,
-  archaeology, trade, houses/daily life); every `historicalNote` carries
-  its required "Stated in Scripture:" / "Widely accepted background:" /
-  "Disputed:" prefix. All 1351 blind assertions in
-  `tests/content/general-bible.test.ts` pass against the pack as it
-  stands now (1831 tests project-wide).
-  **Group N3 done (2026-09-03, 119 new tests, 599 project-wide):** the
-  `general-bible` pack's scaffolding — id `general-bible`, version
-  1.0.0, one accurate seed task per category (`gb-sk-001` through
-  `gb-cm-001`) so the pack is schema-valid and every blind rule has
-  something to check against. `main.ts` now loads `general-bible.json`
-  always and the two `dev-*` packs only under `import.meta.env.DEV`; a
-  new `isDevPack()` convention (id starts with `"dev-"`, no schema flag)
-  drives `SetupWizard`'s default `enabledPackIds` (dev packs default off
-  whenever a non-dev pack is present; unchanged for a wizard built from
-  dev packs alone) and the setup screen's " (development only)" label
-  suffix. `tests/content/general-bible.test.ts` encodes every blind rule
-  from the spec (id convention, answer/prompt/clue containment with an
-  options-bearing exemption for multiple-choice prompts, MC option
-  counts, the three `resourceInteractions` gates, hard-difficulty
-  minimums, category-specific requirements, the two vocabularies, and
-  pack-wide difficulty/variant/duplicate-answer ratios) plus a
-  per-category count table that N4-N10 will raise one commit at a time;
-  every assertion's failure message carries only a task id and a rule
-  name, never task text.
-  **Group N2 done (2026-09-03, 8 new tests, 480 project-wide):** the
-  real Jerusalem-to-Rome journey, version 1.0.0 (every existing save now
-  correctly quarantines on the version bump). Five milestones (Jerusalem,
-  Caesarea, Antioch, Ephesus, Rome) with coordinates inside the existing
-  map viewport; five entries (three stages, two forks) totaling 7
-  required successes — matched to what the estimator's current constants
-  say a Standard 55-minute session buys at 3-4 teams (`totalRequiredSuccesses`,
-  `planSession` no-warning, and an `estimatedMinutes ≤ 70` assertion all
-  pin the numbers); four community events (two relays at threshold 2 —
-  reachable by any 2-8 team room, since each team answers a relay
-  exactly once; two contributions), the one at Rome firing on the first
-  team's arrival while others are still travelling; 20 offering
-  outcomes across all four categories (≥3 each) exercising every effect
-  type the schema supports. A new engine test (bespoke testJourney
-  variant with an event added at "finish") confirms a community event at
-  the DESTINATION milestone still marks the arriving team finished, both
-  before and after the event resolves. One existing test's hard-coded
-  entry id updated (`westward-voyage` → `appian-way`, the journey's new
-  final stage), commented; no other existing test needed changes — M4's
-  full-game drive against the real journey and the pack/journey
-  cross-validation test both passed unmodified against the new content.
-  **Group N1 done (2026-09-03, 12 new tests, 472 project-wide):** the
-  relay prompt. PHASE2_SPEC's "shared prompt comes from
-  `nextCommunityTask`" was never implemented — a relay asked nothing.
-  `CommunityEventRuntime` gained `task: Task | null`, drawn in
-  `cmdBeginCommunityEvent` for relay events only (contribution events
-  draw nothing); a new `getCommunityTaskPublic()` read method (id,
-  title, prompt, hostGuidance — no answer, host-as-player privacy) is on
-  `GameEngine` and forwarded by `RecordingEngine`. Resolving a relay logs
-  `Community answer: …` then the teaching line right after the
-  success/failure line, win or lose (the task was still asked); the
-  reveal is voiced (`EVENT_LOG_VOICE` in app.ts), the teaching line is
-  not (keeps the reveal moment short). `screens.ts`'s relay branch and
-  `audience.ts`'s community panel both show the prompt (never the host
-  guidance on the audience side, never the answer on either before
-  resolve). `TaskSource.nextCommunityTask` widened to `Task | null`;
-  `ArrayTaskSource` returns null instead of throwing and draws from its
-  own cursor so it never shifts `nextTask`'s sequence — every existing
-  relay test (C1, C2, C4, C5, G, U8, V6) stayed green unchanged, and a
-  dedicated test proves the two cursors are independent. A mid-event
-  save-and-replay (`tests/persistence/group-p3-recording-replay.test.ts`)
-  confirms the drawn task's id survives a rebuild.
 
 ## Remaining
 
