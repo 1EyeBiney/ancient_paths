@@ -65,7 +65,7 @@ const TARGET_COUNTS: Record<Task["category"], number> = {
   "decision-strategy": 12, // N7, done
   hymn: 12, // N8, done
   "audio-listening": 12, // N9, done
-  community: 1,
+  community: 12, // N10, done
 };
 
 function loadPack(): ContentPack {

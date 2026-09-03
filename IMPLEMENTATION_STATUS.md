@@ -385,11 +385,22 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
-  last category up to its target (community 12 — counts and ids only
-  anywhere Brian reads, per the secrecy protocol), a sufficiency matrix,
-  and the §34 deliverable as a test: two full sessions with ≤ 5% task
-  overlap. Groups N10-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
+  after Fable's review of Phase 8. `general-bible` now has all 128
+  tasks across its seven categories (counts and ids only anywhere
+  Brian reads, per the secrecy protocol). Remaining: a sufficiency
+  matrix and the §34 deliverable as a test — two full sessions with
+  ≤ 5% task overlap — plus a manual browser check. Groups N11-N12
+  remain. Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N10 done (2026-09-03):** community authored to its target of
+  12 tasks (5 easy, 7 moderate — no hard tier, per spec: relay tasks
+  carry no variants or clues), ids `gb-cm-001` through `gb-cm-012`.
+  Each is an open-list relay prompt ("Name one of the …") where
+  `hostGuidance` states the judging rule without enumerating the set,
+  and `teachingReveal` gives the full set only after the room resolves
+  the event. This completes `general-bible`'s content authoring
+  (Groups N4-N10): 128 tasks, 40/20/20/12/12/12/12 across
+  scripture-knowledge/bible-reasoning/historical-context/decision-
+  strategy/hymn/audio-listening/community.
   **Group N9 done (2026-09-03):** audio-listening authored to its target
   of 12 tasks (4 easy, 4 moderate, 4 hard), ids `gb-al-001` through
   `gb-al-012`, all text-delivered per §30.1 (`audioAsset: null`, tagged
