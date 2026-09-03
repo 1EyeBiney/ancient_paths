@@ -198,7 +198,9 @@ describe("C4 — offering effect summaries", () => {
     engine.dispatch({ type: "relayAnswer", teamId: "matthew", correct: true });
     engine.dispatch({ type: "resolveCommunityEvent" }); // relay-event reward: grant-resource-every-team/choice/1 -> boosted to 2
 
-    const choice = engine.getPendingChoiceDetailsForTeam("matthew")[0];
+    // Group P1: matthew also holds an unrelated stage-reward choice (amount 1)
+    // queued when s1 completed — filter to the boosted community-event one.
+    const choice = engine.getPendingChoiceDetailsForTeam("matthew").find((c) => c.reason === "a community event");
     expect(choice?.amount).toBe(2);
   });
 

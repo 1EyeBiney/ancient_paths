@@ -2,6 +2,8 @@
 // hard-coded limits: the engine reads this object (later merged with
 // per-session setup choices), never scatters magic numbers through code.
 
+import type { ResourceType } from "../engine/types";
+
 export const DEFAULTS = {
   resourceCap: 5,
   journeyTokenCap: 1,
@@ -44,6 +46,11 @@ export const DEFAULTS = {
     exceptionalMinimum: 2, // … and at least this many units, counts as "exceptional"
     maxPledgePerTeam: 3, // the UI offers 1..min(owned, this) per accepted resource
   },
+
+  // Phase 8 (OPEN_QUESTIONS 28, PHASE8_SPEC.md Group P1): the design doc's
+  // undefined "normal stage reward" (§9, §7.6, §20.11) — the only faucet
+  // that grants a resource from a real 0/0/0 start. amount 0 disables it.
+  stageCompletionReward: { resource: "choice" as ResourceType | "choice", amount: 1 as number },
 } as const;
 
 export type GameDefaults = typeof DEFAULTS;

@@ -326,10 +326,13 @@ describe("U8 — granted-resource choice picker drains pendingChoices", () => {
     expect(h.container.textContent).toContain("Team Alpha may choose a resource");
     expect(h.container.textContent).toContain("Team Beta may choose a resource");
 
+    // Group P1: team-1 also holds a stage-reward choice from completing its
+    // stage, queued before the relay's — draining one leaves that one behind.
+    const choicesBefore = h.engine.getPendingChoicesForTeam("team-1");
     const pick = render.actions.find((a) => a.id === "chooseGranted-team-1-insight")!;
     const insightBefore = h.engine.getTeam("team-1")!.resources.insight;
     pick.run();
-    expect(h.engine.getPendingChoicesForTeam("team-1")).toBe(0);
+    expect(h.engine.getPendingChoicesForTeam("team-1")).toBe(choicesBefore - 1);
     expect(h.engine.getTeam("team-1")!.resources.insight).toBe(insightBefore + 1);
     // Beta's pending choice is untouched by Alpha's pick.
     expect(h.engine.getPendingChoicesForTeam("team-2")).toBeGreaterThan(0);

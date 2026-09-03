@@ -948,6 +948,10 @@ class Engine implements GameEngine {
   }
 
   private finalizeStageCompletion(team: TeamState): void {
+    const { resource, amount } = this.config.stageCompletionReward;
+    if (amount > 0) {
+      this.grantOrQueueChoice(team, resource, amount, "a stage reward");
+    }
     const stage = this.findStage(team.currentStageId);
     let eventTriggered = false;
     if (stage.arrivesAtMilestoneId) {

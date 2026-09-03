@@ -25,13 +25,15 @@ function driveToRelayReward(): GameEngine {
 describe("C3 — sharing a granted resource", () => {
   it("moves the pending choice, awards the sharer Service, and logs the gift", () => {
     const engine = driveToRelayReward();
-    expect(engine.getPendingChoicesForTeam("matthew")).toBe(1);
+    // Group P1: matthew's s1 completion also queued a stage-reward choice,
+    // so matthew holds 2 (stage reward + relay reward) before sharing one away.
+    expect(engine.getPendingChoicesForTeam("matthew")).toBe(2);
     expect(engine.getPendingChoicesForTeam("mark")).toBe(1);
     const serviceBefore = engine.getTeam("matthew")!.serviceScore;
 
     engine.dispatch({ type: "shareGrantedResource", teamId: "matthew", toTeamId: "mark" });
 
-    expect(engine.getPendingChoicesForTeam("matthew")).toBe(0);
+    expect(engine.getPendingChoicesForTeam("matthew")).toBe(1); // Group P1: one choice remains (the stage reward)
     expect(engine.getPendingChoicesForTeam("mark")).toBe(2); // mark's own + matthew's gift
     expect(engine.getTeam("matthew")!.serviceScore - serviceBefore).toBe(DEFAULTS.serviceAwards.chooseCommunityBenefit);
     expect(engine.getSession().eventLog.some((e) => e.text === "Team Matthew shares its gift with Team Mark.")).toBe(true);
@@ -64,7 +66,9 @@ describe("C3 — sharing a granted resource", () => {
 
   it("rejects sharing when the sender has no pending choice", () => {
     const engine = driveToRelayReward();
-    engine.dispatch({ type: "chooseGrantedResource", teamId: "matthew", resource: "insight" }); // resolves matthew's only choice
+    // Group P1: matthew now holds 2 choices (stage reward + relay reward) — resolve both.
+    engine.dispatch({ type: "chooseGrantedResource", teamId: "matthew", resource: "insight" });
+    engine.dispatch({ type: "chooseGrantedResource", teamId: "matthew", resource: "provision" });
     expect(engine.getPendingChoicesForTeam("matthew")).toBe(0);
     expect(() => engine.dispatch({ type: "shareGrantedResource", teamId: "matthew", toTeamId: "mark" })).toThrow(
       IllegalCommandError,
@@ -91,7 +95,8 @@ describe("C3 — sharing a granted resource", () => {
     expect(engine.canUndo()).toBe(true);
     engine.dispatch({ type: "undo" });
 
-    expect(engine.getPendingChoicesForTeam("matthew")).toBe(1);
+    // Group P1: matthew holds 2 choices (stage reward + relay reward) before sharing.
+    expect(engine.getPendingChoicesForTeam("matthew")).toBe(2);
     expect(engine.getPendingChoicesForTeam("mark")).toBe(1);
     expect(engine.getTeam("matthew")!.serviceScore).toBe(serviceBefore);
     expect(engine.getSession().eventLog).toHaveLength(logLengthBefore);

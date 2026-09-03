@@ -63,8 +63,9 @@ describe("G3 — a relay meeting its threshold applies the room reward", () => {
     engine.dispatch({ type: "resolveCommunityEvent" });
 
     // The relay's reward is grant-resource-every-team, resource "choice" —
-    // every team should now have a pending choice to resolve.
-    expect(engine.getPendingChoicesForTeam("matthew")).toBe(1);
+    // every team should now have a pending choice to resolve. Group P1:
+    // matthew also holds a stage-reward choice from completing s1.
+    expect(engine.getPendingChoicesForTeam("matthew")).toBe(2);
     expect(engine.getPendingChoicesForTeam("mark")).toBe(1);
 
     const log = engine.getSession().eventLog.map((e) => e.text).join(" | ");
@@ -82,7 +83,9 @@ describe("G4 — a relay that misses its threshold applies no reward and no pena
     const markBefore = engine.getTeam("mark")!;
     engine.dispatch({ type: "resolveCommunityEvent" });
 
-    expect(engine.getPendingChoicesForTeam("matthew")).toBe(0);
+    // Group P1: matthew still holds the stage-reward choice from completing
+    // s1 — the relay's failure withholds only the relay's own reward.
+    expect(engine.getPendingChoicesForTeam("matthew")).toBe(1);
     expect(engine.getPendingChoicesForTeam("mark")).toBe(0);
     expect(engine.getTeam("matthew")!.resources).toEqual(matthewBefore.resources);
     expect(engine.getTeam("mark")!.resources).toEqual(markBefore.resources);
