@@ -1,0 +1,358 @@
+/* The Way — presentation (PHASE5_SPEC "Visual design"). All presentation
+   lives here; tokens are CSS custom properties so a later visual pass
+   (Brian's sighted helpers, a TV in the fellowship hall) is a token edit,
+   not a rebuild. Audience region = television-distance scale; host
+   region = arm's-length scale. */
+
+:root {
+  color-scheme: light dark;
+  --ink: #1c1917;
+  --paper: #faf6ef;
+  --paper-raised: #ffffff;
+  --accent: #7c2d12;
+  --ok: #14532d;
+  --bad: #7f1d1d;
+  --line: #d6cfc2;
+  --muted: #5f574d;
+  --focus: #1d4ed8;
+
+  --audience-base: 1.5rem;
+  --audience-big: 2.25rem;
+  --audience-heading: 2.75rem;
+  --badge-size: 2rem;
+  --host-base: 1.0625rem;
+
+  --space: 1rem;
+  --radius: 0.5rem;
+  --motion: 250ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ece7de;
+    --paper: #171412;
+    --paper-raised: #221e1b;
+    --accent: #f3b664;
+    --ok: #86efac;
+    --bad: #fca5a5;
+    --line: #3d3733;
+    --muted: #b8b0a4;
+    --focus: #93c5fd;
+  }
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  padding: var(--space) calc(var(--space) * 1.25) calc(var(--space) * 3);
+}
+
+#app {
+  max-width: 100rem;
+  margin: 0 auto;
+}
+
+.app-title {
+  color: var(--accent);
+  font-size: 1.6rem;
+  margin: 0 0 var(--space);
+}
+
+h2,
+h3 {
+  margin: 0 0 0.5em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  font-size: var(--host-base);
+  padding: 0.5em 1em;
+  margin: 0.25em 0.5em 0.25em 0;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+input,
+select {
+  font: inherit;
+  padding: 0.35em 0.5em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+}
+
+label {
+  display: block;
+  margin: 0.35em 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 0.95rem;
+  min-height: 1.4em;
+  margin: 0 0 var(--space);
+}
+
+/* -- layout ---------------------------------------------------------- */
+
+main {
+  display: grid;
+  gap: calc(var(--space) * 1.5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1100px) {
+  main {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+/* -- audience region (TV distance) ------------------------------------ */
+
+.audience {
+  font-size: var(--audience-base);
+}
+
+.audience .panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space) calc(var(--space) * 1.25);
+  margin-bottom: var(--space);
+}
+
+.audience h3 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.audience .big {
+  font-size: var(--audience-big);
+  line-height: 1.25;
+  margin: 0.25em 0;
+}
+
+.audience .now-playing .big {
+  font-size: var(--audience-heading);
+}
+
+.audience .choices {
+  font-size: var(--audience-big);
+  list-style: none;
+  padding-left: 0;
+}
+
+.audience .choices li {
+  margin: 0.15em 0;
+}
+
+.audience .clues {
+  color: var(--muted);
+}
+
+.audience .reveal {
+  border-top: 2px solid var(--accent);
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+}
+
+.audience table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--audience-base);
+}
+
+.audience th,
+.audience td {
+  text-align: left;
+  padding: 0.35em 0.5em;
+  border-bottom: 1px solid var(--line);
+}
+
+.audience tr.active-team {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-weight: bold;
+}
+
+.landmark-strip {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+}
+
+.landmark {
+  flex: 1 1 10rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 0.5em;
+}
+
+.landmark-name {
+  display: block;
+  font-weight: bold;
+}
+
+.markers {
+  list-style: none;
+  padding: 0;
+  margin: 0.35em 0 0;
+}
+
+.traveling {
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* -- progress bars ------------------------------------------------------- */
+
+.progress {
+  height: 0.9em;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.25em 0 0.5em;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+/* -- team badges (glyph + name + color; never color alone) ---------------- */
+
+.team-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  background: var(--team-color, var(--line));
+  color: var(--team-foreground, var(--ink));
+  font-size: var(--badge-size);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.team-badge-small {
+  font-size: calc(var(--badge-size) * 0.65);
+}
+
+.team-badge-large {
+  font-size: calc(var(--badge-size) * 1.3);
+}
+
+/* -- host region (arm's length) ------------------------------------------ */
+
+.host {
+  font-size: var(--host-base);
+}
+
+.host [role="listbox"] {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.25em;
+  margin: 0.25em 0 0.75em;
+}
+
+.host [role="option"] {
+  padding: 0.35em 0.5em;
+  border-radius: calc(var(--radius) / 2);
+  cursor: pointer;
+}
+
+.host [role="option"][aria-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  font-weight: bold;
+}
+
+.pending-choice {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* -- modals ---------------------------------------------------------------- */
+
+[role="dialog"]:not([hidden]) {
+  position: fixed;
+  inset: 10% auto auto 50%;
+  transform: translateX(-50%);
+  min-width: 20rem;
+  background: var(--paper-raised);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space) calc(var(--space) * 1.5);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.35);
+}
+
+#help-menu {
+  list-style: none;
+  padding: 0.5em;
+  margin: 0;
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: 28rem;
+  background: var(--paper-raised);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+#help-menu [aria-selected="true"] {
+  font-weight: bold;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* -- motion (only under an explicit "not reduced" stamp; §24) ------------- */
+
+[data-reduced-motion="false"] .audience .panel {
+  animation: panel-in var(--motion) ease-out;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

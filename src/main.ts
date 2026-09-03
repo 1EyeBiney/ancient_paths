@@ -1,10 +1,16 @@
-// Boots the Phase 4 app shell (PHASE4_SPEC "App shell and startup"). This
-// replaces the Phase 1 boot page: loading + validating content is now the
-// startup screen's job, handled by App itself via loadErrors.
+// Boots the app shell (PHASE4_SPEC "App shell and startup", PHASE5_SPEC
+// "Content"). Loads the dev-sample pack (never ships, 8 tasks) and the
+// generated dev-playtest pack (never ships, 420 placeholder tasks — enough
+// to actually play the real journey) plus the Jerusalem-to-Rome journey,
+// validates all of them, and hands any problems to the startup screen.
 
+import "./ui/styles.css";
 import { crossValidate, fetchJson, validateContentPack, validateJourney } from "./content/loader";
 import type { ContentPack, Journey } from "./content/schemas";
 import { App } from "./ui/app";
+
+const PACK_FILES = ["content/packs/dev-sample.json", "content/packs/dev-playtest.json"];
+const JOURNEY_FILES = ["content/journeys/jerusalem-rome.json"];
 
 async function boot(): Promise<void> {
   const root = document.getElementById("app")!;
@@ -13,21 +19,20 @@ async function boot(): Promise<void> {
   const loadErrors: string[] = [];
 
   try {
-    const [packRaw, journeyRaw] = await Promise.all([
-      fetchJson("content/packs/dev-sample.json"),
-      fetchJson("content/journeys/jerusalem-rome.json"),
-    ]);
+    const packRaws = await Promise.all(PACK_FILES.map((f) => fetchJson(f)));
+    const journeyRaws = await Promise.all(JOURNEY_FILES.map((f) => fetchJson(f)));
 
-    const pack = validateContentPack(packRaw, "dev-sample.json");
-    const journey = validateJourney(journeyRaw, "jerusalem-rome.json");
-
-    if (!pack.ok) loadErrors.push(...pack.errors.map((e) => `Pack: ${e}`));
-    if (!journey.ok) loadErrors.push(...journey.errors.map((e) => `Journey: ${e}`));
-    if (pack.ok && journey.ok) {
-      loadErrors.push(...crossValidate(journey.data, [pack.data]));
-      packs.push(pack.data);
-      journeys.push(journey.data);
-    }
+    packRaws.forEach((raw, i) => {
+      const result = validateContentPack(raw, PACK_FILES[i]!);
+      if (result.ok) packs.push(result.data);
+      else loadErrors.push(...result.errors.map((e) => `${PACK_FILES[i]}: ${e}`));
+    });
+    journeyRaws.forEach((raw, i) => {
+      const result = validateJourney(raw, JOURNEY_FILES[i]!);
+      if (result.ok) journeys.push(result.data);
+      else loadErrors.push(...result.errors.map((e) => `${JOURNEY_FILES[i]}: ${e}`));
+    });
+    for (const journey of journeys) loadErrors.push(...crossValidate(journey, packs));
   } catch (err) {
     loadErrors.push("Could not load content: " + (err instanceof Error ? err.message : String(err)));
   }

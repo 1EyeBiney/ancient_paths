@@ -77,6 +77,8 @@ export class SetupWizard {
   communityCatchup: boolean;
   seed: string;
   tasksPerTurnOverride: number | null;
+  /** null = follow the prefers-reduced-motion media query. */
+  reducedMotion: boolean | null;
 
   private readonly randomSeedSource: () => number;
 
@@ -97,6 +99,11 @@ export class SetupWizard {
     this.communityCatchup = true;
     this.seed = defaultSeed(this.randomSeedSource);
     this.tasksPerTurnOverride = null;
+    this.reducedMotion = null;
+  }
+
+  setReducedMotion(v: boolean | null): void {
+    this.reducedMotion = v;
   }
 
   private defaultTeamNames(count: number): string[] {

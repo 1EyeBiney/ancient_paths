@@ -168,6 +168,14 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     parity principle. Confirm the actual Sunday hardware (laptop age,
     TV vs projector) before committing to animation ambition.
 
+18. **Dependency record (CLAUDE.md rule 5), Phase 5:** `@types/node`
+    added as a devDependency (test-only; `tsconfig` `types` gains
+    `"node"`). Reason: Group V7/V8 tests read `styles.css`,
+    `dev-playtest.json`, and the real `jerusalem-rome.json` from disk to
+    keep the stylesheet and the generated pack honest, which needs
+    `node:fs`/`node:path` typings. No runtime dependency added; the
+    generator script itself is dependency-free.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

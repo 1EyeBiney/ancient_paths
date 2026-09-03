@@ -22,7 +22,7 @@ import { ModalManager } from "./modal";
 import { UndoController } from "./undo";
 import { ScreenRenderer, type ScreenRender } from "./screens";
 import { AudienceView } from "./audience";
-import { SetupWizard, attemptSessionGeneration } from "./setup";
+import { SetupWizard, attemptSessionGeneration, NON_COMMUNITY_CATEGORIES } from "./setup";
 import { CursorList } from "./cursorList";
 import { buildStatus, buildActionsSummary, buildPositions } from "./speech";
 import type { DeckDifficultySetting } from "../session/builder";
@@ -37,6 +37,8 @@ export interface AppOptions {
   loadErrors?: string[];
   /** Injectable presenter clock/timer so tests can drive the idle re-prompt manually. */
   presenterTimer?: Pick<PresenterOptions, "now" | "setIntervalFn" | "clearIntervalFn" | "idleThresholdMs">;
+  /** Injectable so tests can simulate prefers-reduced-motion (jsdom has no matchMedia). */
+  matchMedia?: (query: string) => { matches: boolean };
 }
 
 function el(tag: string, opts: { text?: string; className?: string } = {}): HTMLElement {
@@ -44,6 +46,12 @@ function el(tag: string, opts: { text?: string; className?: string } = {}): HTML
   if (opts.text !== undefined) e.textContent = opts.text;
   if (opts.className) e.className = opts.className;
   return e;
+}
+
+function clampInt(raw: string, min: number, max: number, fallback: number): number {
+  const n = Math.round(Number(raw));
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
 }
 
 export class App {
@@ -122,12 +130,17 @@ export class App {
       if (event.repeat) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       const active = document.activeElement;
-      if (!(active instanceof HTMLButtonElement) || !this.root.contains(active)) return;
+      if (!this.root.contains(active)) return;
+      const isButton = active instanceof HTMLButtonElement;
+      const isCheckbox = active instanceof HTMLInputElement && active.type === "checkbox";
+      if (!isButton && !isCheckbox) return;
+      if (isCheckbox && event.key === "Enter") return; // Space toggles a checkbox; Enter is not its activation key
       event.preventDefault();
       event.stopPropagation();
       active.click();
     });
 
+    this.applyReducedMotion();
     this.renderStartup();
   }
 
@@ -150,6 +163,11 @@ export class App {
 
   getPresenterLog() {
     return this.presenter.log();
+  }
+
+  /** Read-only access for tests; the setup screen is the only writer. */
+  getSetupWizard(): SetupWizard {
+    return this.wizard;
   }
 
   // -- keyboard attach/detach ------------------------------------------
@@ -298,10 +316,32 @@ export class App {
     this.renderTeamNameInputs();
 
     // Duration / pace / difficulty
-    this.appendChoiceList("Duration", ["short", "standard", "long"], this.wizard.duration as string, (id) => {
-      this.wizard.setDuration(id as SessionDuration);
+    const customMinutes = document.createElement("input");
+    customMinutes.type = "number";
+    customMinutes.min = "15";
+    customMinutes.max = "180";
+    customMinutes.value = typeof this.wizard.duration === "object" ? String(this.wizard.duration.customMinutes) : "55";
+    customMinutes.setAttribute("aria-label", "Custom minutes");
+    customMinutes.disabled = typeof this.wizard.duration !== "object";
+    this.appendChoiceList("Duration", ["short", "standard", "long", "custom"], this.wizard.duration as string, (id) => {
+      if (id === "custom") {
+        customMinutes.disabled = false;
+        this.wizard.setDuration({ customMinutes: clampInt(customMinutes.value, 15, 180, 55) });
+      } else {
+        customMinutes.disabled = true;
+        this.wizard.setDuration(id as SessionDuration);
+      }
       this.updateEstimate();
     });
+    const customLabel = document.createElement("label");
+    customLabel.textContent = "Custom minutes (15-180)";
+    customLabel.appendChild(customMinutes);
+    customMinutes.addEventListener("input", () => {
+      if (customMinutes.disabled) return;
+      this.wizard.setDuration({ customMinutes: clampInt(customMinutes.value, 15, 180, 55) });
+      this.updateEstimate();
+    });
+    this.contentContainer.appendChild(customLabel);
     this.appendChoiceList("Pace", ["relaxed", "standard", "quick"], this.wizard.pace, (id) => {
       this.wizard.setPace(id as SessionPace);
       this.updateEstimate();
@@ -309,6 +349,85 @@ export class App {
     this.appendChoiceList("Difficulty", ["gentle", "standard", "challenging"], this.wizard.difficulty, (id) => {
       this.wizard.setDifficulty(id as DeckDifficultySetting);
     });
+
+    // Tasks per turn (blank = recommended)
+    this.contentContainer.appendChild(el("h2", { text: "Tasks per turn" }));
+    const tasksPerTurn = document.createElement("input");
+    tasksPerTurn.type = "number";
+    tasksPerTurn.min = "1";
+    tasksPerTurn.max = "6";
+    tasksPerTurn.placeholder = "recommended";
+    tasksPerTurn.setAttribute("aria-label", "Tasks per turn (blank for recommended)");
+    tasksPerTurn.addEventListener("input", () => {
+      this.wizard.setTasksPerTurnOverride(tasksPerTurn.value === "" ? null : clampInt(tasksPerTurn.value, 1, 6, 3));
+      this.updateEstimate();
+    });
+    this.contentContainer.appendChild(tasksPerTurn);
+
+    // Content packs
+    this.contentContainer.appendChild(el("h2", { text: "Content packs" }));
+    const packsBox = el("div");
+    packsBox.id = "packs";
+    for (const pack of this.wizard.packs) {
+      packsBox.appendChild(
+        this.checkbox(`pack-${pack.packId}`, pack.title, this.wizard.enabledPackIds.includes(pack.packId), (on) => {
+          const ids = new Set(this.wizard.enabledPackIds);
+          if (on) ids.add(pack.packId);
+          else ids.delete(pack.packId);
+          this.wizard.setEnabledPacks([...ids]);
+        }),
+      );
+    }
+    this.contentContainer.appendChild(packsBox);
+
+    // Task categories (community is always in play; not listed)
+    this.contentContainer.appendChild(el("h2", { text: "Task categories" }));
+    const categoriesBox = el("div");
+    categoriesBox.id = "categories";
+    for (const category of NON_COMMUNITY_CATEGORIES) {
+      categoriesBox.appendChild(
+        this.checkbox(`category-${category}`, category, this.wizard.enabledCategories.includes(category), (on) => {
+          const set = new Set(this.wizard.enabledCategories);
+          if (on) set.add(category);
+          else set.delete(category);
+          this.wizard.setEnabledCategories(NON_COMMUNITY_CATEGORIES.filter((c) => set.has(c)));
+        }),
+      );
+    }
+    this.contentContainer.appendChild(categoriesBox);
+
+    // Audio settings (stored only until Phase 6)
+    this.contentContainer.appendChild(el("h2", { text: "Audio (applies from Phase 6)" }));
+    const audioBox = el("div");
+    audioBox.id = "audio";
+    for (const key of ["master", "music", "effects", "narration"] as const) {
+      const label = document.createElement("label");
+      label.textContent = `${key} volume (0-100)`;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.max = "100";
+      input.value = String(this.wizard.audio[key]);
+      input.setAttribute("aria-label", `${key} volume`);
+      input.addEventListener("input", () => this.wizard.setAudio({ [key]: clampInt(input.value, 0, 100, 100) }));
+      label.appendChild(input);
+      audioBox.appendChild(label);
+    }
+    this.contentContainer.appendChild(audioBox);
+
+    // Community catch-up, reduced motion
+    this.contentContainer.appendChild(el("h2", { text: "Options" }));
+    this.contentContainer.appendChild(
+      this.checkbox("community-catchup", "Community catch-up (applies from Phase 7)", this.wizard.communityCatchup, (on) =>
+        this.wizard.setCommunityCatchup(on),
+      ),
+    );
+    this.contentContainer.appendChild(
+      this.checkbox("reduced-motion", "Reduce motion", this.effectiveReducedMotion(), (on) => {
+        this.wizard.setReducedMotion(on);
+        this.applyReducedMotion();
+      }),
+    );
 
     // Seed
     this.contentContainer.appendChild(el("h2", { text: "Seed" }));
@@ -341,6 +460,28 @@ export class App {
     this.contentContainer.appendChild(beginButton);
 
     this.presenter.present({ visual: "Session setup. Choose a journey, team count, names, pace, and seed." });
+  }
+
+  private checkbox(id: string, labelText: string, checked: boolean, onChange: (on: boolean) => void): HTMLElement {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = id;
+    input.checked = checked;
+    input.addEventListener("change", () => onChange(input.checked));
+    label.append(input, ` ${labelText}`);
+    return label;
+  }
+
+  private effectiveReducedMotion(): boolean {
+    if (this.wizard.reducedMotion !== null) return this.wizard.reducedMotion;
+    const mm = this.options.matchMedia ?? (typeof window.matchMedia === "function" ? window.matchMedia.bind(window) : null);
+    return mm ? mm("(prefers-reduced-motion: reduce)").matches : false;
+  }
+
+  /** Stamps the effective value on the root; styles.css only animates under "false". */
+  private applyReducedMotion(): void {
+    this.root.dataset.reducedMotion = this.effectiveReducedMotion() ? "true" : "false";
   }
 
   private renderTeamNameInputs(): void {

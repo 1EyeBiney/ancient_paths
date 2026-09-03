@@ -4,8 +4,9 @@
 // Every harness exposes dispose() — call it in afterEach so the
 // presenter's idle interval never outlives its test.
 
+import { expect } from "vitest";
 import { App, type AppOptions } from "../../src/ui/app";
-import type { ContentPack, Journey } from "../../src/content/schemas";
+import type { ContentPack, Journey, Task } from "../../src/content/schemas";
 import { testJourney, bigPack } from "../session/fixtures";
 
 export interface AppHarness {
@@ -136,6 +137,53 @@ export function keyboardStep(h: AppHarness): boolean {
     }
     default:
       throw new Error(`appHarness.keyboardStep: unhandled state "${state}"`);
+  }
+}
+
+/** The V2 synchronization assertion, journey-agnostic so V8 can reuse it
+ * against the real Jerusalem-to-Rome journey. */
+export function assertAudienceMatchesEngine(h: AppHarness, tasksById: Map<string, Task>, journey: Journey): void {
+  const engine = h.app.getEngine()!;
+  const session = engine.getSession();
+  const state = engine.getState();
+  const audience = h.root.querySelector<HTMLElement>("#audience-view")!;
+  expect(audience.hidden).toBe(false);
+
+  const active = session.teams[session.activeTeamIndex]!;
+  const nowPlaying = audience.querySelector<HTMLElement>('[data-audience="now-playing"]')!;
+  if (state !== "ready") {
+    expect(nowPlaying.textContent).toContain(active.name);
+    const milestone = journey.milestones.find((m) => m.id === active.currentMilestoneId)!.name;
+    expect(nowPlaying.textContent).toContain(milestone);
+    const required = engine.getEffectiveStageRequirement(active.id)!;
+    expect(audience.querySelector('[data-audience="stage-progress"]')!.textContent).toContain(
+      `${active.stageSuccesses} of ${required} successes`,
+    );
+  }
+
+  for (const team of session.teams) {
+    const row = audience.querySelector<HTMLElement>(`[data-audience="teams"] tr[data-team-id="${team.id}"]`)!;
+    expect(row.querySelector('[data-col="insight"]')!.textContent).toBe(String(team.resources.insight));
+    expect(row.querySelector('[data-col="provision"]')!.textContent).toBe(String(team.resources.provision));
+    expect(row.querySelector('[data-col="courage"]')!.textContent).toBe(String(team.resources.courage));
+  }
+
+  const publicTask = engine.getCurrentTaskPublic();
+  if (publicTask) {
+    const answer = tasksById.get(publicTask.id)!.answer;
+    const revealed = engine.getRevealedAnswer();
+    if (revealed) {
+      expect(audience.querySelector('[data-audience="reveal"]')!.textContent).toContain(answer);
+    } else {
+      // A multiple-choice task legitimately lists the answer among its
+      // options pre-reveal (the schema requires it); the guarantee is that
+      // no REVEAL panel exists and nothing marks which option is right.
+      expect(audience.querySelector('[data-audience="reveal"]')).toBeNull();
+      if (!publicTask.activeVariant.options) expect(audience.textContent).not.toContain(answer);
+    }
+    if (state === "awaitingAnswer" || state === "answerReveal") {
+      expect(audience.querySelector('[data-audience="prompt"]')!.textContent).toBe(publicTask.activeVariant.prompt);
+    }
   }
 }
 
