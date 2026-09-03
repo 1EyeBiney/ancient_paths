@@ -385,12 +385,18 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. Remaining: authoring `general-bible`
-  up to its full 128-task target across seven categories (currently 7
-  seed tasks, one per category — counts and ids only anywhere Brian
-  reads, per the secrecy protocol), a sufficiency matrix, and the §34
-  deliverable as a test: two full sessions with ≤ 5% task overlap.
-  Groups N4-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
+  after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
+  other six categories up to their targets (bible-reasoning 20,
+  historical-context 20, decision-strategy 12, hymn 12, audio-listening
+  12, community 12 — counts and ids only anywhere Brian reads, per the
+  secrecy protocol), a sufficiency matrix, and the §34 deliverable as a
+  test: two full sessions with ≤ 5% task overlap. Groups N5-N12 remain.
+  Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N4 done (2026-09-03):** scripture-knowledge authored to its
+  target of 40 tasks (16 easy, 16 moderate, 8 hard), ids `gb-sk-001`
+  through `gb-sk-040`. All 743 blind assertions in
+  `tests/content/general-bible.test.ts` pass against the pack as it
+  stands now (1223 tests project-wide).
   **Group N3 done (2026-09-03, 119 new tests, 599 project-wide):** the
   `general-bible` pack's scaffolding — id `general-bible`, version
   1.0.0, one accurate seed task per category (`gb-sk-001` through
