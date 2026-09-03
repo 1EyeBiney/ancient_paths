@@ -447,17 +447,31 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   categories required). Sample journey/pack updated; 24 tests passing.
   PHASE2_SPEC.md written as the unattended-implementation contract.
 
+## Active
+
+- Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X1 done (2026-09-03, 21 new tests, 2755 project-wide):** the
+  simulation harness, `src/sim/` (not imported by `src/ui` or `main.ts` —
+  build output unchanged in size, confirming Vite tree-shakes it out).
+  `policy.ts`: the documented success-model parameters (0.85/0.65/0.45
+  base rates, assisted/amplified/clue/eliminate/skip factors) and five
+  named team-policy presets (PASSIVE, CAUTIOUS, BOLD, GENEROUS, HOARDER).
+  `simulate.ts`: `simulateGame()` plays one complete game headlessly
+  against the real engine and a real `SessionDeck`, resolving every
+  decision point (fork route, resource-window spending, recover,
+  surplus, relay answers, contribution pledges, granted-choice
+  sharing) per the active team's policy, with its own `${seed}:sim`
+  rng kept separate from the engine's and the deck's. One real bug
+  caught by the tests before commit: the recover path double-counted
+  the replacement task's id in `taskIds` (pushed once explicitly, then
+  again when the loop naturally re-entered `resourceWindow` for it) —
+  fixed by letting the ordinary branch record it once. Every preset
+  reaches `gameSummary` cleanly at 2/4/8 teams standard with zero
+  illegal commands and no repeated task within a session; PASSIVE
+  spends nothing; BOLD reaches the amplified form in ≥ 90 of 100 seeds.
+
 ## Remaining
 
-- Phase 10 — Accessibility and balance audit: **specified**
-  (PHASE10_SPEC.md, 2026-09-03) — a headless simulation harness
-  (`src/sim/`) with a committed, test-checked `SIMULATION_REPORT.md`;
-  game-length, economy, fairness and content-repeat analyses as
-  findings-plus-proposals; automated accessibility, focus and
-  error-recovery audits against the real content; an NVDA checklist
-  for Brian's own pass; route difficulty made real in the deck (X4b);
-  recent-use memory across games (X6, Brian ruled yes); and the
-  §35 Definition of Done walked item by item.
 - Phase 11 — Content growth and the deferred items (timed endgame,
   melody tasks when Brian's note data arrives, audio-listening
   recordings, a second journey).
