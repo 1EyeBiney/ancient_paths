@@ -450,6 +450,25 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X11 done (2026-09-03):** the manual browser check, real content,
+  keyboard only — `npm run dev`, Welcome through a full setup wizard by
+  Tab/arrows/Enter (4 teams, General Bible only), 3 real-time rounds
+  covering every required checkpoint (the Caesarea relay, a granted-choice
+  share, three fork choices, the Antioch contribution with a real pledge,
+  an assisted form, an amplified form that triggered `surplusDecision`, a
+  surplus offer, `?` help, second-`?` explorer, Escape → game menu → Game
+  log → Escape back to the reopened menu, reload → Resume → Ctrl+Z twice,
+  End session), zero console errors throughout, three screenshots
+  confirming a visible focus indicator (Welcome, setup's "Begin journey",
+  the open game menu), `SIMULATION_REPORT.md` read and sensible. Then
+  `npm run build && npm run preview`: Welcome, New game showing only
+  General Bible (dev packs correctly excluded from the production
+  bundle), one full turn played, zero console errors. No app defects
+  found. Full writeup (counts/ids/observations, no task text) in
+  OPEN_QUESTIONS item 41, including one testing-tool caveat (not a game
+  finding) about devtools-evaluation calls interleaved between Ctrl+Z
+  presses spuriously cancelling the arm — a batched, uninterrupted press
+  pair worked correctly on the first try.
   **Group X10 done (2026-09-03, 3 new tests, 2882 project-wide):** the
   simulation report. `src/sim/report.ts`'s `generateReport(journey, packs)`
   is a pure function that runs its OWN smaller batches (length 2/cell vs.

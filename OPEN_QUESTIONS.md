@@ -1013,6 +1013,50 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     behavior for L, which is correct given the content as it stands, not
     a regression to chase.
 
+41. **PHASE10_SPEC Group X11 — manual browser check, real content, keyboard
+    only (2026-09-03).** `npm run dev`: Welcome (browse-mode readable,
+    Enter on New game) → setup wizard entirely by Tab/arrows/Enter,
+    4 teams, standard duration/pace/difficulty, General Bible only
+    (dev packs explicitly unchecked) → played 3 rounds real-time: the
+    Caesarea relay (all 4 teams answered in turn, "Room progress"/"Now
+    answering" both read correctly, resolved and advanced the whole
+    room), a granted-choice share (Team 1 → Team 2, confirmed the
+    receiving team's own take-only options and no re-share option on
+    a received gift), 3 fork choices (one per remaining team; Team 1
+    had already forked earlier), the Antioch contribution ("Pledged: N
+    of 3", one real "contribute" pledge — not just decline — accepted
+    and reflected in Service), an assisted form (Provision 2→1,
+    variant/title changed), an amplified form (Courage 2→1) that
+    overshot a 1-success stage and correctly reached `surplusDecision`,
+    a surplus offer, `?` help (rows matched the legal actions for that
+    state), a second `?` entering keyboard explorer (a key press spoke
+    what it would do without changing any game state; Escape exited
+    cleanly), Escape → game menu → Game log (50 entries, ids/effects
+    only, no task text) → Escape closed it back to the reopened menu
+    (Group X7g's fix, confirmed live) → reload → Resume (exact same
+    screen, teams, and log restored) → Ctrl+Z twice (arm wording named
+    the real reversed action; confirm restored the exact prior screen)
+    → End session (press-twice confirm, landed cleanly back on setup).
+    Zero console errors at every checkpoint. Three screenshots taken
+    (Welcome, setup's "Begin journey" with focus ring, the open Game
+    menu with focus ring) — the keyboard focus indicator was clearly
+    visible in all three. No app defects found. One testing-tool
+    caveat, not a game finding: a few isolated `Ctrl+Z` presses
+    interleaved with separate devtools-evaluation round-trips were each
+    read back as a fresh arm rather than a confirm (each subsequent
+    press's arm text was identical, meaning the arm had been silently
+    cancelled between presses) — a single batched pair of presses with
+    no intervening tool call between them worked correctly on the first
+    try, so this reads as devtools-evaluation-induced blur cancelling
+    the arm between separate tool round-trips (`UndoController.cancel()`
+    fires on "any other action"), not a real double-press failure a
+    person would hit. `SIMULATION_REPORT.md` (Group X10) was read and
+    reads sensibly. Then `npm run build && npm run preview`: Welcome
+    rendered, New game's Content packs section showed only "General
+    Bible" (both dev-only packs correctly absent from the production
+    bundle), one full turn played end-to-end (present → accept →
+    reveal → rule correct → teaching), zero console errors throughout.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
