@@ -386,11 +386,17 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
   after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
-  other four categories up to their targets (decision-strategy 12, hymn
-  12, audio-listening 12, community 12 — counts and ids only anywhere
-  Brian reads, per the secrecy protocol), a sufficiency matrix, and the
-  §34 deliverable as a test: two full sessions with ≤ 5% task overlap.
-  Groups N7-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
+  other three categories up to their targets (hymn 12, audio-listening
+  12, community 12 — counts and ids only anywhere Brian reads, per the
+  secrecy protocol), a sufficiency matrix, and the §34 deliverable as a
+  test: two full sessions with ≤ 5% task overlap. Groups N8-N12 remain.
+  Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N7 done (2026-09-03):** decision-strategy authored to its
+  target of 12 tasks (4 easy, 4 moderate, 4 hard — including the group's
+  original seed), ids `gb-ds-001` through `gb-ds-012`; every task
+  presents a situation with no single "correct" strategic choice
+  (§13.6), `hostGuidance` on every one says to judge the reasoning, not
+  the choice.
   **Group N4 done (2026-09-03):** scripture-knowledge authored to its
   target of 40 tasks (16 easy, 16 moderate, 8 hard), ids `gb-sk-001`
   through `gb-sk-040`.
