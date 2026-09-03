@@ -450,6 +450,54 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X8 done (2026-09-03, 9 new tests, 2879 project-wide):** the
+  error-recovery matrix (§23.7), `tests/audit/group-x8-recovery.test.ts`,
+  real journey + general-bible pack (blind: ids/categories only). For four
+  mistakes a host can make (wrong route, wrong ruling, wrong resource
+  spent, Present-task-too-early) — one `describe` per mistake, parameterized
+  over a shared `MistakeScenario` table — Ctrl+Z's arm press names the
+  reversed action in plain words and its confirm press restores the exact
+  prior session and screen heading, proven twice: once as a plain in-memory
+  undo, and once for a mistake that was made, autosaved, reloaded through
+  the real Resume flow (which uses `rebuildFromSave` internally), and only
+  THEN undone (Phase 8 had proven one such case; this proves all four). A
+  fifth mistake, skipped narration, is a different recovery shape (N/R/L,
+  not Ctrl+Z) and gets its own test. No app defects found this group — every
+  failure along the way was in the test's own assumptions:
+  - `PublicTask.canAssist`/`canAmplify`/`canExtraClue` are content flags
+    ("this task supports the form"), not affordability checks — a team
+    with 0 Provision still sees a "Spend Provision" button. Clicking it
+    dispatches a command that throws `IllegalCommandError` inside
+    `dispatch()`, silently rolled back and never recorded (by design — an
+    unaffordable spend is exactly the kind of accidental double-click undo
+    exists for). The "spent the wrong resource" scenario now looks up each
+    candidate spend's real `{resource, amount}` cost from the loaded pack
+    and only attempts one the active team can actually afford.
+  - Assist/amplify buttons have no dedicated keyboard binding (unlike
+    Enter/C/I, which the app's own keyboard ladder maps to the current
+    screen's primary/ruling action) — driving one needs a direct `.click()`
+    (matching `group-x7b-status.test.ts`'s own established pattern), not a
+    synthetic Enter keydown, which jsdom never converts into a native
+    button activation the way a real browser does.
+  - `startingResources` (a test-only `AppOptions` override used elsewhere
+    in this phase) can't be used for any scenario proven through save +
+    Resume: it only seeds the LIVE engine, and `rebuildFromSave` has no
+    such override, so a replayed game would start its teams at 0/0/0 and
+    genuinely diverge from the original — not an undo bug, a test-fixture
+    mismatch. The resource-spend scenario earns its resource the normal
+    way (a real stage-completion reward) instead.
+  - Spending a resource changes the in-progress task's active variant
+    (assisted/amplified), which lives on the engine's internal
+    `currentTask`, not on `PlaySession` — so a before/after comparison
+    based on `getSession()` alone saw "no visual difference" even though
+    the mistake (and undo) were both real. Fixed by folding the active
+    variant kind into the comparable snapshot for every scenario.
+  - The shipped `general-bible` pack currently has no real `audioAssets`
+    at all (Phase 6 status: narration is placeholder) — see OPEN_QUESTIONS
+    item 40 — so the N/R/L test augments an in-memory copy of the real
+    pack with one synthetic asset on every audio-listening task (never
+    written to the committed file) to exercise L's replay/fallback
+    branches at all.
   **Group X7g done (2026-09-03, 2 new tests, 2870 project-wide):** modals —
   `tests/audit/group-x7g-modals.test.ts` checks every `ModalManager`
   dialog (game menu, Audio, Game log, Delete saved game, Forget recent

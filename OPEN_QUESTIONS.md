@@ -989,6 +989,30 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     attempted here to avoid rushing a change to a path that changes
     game state.
 
+40. **Finding (2026-09-03) — PHASE10_SPEC Group X8: the shipped
+    `general-bible.json` pack has zero real `audioAssets`, and every one of
+    its 12 audio-listening tasks has `audioAsset: null`.** Discovered while
+    writing the error-recovery matrix's "skipped narration" test (N/R/L),
+    which needs a task whose audio actually plays to exercise L's replay
+    and fallback branches at all — against the pack as committed today,
+    `AudioManager.replay()` can never do anything but say "Nothing to
+    replay yet." for ANY real task, since `lastTaskAudio` is never set.
+    This matches CLAUDE.md's own Phase 6 status ("narration is placeholder
+    ... Brian records produced narration later") — not a bug, a known gap
+    — but it's worth naming precisely: it's not just ambient/narration
+    that's placeholder, the *audio-listening category's own defining
+    feature* (a task you listen to) currently has no audio in the
+    production pack either. `tests/audit/group-x8-recovery.test.ts`
+    works around it by augmenting an in-memory copy of the real pack with
+    one synthetic asset on every audio-listening task (never written back
+    to the committed file) — real journey/task ids and structure, one
+    fabricated clip. Once Brian records real narration (Phase 9/11 per
+    CLAUDE.md), re-point that test at the real assets instead and drop the
+    augmentation; until then, X11's manual browser check should expect
+    every audio-listening task to show the same "Nothing to replay yet."
+    behavior for L, which is correct given the content as it stands, not
+    a regression to chase.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
