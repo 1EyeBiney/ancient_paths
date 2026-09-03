@@ -27,12 +27,15 @@ import { CursorList } from "./cursorList";
 import { buildStatus, buildActionsSummary, buildPositions } from "./speech";
 import type { DeckDifficultySetting } from "../session/builder";
 import type { SessionDuration, SessionPace } from "../session/plan";
+import type { MapManifest, MapStyleId } from "./mapProjection";
 
 export type AppMode = "startup" | "setup" | "playing";
 
 export interface AppOptions {
   root: HTMLElement;
   journeys: Journey[];
+  /** Absent = no map (the strip alone) — never an error. */
+  mapManifest?: MapManifest | null;
   packs: ContentPack[];
   loadErrors?: string[];
   /** Injectable presenter clock/timer so tests can drive the idle re-prompt manually. */
@@ -350,6 +353,10 @@ export class App {
       this.wizard.setDifficulty(id as DeckDifficultySetting);
     });
 
+    this.appendChoiceList("Map style", ["satellite", "parchment", "none"], this.wizard.mapStyle, (id) => {
+      this.wizard.setMapStyle(id as MapStyleId);
+    });
+
     // Tasks per turn (blank = recommended)
     this.contentContainer.appendChild(el("h2", { text: "Tasks per turn" }));
     const tasksPerTurn = document.createElement("input");
@@ -564,7 +571,12 @@ export class App {
       },
       onAfterAction: () => this.renderCurrentScreen(),
     });
-    this.audience = new AudienceView({ journey, tasksById });
+    this.audience = new AudienceView({
+      journey,
+      tasksById,
+      mapManifest: this.options.mapManifest,
+      mapStyle: this.wizard.mapStyle,
+    });
     this.audienceContainer.hidden = false;
 
     this.mode = "playing";

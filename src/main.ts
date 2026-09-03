@@ -8,15 +8,18 @@ import "./ui/styles.css";
 import { crossValidate, fetchJson, validateContentPack, validateJourney } from "./content/loader";
 import type { ContentPack, Journey } from "./content/schemas";
 import { App } from "./ui/app";
+import { mapManifestSchema, type MapManifest } from "./ui/mapProjection";
 
 const PACK_FILES = ["content/packs/dev-sample.json", "content/packs/dev-playtest.json"];
 const JOURNEY_FILES = ["content/journeys/jerusalem-rome.json"];
+const MAP_MANIFEST_FILE = "map/mediterranean.json";
 
 async function boot(): Promise<void> {
   const root = document.getElementById("app")!;
   const journeys: Journey[] = [];
   const packs: ContentPack[] = [];
   const loadErrors: string[] = [];
+  let mapManifest: MapManifest | null = null;
 
   try {
     const packRaws = await Promise.all(PACK_FILES.map((f) => fetchJson(f)));
@@ -37,7 +40,19 @@ async function boot(): Promise<void> {
     loadErrors.push("Could not load content: " + (err instanceof Error ? err.message : String(err)));
   }
 
-  new App({ root, journeys, packs, loadErrors: loadErrors.length > 0 ? loadErrors : undefined });
+  // Absence or failure of the map manifest is never a load error — the
+  // game is fully playable without it (the landmark strip is the text
+  // layer regardless), so this is fetched separately and swallowed.
+  try {
+    const raw = await fetchJson(MAP_MANIFEST_FILE);
+    const result = mapManifestSchema.safeParse(raw);
+    if (result.success) mapManifest = result.data;
+    else console.warn(`Map manifest invalid, playing without a map: ${result.error.message}`);
+  } catch (err) {
+    console.warn(`Map manifest could not be loaded, playing without a map: ${err instanceof Error ? err.message : err}`);
+  }
+
+  new App({ root, journeys, packs, mapManifest, loadErrors: loadErrors.length > 0 ? loadErrors : undefined });
 }
 
 void boot();

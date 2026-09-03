@@ -9,6 +9,7 @@ import { TASK_CATEGORIES } from "../content/schemas";
 import { planSession, type SessionDuration, type SessionPace, type SessionPlan } from "../session/plan";
 import { buildSessionDeck, SessionBuildError, type BuildOptions, type BuildResult, type DeckDifficultySetting } from "../session/builder";
 import type { TeamSetup } from "../engine/engine";
+import type { MapStyleId } from "./mapProjection";
 
 export type NonCommunityCategory = Exclude<Task["category"], "community">;
 
@@ -79,6 +80,7 @@ export class SetupWizard {
   tasksPerTurnOverride: number | null;
   /** null = follow the prefers-reduced-motion media query. */
   reducedMotion: boolean | null;
+  mapStyle: MapStyleId;
 
   private readonly randomSeedSource: () => number;
 
@@ -100,10 +102,15 @@ export class SetupWizard {
     this.seed = defaultSeed(this.randomSeedSource);
     this.tasksPerTurnOverride = null;
     this.reducedMotion = null;
+    this.mapStyle = "satellite";
   }
 
   setReducedMotion(v: boolean | null): void {
     this.reducedMotion = v;
+  }
+
+  setMapStyle(style: MapStyleId): void {
+    this.mapStyle = style;
   }
 
   /** Default names are the preset symbol words ("Cross", "Lion", ...) so
@@ -248,6 +255,7 @@ export class SetupWizard {
       `Duration: ${typeof this.duration === "string" ? this.duration : `${this.duration.customMinutes} minutes`}.`,
       `Pace: ${this.pace}.`,
       `Difficulty: ${this.difficulty}.`,
+      `Map style: ${this.mapStyle}.`,
       `Enabled packs: ${this.enabledPackIds.join(", ") || "none"}.`,
       `Enabled categories: ${this.enabledCategories.join(", ") || "none"}.`,
       `Tasks per turn: ${this.effectiveTasksPerTurn()}${this.tasksPerTurnOverride ? " (overridden)" : " (recommended)"}.`,
