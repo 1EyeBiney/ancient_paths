@@ -72,7 +72,10 @@ export class MapView {
       placed.forEach((m, i) => {
         const p = points[i]!;
         const g = document.createElementNS(svgNs, "g");
-        g.setAttribute("class", "landmark");
+        // Named map-landmark, not landmark: audience.ts's strip items are
+        // also .landmark, a different DOM shape (<li>, not an SVG <g>) —
+        // an unscoped `.landmark` query would silently match both.
+        g.setAttribute("class", "map-landmark");
         g.dataset.milestoneId = m.id;
         const circle = document.createElementNS(svgNs, "circle");
         circle.setAttribute("cx", String(p.x));

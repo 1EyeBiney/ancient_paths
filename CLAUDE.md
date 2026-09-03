@@ -1,12 +1,13 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 5 COMPLETE, PHASE 5B (THE MAP) SPECIFIED (2026-09-02) — implement PHASE5B_SPEC.md next, then Phase 6 audio
+## Status: PHASE 5B (THE MAP) COMPLETE (2026-09-02) — next up: Phase 6, audio (not yet specified)
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (228/228
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (297/297
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
-for Pages). See IMPLEMENTATION_STATUS.md for the full inventory and
-OPEN_QUESTIONS.md for decided amendments + open items.
+for Pages; map assets under `public/map/` copy through). See
+IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
+for decided amendments + open items.
 
 **Phases 2, 3, and 4 are done**, each built against its binding spec
 (PHASE2_SPEC.md: the headless engine in `src/engine/`, groups A-I plus a
@@ -31,17 +32,19 @@ motion, the full setup screen, and a generated never-ships
 the default team names now being symbol words ("Team Lion" — see
 OPEN_QUESTIONS 19).
 
-**Phase 5B (the map) is specified and ready to implement**: see
-**PHASE5B_SPEC.md** — shared public-domain imagery of the eastern
-Mediterranean (NASA Blue Marble via one GIBS request; Natural Earth
-coastlines rendered to a parchment SVG), fetched by a dependency-free
-script and committed; an aria-hidden map panel above the landmark strip
-with the route through the milestones and team badges gliding along it
-(CSS transition; reduced motion jumps); a host-selectable style
-(satellite / parchment / none); test groups M1-M6. The schema already
-has `journey.map.viewport` and `milestone.coordinates` (Fable added them
-with the spec; `jerusalem-rome.json` is authored) — implementers must
-not touch either file. After 5B: Phase 6 audio.
+**Phase 5B (the map) is done** (PHASE5B_SPEC.md, groups M1-M6, 297
+tests): a real map on the audience view — NASA Blue Marble satellite
+imagery or a Natural Earth parchment style, host-selectable, generated
+once by `scripts/make-map.mjs` and committed under `public/map/`, with
+the journey's route drawn through its landmarks and team badges gliding
+along it (a CSS transition, gated behind reduced motion — verified live
+in both states, not just in tests). Manually browser-checked; findings
+and one small clarity fix (a class-name collision between the map's own
+landmark groups and the Phase 5 strip's) are in OPEN_QUESTIONS item 21.
+
+Phase 6 (audio system, design doc §34) is not yet specified. When ready,
+Fable reviews Phase 5B and writes PHASE6_SPEC.md next, the same
+review-then-spec handoff used for every phase so far.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

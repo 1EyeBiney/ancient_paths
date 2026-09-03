@@ -4,6 +4,46 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 5B — The Map — DONE.** All 6 test groups (M1-M6) are green: 41
+  tests total (297 project-wide), `npx tsc --noEmit` clean, `npm run
+  build` clean (map assets copied into `dist/`). New: `src/ui/
+  mapProjection.ts` (pure equirectangular projection + zod manifest
+  schema), `src/ui/mapView.ts` (the aria-hidden map panel), `scripts/
+  make-map.mjs` (dependency-free asset pipeline) and its committed
+  output `public/map/` (manifest, satellite JPEG, parchment SVG,
+  CREDITS.md). See PHASE5B_SPEC.md for the contract.
+  - One shared imagery set (eastern Mediterranean) fetched live: NASA
+    Blue Marble via a single GIBS WMS request (308KB, well under the
+    700KB budget, no image tooling needed) and Natural Earth coastlines
+    clipped/simplified/projected in pure JS into a parchment SVG (17.7KB
+    vs. a 400KB budget). Both fetches succeeded; the offline-placeholder
+    fallback path exists but was never exercised.
+  - The map panel is `aria-hidden`; its accessible twin is the Phase 5
+    landmark strip beneath it plus `allPositionsText`. Route drawn
+    through the milestones with halo-labeled landmarks; team badges
+    positioned by `teamMapPosition()` (percentage of the journey's own
+    viewport window, interpolating toward the next milestone while
+    `stagesBeyondMilestone > 0`, capped at 0.9, fanned when co-located)
+    and moved by a CSS `left`/`top` transition gated behind
+    `[data-reduced-motion="false"]` — the same pattern as Phase 5's
+    panel animation, verified live in both states (an instant jump vs. a
+    real 0.25s glide, confirmed via `getComputedStyle`, not just CSS
+    text).
+  - Setup gained a Map style choice (satellite/parchment/none, default
+    satellite) reaching `SetupWizard.mapStyle` and the review lines.
+    Group M4 drives a complete keyboard game against the REAL
+    `jerusalem-rome.json` + dev-playtest and asserts every marker's
+    position against `teamMapPosition()` after every step.
+  - Manual browser check passed; one clarity fix made on sight (not a
+    functional bug): `mapView.ts`'s SVG landmark groups and `audience.ts`'s
+    strip items both used the class `landmark`, so an unscoped
+    `.landmark` query silently matched both — renamed to `map-landmark`.
+    Full results in OPEN_QUESTIONS item 21.
+  - No changes to `src/engine/`, `src/session/`, `dev-sample.json`, or
+    any spec file. The schema's `milestone.coordinates` /
+    `journey.map.viewport` additions were made by Fable with the spec,
+    ahead of this implementation pass.
+
 - **Phase 5 — Audience Presentation — DONE.** All 8 test groups (V1-V8)
   are green: 34 tests total (262 project-wide), `npx tsc --noEmit`
   clean, `npm run build` clean (stylesheet bundled). New in `src/ui/`:
@@ -199,11 +239,8 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- Phase 5B — The map: PHASE5B_SPEC.md written (2026-09-02); schema
-  gained optional `milestone.coordinates` and `journey.map.viewport`
-  (validated together; 4 new content tests) and the sample journey is
-  authored with real coordinates and a viewport. Test groups M1-M6.
-  Implementation not yet started.
+- (nothing in flight — Phase 5B complete; Phase 6 audio not yet
+  specified)
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
@@ -213,9 +250,6 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Remaining
 
-- The map (after Phase 5, before audio): shipped public-domain map image
-  with an SVG route/badge overlay, host-selectable background, per-
-  journey viewport + milestone coordinates (schema change) — decision 9.
 - Phase 6 — Audio system.
 - Phase 7 — Community and offering systems.
 - Phase 8 — Persistence and recovery.

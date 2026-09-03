@@ -81,7 +81,9 @@ describe("M3 — one landmark group per milestone, in journey order", () => {
     const journey = mappedJourney();
     const container = document.createElement("div");
     new MapView({ journey, manifest }).render(container, [team()], "satellite");
-    const groups = Array.from(container.querySelectorAll(".landmark"));
+    // .map-landmark, not .landmark — audience.ts's strip items are also
+    // .landmark (a different DOM shape); this scopes to the map's own.
+    const groups = Array.from(container.querySelectorAll(".map-landmark"));
     expect(groups.map((g) => (g as HTMLElement).dataset.milestoneId)).toEqual(
       journey.milestones.map((m) => m.id),
     );

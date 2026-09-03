@@ -212,6 +212,36 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     ("Team Cross" / "Team Lion") — no objection raised; stands unless
     Brian says otherwise.
 
+21. **Phase 5B (the map) manual browser check (2026-09-02) — passed, one
+    small clarity fix made along the way.** Against the real
+    `jerusalem-rome.json` + dev-playtest, satellite style: the real Blue
+    Marble crop renders correctly (Rome and the Italian coastline
+    recognizable), route line and halo-labeled landmarks in place, two
+    team badges fanned at Jerusalem. Played a full stage (3 correct
+    answers) to Caesarea; on arrival, the marker's `--x`/`--y` updated to
+    Caesarea's coordinates and the landmark/community-event screens
+    triggered correctly (Journey Token earned for the perfect stage,
+    "The Harbor Gathering" relay pending) — matches the Phase 5 check's
+    findings, same content, still correct. Confirmed BOTH motion states
+    live via `getComputedStyle`: this sandboxed browser's own
+    `prefers-reduced-motion` reports `true` by default, and under that
+    the marker's `transition-duration` is genuinely `0s` (an instant
+    jump, not just an unused CSS property); switching the setup "Reduce
+    motion" checkbox off flips `transition-duration` to `0.25s` on
+    `left`/`top`, confirming the glide is real. Switched Map style to
+    parchment mid-check: the warmer route/halo colors and the Natural-
+    Earth coastline render correctly, no console errors either style.
+    One thing WORTH NOTING for future debugging (not a functional bug,
+    fixed on sight): `mapView.ts`'s SVG landmark groups and
+    `audience.ts`'s strip `<li>` items both used the class `landmark`:
+    an unscoped `document.querySelectorAll(".landmark")` — exactly the
+    kind of ad-hoc query someone debugging live would reach for —
+    silently returns both (8 elements, looking like duplication when it
+    is not). Renamed the map's own class to `map-landmark` and updated
+    its one test reference; `.landmark-strip .landmark` /
+    `.map-overlay .map-landmark` are now unambiguous. No other issues
+    found.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

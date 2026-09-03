@@ -248,13 +248,13 @@ main {
   filter: drop-shadow(0 0 3px var(--map-halo));
 }
 
-.map-overlay .landmark circle {
+.map-overlay .map-landmark circle {
   fill: var(--map-route);
   stroke: var(--map-halo);
   stroke-width: 2;
 }
 
-.map-overlay .landmark text {
+.map-overlay .map-landmark text {
   font-size: 28px;
   font-weight: bold;
   fill: var(--ink);
