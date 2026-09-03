@@ -133,7 +133,9 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     added so the browser build is actually playable — `dev-sample`'s 8
     tasks cannot pass the sufficiency check for the real journey.
 
-17. **DECIDED (2026-09-02) — the map.** Brian chose Tiers 2 AND 3 with
+17. **DECIDED (2026-09-02) — the map.** Spec'd as PHASE5B_SPEC.md (Fable
+    added `milestone.coordinates` + `journey.map.viewport` to the schema
+    and authored the sample journey's coordinates with it). Brian chose Tiers 2 AND 3 with
     a host-selectable background (satellite imagery or period/parchment
     style), built as its own phase after Phase 5. Requirements added by
     the ruling: the map must serve MORE THAN ONE journey (further Pauline

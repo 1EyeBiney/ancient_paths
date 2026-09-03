@@ -163,6 +163,38 @@ describe("journey validation rejects (§33.2)", () => {
     expect(validateJourney(journey, "bad-start").ok).toBe(false);
   });
 
+  // Map layer (PHASE5B_SPEC, decision 9): coordinates are optional per
+  // milestone, but a journey that declares a map must place every
+  // milestone, inside its own viewport.
+  it("a journey with a map but a milestone missing coordinates", () => {
+    const journey = cloneJourney();
+    delete journey.milestones[1].coordinates;
+    const result = validateJourney(journey, "map-no-coords");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(" ")).toMatch(/needs coordinates/);
+  });
+
+  it("a milestone outside the journey's map viewport", () => {
+    const journey = cloneJourney();
+    journey.milestones[0].coordinates = { lat: 51.5, lon: -0.12 }; // London
+    const result = validateJourney(journey, "map-outside");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(" ")).toMatch(/outside the journey's map viewport/);
+  });
+
+  it("an inverted map viewport", () => {
+    const journey = cloneJourney();
+    journey.map.viewport = { north: 30, south: 44, east: 38, west: 11 };
+    expect(validateJourney(journey, "map-inverted").ok).toBe(false);
+  });
+
+  it("still accepts a journey with no map and no coordinates at all", () => {
+    const journey = cloneJourney();
+    delete journey.map;
+    for (const m of journey.milestones) delete m.coordinates;
+    expect(validateJourney(journey, "no-map").ok).toBe(true);
+  });
+
   it("a fork with only one route", () => {
     const journey = cloneJourney();
     journey.entries[1].routes = [journey.entries[1].routes[0]];

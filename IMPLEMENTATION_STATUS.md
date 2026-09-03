@@ -199,9 +199,11 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- (nothing in flight — Phase 5 complete; next is the map phase Brian
-  chose, OPEN_QUESTIONS item 17 / CLAUDE.md decision 9, to be spec'd by
-  Fable, then Phase 6 audio)
+- Phase 5B — The map: PHASE5B_SPEC.md written (2026-09-02); schema
+  gained optional `milestone.coordinates` and `journey.map.viewport`
+  (validated together; 4 new content tests) and the sample journey is
+  authored with real coordinates and a viewport. Test groups M1-M6.
+  Implementation not yet started.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the

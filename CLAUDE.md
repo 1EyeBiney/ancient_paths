@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 5 COMPLETE (2026-09-02) — next up: the map phase (decision 9), then Phase 6 audio
+## Status: PHASE 5 COMPLETE, PHASE 5B (THE MAP) SPECIFIED (2026-09-02) — implement PHASE5B_SPEC.md next, then Phase 6 audio
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (228/228
@@ -29,8 +29,19 @@ motion, the full setup screen, and a generated never-ships
 (`npm run dev`). Awaiting Brian's NVDA/sighted pass on: the scoped
 `role="application"` host region (Decision 1), the visual scale, and
 the default team names now being symbol words ("Team Lion" — see
-OPEN_QUESTIONS 19). Next: Fable specs the map phase (decision 9), then
-Phase 6 audio.
+OPEN_QUESTIONS 19).
+
+**Phase 5B (the map) is specified and ready to implement**: see
+**PHASE5B_SPEC.md** — shared public-domain imagery of the eastern
+Mediterranean (NASA Blue Marble via one GIBS request; Natural Earth
+coastlines rendered to a parchment SVG), fetched by a dependency-free
+script and committed; an aria-hidden map panel above the landmark strip
+with the route through the milestones and team badges gliding along it
+(CSS transition; reduced motion jumps); a host-selectable style
+(satellite / parchment / none); test groups M1-M6. The schema already
+has `journey.map.viewport` and `milestone.coordinates` (Fable added them
+with the spec; `jerusalem-rome.json` is authored) — implementers must
+not touch either file. After 5B: Phase 6 audio.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

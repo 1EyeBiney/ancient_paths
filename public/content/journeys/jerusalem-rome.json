@@ -5,30 +5,37 @@
   "title": "Jerusalem to Rome",
   "startMilestoneId": "jerusalem",
   "destinationMilestoneId": "rome",
+  "map": {
+    "viewport": { "north": 44, "south": 30, "east": 38, "west": 11 }
+  },
   "milestones": [
     {
       "id": "jerusalem",
       "name": "Jerusalem",
       "introText": "Jerusalem, the city of the temple, where the church was born at Pentecost and the journey of the gospel begins.",
-      "ambientAudioAsset": null
+      "ambientAudioAsset": null,
+      "coordinates": { "lat": 31.7683, "lon": 35.2137 }
     },
     {
       "id": "caesarea",
       "name": "Caesarea",
       "introText": "Caesarea Maritima, Herod's great harbor on the Mediterranean, gateway between Judea and the wider Roman world.",
-      "ambientAudioAsset": null
+      "ambientAudioAsset": null,
+      "coordinates": { "lat": 32.4995, "lon": 34.8919 }
     },
     {
       "id": "antioch",
       "name": "Antioch",
       "introText": "Antioch on the Orontes, third city of the empire, where believers were first called Christians and missionaries were first sent out.",
-      "ambientAudioAsset": null
+      "ambientAudioAsset": null,
+      "coordinates": { "lat": 36.2021, "lon": 36.1604 }
     },
     {
       "id": "rome",
       "name": "Rome",
       "introText": "Rome, heart of the empire. All roads lead here, and so does the gospel.",
-      "ambientAudioAsset": null
+      "ambientAudioAsset": null,
+      "coordinates": { "lat": 41.9028, "lon": 12.4964 }
     }
   ],
   "entries": [

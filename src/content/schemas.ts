@@ -254,12 +254,44 @@ const forkSchema = z.object({
   routes: z.array(routeSchema).min(2).max(3),
 });
 
+// Geographic position for the map layer (PHASE5B_SPEC, decision 9).
+// Optional per milestone so journeys authored before the map keep
+// validating; a journey that declares a `map` must give EVERY milestone
+// coordinates (checked below), since a marker with nowhere to go is a
+// content error, not something the map should guess about.
+const coordinatesSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+});
+
 const milestoneSchema = z.object({
   id: idSchema,
   name: z.string().min(1),
   introText: z.string().min(1),
   ambientAudioAsset: idSchema.nullable(),
+  coordinates: coordinatesSchema.optional(),
 });
+
+// The window of the shared map imagery a journey is shown within (degrees).
+// One imagery set covers the whole eastern Mediterranean; each journey
+// picks its own view of it — never a per-journey hand-cropped picture.
+const mapViewportSchema = z
+  .object({
+    north: z.number().min(-90).max(90),
+    south: z.number().min(-90).max(90),
+    east: z.number().min(-180).max(180),
+    west: z.number().min(-180).max(180),
+  })
+  .refine((v) => v.north > v.south && v.east > v.west, {
+    message: "Map viewport must have north > south and east > west.",
+  });
+
+const journeyMapSchema = z.object({
+  viewport: mapViewportSchema,
+});
+
+export type Coordinates = z.infer<typeof coordinatesSchema>;
+export type MapViewport = z.infer<typeof mapViewportSchema>;
 
 // Room rewards a community event (or offering outcome) can grant. Small,
 // closed union: the engine implements each type; content only combines them.
@@ -340,8 +372,34 @@ export const journeySchema = z
     entries: z.array(z.discriminatedUnion("kind", [stageSchema, forkSchema])).min(1),
     communityEvents: z.array(communityEventSchema),
     offeringOutcomes: z.array(offeringOutcomeSchema).min(1),
+    map: journeyMapSchema.optional(),
   })
   .superRefine((journey, ctx) => {
+    if (journey.map) {
+      journey.milestones.forEach((m, index) => {
+        if (!m.coordinates) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["milestones", index, "coordinates"],
+            message: `Milestone "${m.id}" needs coordinates because the journey declares a map.`,
+          });
+          return;
+        }
+        const { viewport } = journey.map!;
+        const inside =
+          m.coordinates.lat <= viewport.north &&
+          m.coordinates.lat >= viewport.south &&
+          m.coordinates.lon <= viewport.east &&
+          m.coordinates.lon >= viewport.west;
+        if (!inside) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["milestones", index, "coordinates"],
+            message: `Milestone "${m.id}" lies outside the journey's map viewport.`,
+          });
+        }
+      });
+    }
     const milestoneIds = new Set(journey.milestones.map((m) => m.id));
 
     if (!milestoneIds.has(journey.startMilestoneId)) {
