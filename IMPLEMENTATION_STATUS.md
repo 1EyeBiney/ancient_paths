@@ -450,6 +450,26 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X9 done (2026-09-03):** `NVDA_CHECKLIST.md`, a 17-section
+  numbered walkthrough for Brian to run by hand with NVDA in Chrome —
+  boot/Welcome, the setup wizard's cursor lists and input firewall, a full
+  turn, assisted/amplified forms, a fork, a relay and a contribution, a
+  granted choice and a share, surplus keep/offer plus the offering
+  announcement and the Journey Token, S/A/T/R checked in five different
+  states, help/explorer/an unmapped key, Escape → game menu → Game log →
+  Copy, Ctrl+Z arm/confirm wording (including the Phase 8 race fix),
+  reload → Resume → Ctrl+Z, End session, Sound check's Tab+Enter/Space/X/N
+  transport, reduced motion on the map (sighted-helper step), and the
+  audience region read in browse mode. Every expected announcement is
+  quoted from the real source strings this phase's own audit tests already
+  verified (undo.ts's arm/confirm wording, modal.ts's "dialog opened",
+  keys.ts's help/explorer lines, KEYBOARD_COMMANDS.md's key table) — no
+  task prompt or answer text anywhere, per CONTENT_AUTHORING §1. Closes
+  with the five decisions PHASE10_SPEC asks Brian to record afterward
+  (role="application" keep/drop, visual scale, "Team Lion" symbol names,
+  X7e's 3-4-announcements-per-action ceiling, anything that felt slow) as
+  a template for a new dated OPEN_QUESTIONS item. No code changed; no new
+  test (this group is Brian's manual pass, agent-authored document only).
   **Group X8 done (2026-09-03, 9 new tests, 2879 project-wide):** the
   error-recovery matrix (§23.7), `tests/audit/group-x8-recovery.test.ts`,
   real journey + general-bible pack (blind: ids/categories only). For four
