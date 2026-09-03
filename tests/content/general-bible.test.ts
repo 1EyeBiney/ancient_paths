@@ -63,7 +63,7 @@ const TARGET_COUNTS: Record<Task["category"], number> = {
   "bible-reasoning": 20, // N5, done
   "historical-context": 20, // N6, done
   "decision-strategy": 12, // N7, done
-  hymn: 1,
+  hymn: 12, // N8, done
   "audio-listening": 1,
   community: 1,
 };

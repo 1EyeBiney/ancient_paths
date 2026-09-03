@@ -386,11 +386,19 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
   after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
-  other three categories up to their targets (hymn 12, audio-listening
-  12, community 12 — counts and ids only anywhere Brian reads, per the
+  other two categories up to their targets (audio-listening 12,
+  community 12 — counts and ids only anywhere Brian reads, per the
   secrecy protocol), a sufficiency matrix, and the §34 deliverable as a
-  test: two full sessions with ≤ 5% task overlap. Groups N8-N12 remain.
+  test: two full sessions with ≤ 5% task overlap. Groups N9-N12 remain.
   Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N8 done (2026-09-03):** hymn authored to its target of 12
+  tasks (4 easy, 4 moderate, 4 hard — including the group's original
+  seed), ids `gb-hy-001` through `gb-hy-012`, all pre-1929 public-domain
+  hymns, text-only (CONTENT_AUTHORING §3: melody tasks wait for Brian's
+  note data). Two "which hymn has this line" tasks were rephrased mid-
+  group to quote a later line instead of the opening line, once the
+  blind tests caught that the hymn's own well-known opening necessarily
+  restates its title.
   **Group N7 done (2026-09-03):** decision-strategy authored to its
   target of 12 tasks (4 easy, 4 moderate, 4 hard — including the group's
   original seed), ids `gb-ds-001` through `gb-ds-012`; every task
