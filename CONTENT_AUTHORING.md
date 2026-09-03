@@ -179,3 +179,11 @@ sessions draw without repeats) and binds the authoring rules.
   form" / "Spend Courage to amplify the task" — so a task authored
   otherwise silently misleads the host. `general-bible.test.ts` enforces
   this blind; `dev-sample` was corrected to match.
+- **A clue never answers the amplified form (Phase 9 content review,
+  OPEN_QUESTIONS 35).** An amplified form earns two successes for
+  knowing an extra detail; a purchasable clue that hands over that
+  detail turns Courage's calculated risk (§8.3) into a one-Insight
+  purchase. Clues help with the BASE question only. (Voice Portraits
+  already say this: §3b "answer after the first clue only".) No blind
+  rule can check this — it is a reviewer's item; a factual review pass
+  over every new category is part of authoring, not optional.
