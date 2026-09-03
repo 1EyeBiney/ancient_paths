@@ -262,6 +262,20 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     dev-playtest — no real voices, no ElevenLabs (item 12's licensing
     question still stands), no real hymn melodies (Brian authors those).
 
+23. **RESOLVED (2026-09-02) — ElevenLabs rights; melody authoring
+    plan.** Brian holds an ElevenLabs subscription, so clips he generates
+    carry usage rights for publication: Voice Portrait / Event Scene
+    clips may use real ElevenLabs voices (item 12's licensing caveat is
+    closed). Author-known-content rule unchanged: he sits out tasks whose
+    clips he recorded (honor system, item 12). Melodies: "authoring"
+    means producing the note-data JSON (`melodySchema`), not recordings.
+    Agreed approach: Fable drafts note data for well-known public-domain
+    hymn tunes (New Britain, Old Hundredth, Hyfrydol, …) as production
+    content under the secrecy rules; Brian verifies by EAR in the running
+    game and corrections follow. A MIDI→melody converter script is
+    available on request if he prefers exporting from his own tools.
+    Placeholder tunes in dev-playtest stay synthetic regardless.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
