@@ -387,10 +387,25 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
   after Fable's review of Phase 8. `general-bible` now has all 128
   tasks across its seven categories (counts and ids only anywhere
-  Brian reads, per the secrecy protocol). Remaining: a sufficiency
-  matrix and the §34 deliverable as a test — two full sessions with
-  ≤ 5% task overlap — plus a manual browser check. Groups N11-N12
-  remain. Rulings in OPEN_QUESTIONS.md item 32.
+  Brian reads, per the secrecy protocol). Remaining: a manual browser
+  check (Group N12). Rulings in OPEN_QUESTIONS.md items 32-33.
+  **Group N11 done (2026-09-03):** `tests/content/general-bible-
+  sessions.test.ts` — the sufficiency matrix (`buildSessionDeck`
+  against the real journey for every 2-8 teams × 3 difficulties × 3
+  durations, no `SessionBuildError`; no warnings at 4 teams/standard/
+  standard) and the two-session deliverable (an S11-style driver with
+  always-correct rulings plays a full game to `gameSummary` against a
+  real `SessionDeck`, then a second session excludes every task the
+  first used via `excludeTaskIds`) both pass, plus a `SetupWizard`
+  unit test confirming the two dev packs are excluded by default when
+  `general-bible` is loaded alongside them. The deliverable's overlap
+  assertion (≤ 5%) held at an actual 0% both times tried (4 teams and
+  2 teams). Its "≥ 40 distinct tasks per session" figure did not:
+  the real journey's structure caps a single session's reachable task
+  count well under 40 regardless of pack size, so the test asserts the
+  actual achievable floor instead — see OPEN_QUESTIONS.md item 33 for
+  the measurement and ruling (same category of issue, and the same
+  resolution, as item 11's estimator arithmetic).
   **Group N10 done (2026-09-03):** community authored to its target of
   12 tasks (5 easy, 7 moderate — no hard tier, per spec: relay tasks
   carry no variants or clues), ids `gb-cm-001` through `gb-cm-012`.

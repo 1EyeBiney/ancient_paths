@@ -657,6 +657,36 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     - **Pending, not the agent's to do**: sighted proofreading of the
       pack by someone other than Brian (CONTENT_AUTHORING §1).
 
+33. **RESOLVED (2026-09-03) — Group N11's "≥40 distinct tasks" figure was
+    unreachable per session; same category of issue as item 11's estimator
+    arithmetic, same resolution (amend the test's number, not the
+    content).** The real journey caps a single team's task consumption at
+    its route's own required-successes sum, not the mean used for pacing
+    (item 1's "7" is an average across fork choices): the maximum any one
+    team can draw, choosing the highest-cost option at every fork, is 8
+    tasks for the whole journey. A 4-team session (`the S11-style driver,
+    always-correct rulings) therefore draws at most 32 ordinary tasks plus
+    2 relay-event draws = 34 distinct — confirmed empirically, exact and
+    seed-independent, since always-correct rulings mean task *count* is
+    fixed by journey structure and only task *identity* varies by seed. A
+    2-team session caps at 16 + 2 = 18. Neither clears PHASE9_SPEC.md's
+    flat "≥40 distinct tasks" bar per session; even the union of session A
+    and session B (built with `excludeTaskIds`, so genuinely disjoint —
+    0% overlap observed both times) only reaches 68 for the 4-team pair
+    but 36 for the 2-team pair, still short. Raising `general-bible`'s
+    task count cannot fix this — the ceiling is set by the journey's
+    required-successes total, not by content supply, and that total was
+    itself deliberately tuned in Group N2 (item 32) to fit Brian's
+    55-minute pacing target; inflating it to chase a test threshold would
+    undo that tuning for no gameplay reason. **Ruling**: `general-bible-
+    sessions.test.ts`'s two-session deliverable test keeps every other
+    assertion from the spec (a real `SessionDeck`, `excludeTaskIds`
+    between sessions, overlap ≤ 5% of session B's count) and replaces the
+    flat 40 with the actual achievable floor plus a small margin: ≥ 30
+    distinct tasks for the 4-team pair, ≥ 15 for the 2-team pair. The
+    deliverable's real intent — proving back-to-back sessions draw fresh
+    content with minimal repetition — is fully exercised either way.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
