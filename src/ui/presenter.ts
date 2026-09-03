@@ -33,6 +33,19 @@ export interface IdleWatcher {
   getPrompt: () => string | null;
 }
 
+/** PHASE6_SPEC "the binding rules" #3 — the AudioManager implements this.
+ * While a produced clip plays, polite present() calls are deferred
+ * (latest wins) rather than competing with it; assertive calls (and,
+ * in "interrupt" speech mode, polite ones too) stop the clip instead. */
+export interface PresenterGate {
+  /** True if a polite present() right now should be held rather than announced. */
+  shouldDefer(): boolean;
+  /** Records the (single, latest-wins) deferred announcement. */
+  defer(input: PresentInput): void;
+  /** Called before every announcement that is NOT deferred; may stop a playing clip. */
+  onAnnounce(channel: PresenterChannel): void;
+}
+
 export interface PresenterOptions extends PresenterElements {
   now?: () => number;
   /** Injectable so tests can capture and manually invoke the tick callback. */
@@ -80,6 +93,7 @@ export class Presenter {
   private readonly entries: PresenterLogEntry[] = [];
   private idleWatcher: IdleWatcher | null = null;
   private readonly intervalId: number;
+  private gate: PresenterGate | null = null;
 
   constructor(options: PresenterOptions) {
     this.politeRegion = options.politeRegion;
@@ -94,8 +108,20 @@ export class Presenter {
     this.intervalId = setIntervalFn(() => this.checkIdle(), options.idleCheckMs ?? DEFAULT_IDLE_CHECK_MS);
   }
 
+  /** Replaces (or clears, with null) the audio-coordination gate. */
+  setGate(gate: PresenterGate | null): void {
+    this.gate = gate;
+  }
+
   present(input: PresentInput): void {
     const channel: PresenterChannel = input.channel ?? "polite";
+    if (this.gate) {
+      if (channel === "polite" && this.gate.shouldDefer()) {
+        this.gate.defer(input);
+        return;
+      }
+      this.gate.onAnnounce(channel);
+    }
     const spokenSource = input.spoken ?? input.visual;
     const base = sanitizeForSpeech(spokenSource);
     const state = this.channelState[channel];
