@@ -450,6 +450,19 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X2 done (2026-09-03, 56 new tests, 2811 project-wide):** game
+  length and sufficiency under realistic play, `tests/sim/group-x2-
+  length.test.ts` — a 7-team-count × 3-difficulty × 3-preset matrix (3
+  seeds per cell, not the spec's 12 — OPEN_QUESTIONS item 36) confirms
+  zero exhausted games at gentle or standard for every team count and
+  preset; median rounds land within [0.5x, 2.0x] of `planSession`'s own
+  estimate at standard for every team count; a dedicated check on
+  challenging at 7-8 teams (the one place exhaustion is expected to be
+  possible) verifies any exhaustion there coincides with the builder's
+  own "content supply is tight" warning at build time — none actually
+  exhausted in this run, so the check currently passes vacuously, but it
+  stays in place as the sufficiency-formula regression guard the spec
+  calls for.
   **Group X1 done (2026-09-03, 21 new tests, 2755 project-wide):** the
   simulation harness, `src/sim/` (not imported by `src/ui` or `main.ts` —
   build output unchanged in size, confirming Vite tree-shakes it out).

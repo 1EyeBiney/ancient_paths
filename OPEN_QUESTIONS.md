@@ -855,6 +855,36 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     difference is the new blind cost rule per task, the route-focus
     tests, and the reveal-alternatives case).
 
+36. **RESOLVED (2026-09-03) — PHASE10_SPEC.md's per-cell seed counts (X2's
+    12, X4's 300) don't fit the spec's own "≤30s total for tests/sim"
+    budget against the real engine; same category of issue as items 11
+    and 33 (a number in the spec didn't survive contact with measurement),
+    same resolution (measure, then amend the number, not the intent).**
+    Benchmarked directly: a simulated game's cost scales with team count,
+    not difficulty (difficulty barely moves it) — roughly 11ms at 2 teams,
+    35ms at 4, 116ms at 8 (10-11x from 2 to 8 teams, matching attempt
+    count) — because `Engine.dispatch()` does a full `structuredClone` of
+    its state on every command for undo (§33.1's "undo restores the
+    complete prior state"), and a full game is dozens of commands per
+    team. This is a genuine, correct cost of an already-tested engine
+    guarantee, not a simulator inefficiency, and `src/engine/` is frozen
+    to defects only this phase (PHASE10_SPEC.md's Files section) — so the
+    fix is scaling the audit's sample sizes, not the engine. X2's literal
+    matrix (7 team counts × 3 difficulties × 3 presets × 12 seeds) alone
+    measured 44.7s; X4's seat-order test alone (300 seeds at 4 teams)
+    would add another ~9.6s program that. **Ruling**: every group's
+    per-cell seed count is scaled down to what a real run showed keeps
+    every assertion meaningful (recorded in each group's own commit and
+    in `SIMULATION_REPORT.md`'s header), and un-run duplicate simulation
+    is eliminated where one batch of games can answer two groups'
+    questions (X4's community-event and Service stats are read off the
+    SAME games used for its seat-order analysis, not re-simulated).
+    Because `simulateGame` takes no external randomness — same seed,
+    same code, same result, always — a smaller sample is not "more
+    flaky" in the CI sense; it is simply a fixed set of games, checked
+    once, that either does or doesn't clear a bound. The realized total
+    for `tests/sim` is recorded in `SIMULATION_REPORT.md`'s header.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
