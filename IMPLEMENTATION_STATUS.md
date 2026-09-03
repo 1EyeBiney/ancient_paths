@@ -323,10 +323,19 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Active
 
-(none — Phase 7 complete; Phase 8 not yet planned)
+- Phase 8 — Persistence and recovery: PHASE8_SPEC.md written
+  (2026-09-03) after Fable's review of Phase 7. A save is the setup plus
+  the engine's command log; resume rebuilds the deck from the seed and
+  replays (Phase 3's determinism makes this sound). IndexedDB behind a
+  `SaveStore` seam (in-memory store for tests, no new dependency), a
+  `RecordingEngine` decorator for autosave after every command, a
+  Resume card on Welcome, a New-game guard, a Game log viewer,
+  quarantine-never-delete for bad saves. Group P1 first: the
+  stage-completion reward Brian ruled on (OPEN_QUESTIONS 28), which fixes
+  the resource economy's missing faucet. Test groups P1-P8.
+  Implementation not yet started. Rulings in OPEN_QUESTIONS.md item 29.
 
 ## Remaining
 
-- Phase 8 — Persistence and recovery.
 - Phase 9 — Version-one content (full General Bible pack, full journey).
 - Phase 10 — Accessibility and balance audit.

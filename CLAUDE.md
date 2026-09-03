@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 7 (COMMUNITY & OFFERINGS) COMPLETE (2026-09-03) — Phase 8 (persistence) not yet planned
+## Status: PHASE 7 COMPLETE + REVIEWED, PHASE 8 (PERSISTENCE & RECOVERY) SPECIFIED (2026-09-03) — implement PHASE8_SPEC.md next
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (415/415
@@ -79,7 +79,25 @@ accomplishments list on both the host and audience summary. Manual
 browser check (real content) found no code bugs; one content-balance
 note for Phase 9 (Caesarea's relay threshold needs 7+ teams to be
 reachable under the current one-turn-per-team design). Rulings and the
-browser-check writeup: OPEN_QUESTIONS items 26-27.
+browser-check writeup: OPEN_QUESTIONS items 26-27. Fable's review
+(item 28) fixed four small things and surfaced a pre-existing design
+gap: nothing grants a resource from the real 0/0/0 start except
+surplus/events/offerings, which all need a resource first — Brian ruled
+a configurable stage-completion reward, folded into Phase 8.
+
+**Phase 8 (persistence and recovery) is specified and ready to
+implement**: see **PHASE8_SPEC.md**. Group P1 first: the
+stage-completion reward (`DEFAULTS.stageCompletionReward`, granted in
+`finalizeStageCompletion`; amending the existing tests it disturbs is
+expected and must be recorded). Then: a save = setup + the engine's
+command log (resume rebuilds the deck from the seed and replays —
+Phase 3's determinism makes this sound; undo comes back for free),
+IndexedDB behind a `SaveStore` seam with an in-memory store for tests
+(no new dependency), a `RecordingEngine` decorator so autosave after
+every command touches none of screens.ts's 28 dispatch sites, a Resume
+card on Welcome, a New-game guard, a Game log viewer, quarantine-never-
+delete for bad/foreign saves, two save-and-resume full-game round trips.
+Rulings: OPEN_QUESTIONS item 29.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

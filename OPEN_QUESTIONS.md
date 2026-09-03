@@ -500,8 +500,28 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     through the existing pending-choice picker (and shareable — the
     §11 "choose the community" action gets a regular decision point).
     Journeys could later override per stage (schema change, Phase 9).
-    Not implemented — it changes the economy and §1 says preserve
-    mechanics without approval; waiting on Brian.
+    **DECIDED (2026-09-03): Brian folded it into Phase 8** — it is
+    PHASE8_SPEC.md Group P1, implemented first, with the existing tests
+    it disturbs amended and recorded.
+
+29. **DECIDED (2026-09-03) — Phase 8 design (PHASE8_SPEC.md).** A save
+    is the setup plus the engine's command log; resume rebuilds the deck
+    from the seed and replays. Justified by Phase 3's determinism
+    guarantees (S1, S11): the deck is a pure function of options + seed,
+    the engine of seed + task source + commands. Undo is a command, so
+    undo history is recovered for free. A snapshot of `PlaySession` rides
+    along for the Welcome card and as an integrity check (replay must
+    reproduce it, timestamps ignored). Storage is IndexedDB (decision 1)
+    behind a `SaveStore` seam with an in-memory implementation for tests
+    — no fake-IndexedDB dependency (rule 5); the real store is covered by
+    the browser check. Autosave after EVERY committed command via a
+    `RecordingEngine` decorator, so the 28 dispatch sites in screens.ts
+    stay untouched. Bad or foreign saves are quarantined, never deleted,
+    and never crash boot. Deferred from §27.6 to a later phase: manual
+    export/import of a save file (the game menu gets a Game log viewer
+    now; export waits for a need). Audio playback state is not persisted
+    (§26 says "where practical"): on resume the current task's clip plays
+    again as a fresh presentation.
 
 ## Open
 
