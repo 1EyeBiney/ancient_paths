@@ -228,7 +228,11 @@ describe("journey audio assets", () => {
 describe("journey validation rejects (§33.2)", () => {
   it("a fork as the final entry (routes that do not reconnect)", () => {
     const journey = cloneJourney();
-    journey.entries = journey.entries.filter((e: any) => e.kind !== "stage" || e.id !== "westward-voyage");
+    // PHASE9_SPEC Group N2: the journey's final stage is now "appian-way"
+    // (was "westward-voyage" before the v1.0.0 journey rewrite). Removing
+    // it leaves "aegean-fork" as the last entry — still a fork, still
+    // unreconnected.
+    journey.entries = journey.entries.filter((e: any) => e.kind !== "stage" || e.id !== "appian-way");
     const result = validateJourney(journey, "fork-last");
     expect(result.ok).toBe(false);
     if (!result.ok) {

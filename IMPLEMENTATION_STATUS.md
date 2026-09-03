@@ -385,14 +385,34 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
-  after Fable's review of Phase 8. Then the full journey (five
-  milestones, 7 required successes, 4 events, 20 offerings), the
-  `general-bible` pack (128 tasks across seven categories, authored under
-  the secrecy protocol — counts and ids only anywhere Brian reads),
-  `dev-*` packs excluded from production builds, blind content tests, a
-  sufficiency matrix, and the §34 deliverable as a test: two full
-  sessions with ≤ 5% task overlap. Groups N2-N12 remain. Rulings in
-  OPEN_QUESTIONS.md item 32.
+  after Fable's review of Phase 8. Remaining: the `general-bible` pack
+  (128 tasks across seven categories, authored under the secrecy
+  protocol — counts and ids only anywhere Brian reads), `dev-*` packs
+  excluded from production builds, blind content tests, a sufficiency
+  matrix, and the §34 deliverable as a test: two full sessions with
+  ≤ 5% task overlap. Groups N3-N12 remain. Rulings in OPEN_QUESTIONS.md
+  item 32.
+  **Group N2 done (2026-09-03, 8 new tests, 480 project-wide):** the
+  real Jerusalem-to-Rome journey, version 1.0.0 (every existing save now
+  correctly quarantines on the version bump). Five milestones (Jerusalem,
+  Caesarea, Antioch, Ephesus, Rome) with coordinates inside the existing
+  map viewport; five entries (three stages, two forks) totaling 7
+  required successes — matched to what the estimator's current constants
+  say a Standard 55-minute session buys at 3-4 teams (`totalRequiredSuccesses`,
+  `planSession` no-warning, and an `estimatedMinutes ≤ 70` assertion all
+  pin the numbers); four community events (two relays at threshold 2 —
+  reachable by any 2-8 team room, since each team answers a relay
+  exactly once; two contributions), the one at Rome firing on the first
+  team's arrival while others are still travelling; 20 offering
+  outcomes across all four categories (≥3 each) exercising every effect
+  type the schema supports. A new engine test (bespoke testJourney
+  variant with an event added at "finish") confirms a community event at
+  the DESTINATION milestone still marks the arriving team finished, both
+  before and after the event resolves. One existing test's hard-coded
+  entry id updated (`westward-voyage` → `appian-way`, the journey's new
+  final stage), commented; no other existing test needed changes — M4's
+  full-game drive against the real journey and the pack/journey
+  cross-validation test both passed unmodified against the new content.
   **Group N1 done (2026-09-03, 12 new tests, 472 project-wide):** the
   relay prompt. PHASE2_SPEC's "shared prompt comes from
   `nextCommunityTask`" was never implemented — a relay asked nothing.

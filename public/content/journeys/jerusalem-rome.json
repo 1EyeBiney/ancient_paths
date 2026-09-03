@@ -1,7 +1,7 @@
 {
   "journeyId": "jerusalem-rome",
   "schemaVersion": 1,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "title": "Jerusalem to Rome",
   "startMilestoneId": "jerusalem",
   "destinationMilestoneId": "rome",
@@ -12,28 +12,35 @@
     {
       "id": "jerusalem",
       "name": "Jerusalem",
-      "introText": "Jerusalem, the city of the temple, where the church was born at Pentecost and the journey of the gospel begins.",
+      "introText": "Jerusalem, city of the temple, where the church was born at Pentecost and scattered believers first carried the good news beyond its walls. From here the road west begins, following the routes the earliest missionaries walked.",
       "ambientAudioAsset": null,
       "coordinates": { "lat": 31.7683, "lon": 35.2137 }
     },
     {
       "id": "caesarea",
       "name": "Caesarea",
-      "introText": "Caesarea Maritima, Herod's great harbor on the Mediterranean, gateway between Judea and the wider Roman world.",
+      "introText": "Caesarea Maritima, Herod's great harbor on the Mediterranean coast, where Roman ships and Roman roads meet the land of Judea. Here Peter first preached to a Gentile household, and the gospel's reach began to widen.",
       "ambientAudioAsset": null,
       "coordinates": { "lat": 32.4995, "lon": 34.8919 }
     },
     {
       "id": "antioch",
       "name": "Antioch",
-      "introText": "Antioch on the Orontes, third city of the empire, where believers were first called Christians and missionaries were first sent out.",
+      "introText": "Antioch on the Orontes, third city of the empire, where believers were first called Christians. From this church missionaries were first sent out, and the road to the nations properly begins here.",
       "ambientAudioAsset": null,
       "coordinates": { "lat": 36.2021, "lon": 36.1604 }
     },
     {
+      "id": "ephesus",
+      "name": "Ephesus",
+      "introText": "Ephesus, a great port city of Asia Minor and home to one of the wonders of the ancient world. Paul taught here for years, and the church that grew from his work became one of the most influential of the early centuries.",
+      "ambientAudioAsset": null,
+      "coordinates": { "lat": 37.9411, "lon": 27.3419 }
+    },
+    {
       "id": "rome",
       "name": "Rome",
-      "introText": "Rome, heart of the empire. All roads lead here, and so does the gospel.",
+      "introText": "Rome, heart of the empire, where every road on this journey has been leading. Here the good news arrives at the center of the ancient world, carried by ordinary travelers who trusted an extraordinary message.",
       "ambientAudioAsset": null,
       "coordinates": { "lat": 41.9028, "lon": 12.4964 }
     }
@@ -43,7 +50,7 @@
       "kind": "stage",
       "id": "judea-road",
       "name": "The Road from Jerusalem",
-      "requiredSuccesses": 3,
+      "requiredSuccesses": 2,
       "arrivesAtMilestoneId": "caesarea",
       "taskFocus": ["scripture-knowledge", "bible-reasoning"]
     },
@@ -55,7 +62,7 @@
         {
           "id": "coastal-route",
           "name": "Coastal Route",
-          "description": "Four successes required. Easier challenges, primarily listening and general Bible knowledge.",
+          "description": "Three successes required. The easier road along the shoreline, testing general Bible knowledge and listening skill.",
           "difficulty": "easy",
           "taskFocus": ["scripture-knowledge", "audio-listening"],
           "stages": [
@@ -63,7 +70,7 @@
               "kind": "stage",
               "id": "coastal-1",
               "name": "The Coast Road",
-              "requiredSuccesses": 4,
+              "requiredSuccesses": 3,
               "arrivesAtMilestoneId": "antioch"
             }
           ]
@@ -71,7 +78,7 @@
         {
           "id": "inland-route",
           "name": "Inland Route",
-          "description": "Three successes required. Moderate Scripture and reasoning challenges.",
+          "description": "Two successes required. A moderate road through the hill country, testing Scripture knowledge and reasoning.",
           "difficulty": "moderate",
           "taskFocus": ["scripture-knowledge", "bible-reasoning"],
           "stages": [
@@ -79,7 +86,7 @@
               "kind": "stage",
               "id": "inland-1",
               "name": "The Inland Hills",
-              "requiredSuccesses": 3,
+              "requiredSuccesses": 2,
               "arrivesAtMilestoneId": "antioch"
             }
           ]
@@ -87,7 +94,7 @@
         {
           "id": "mountain-route",
           "name": "Mountain Route",
-          "description": "Two successes required. Difficult challenges with greater reward potential.",
+          "description": "One success required. The hardest road, over difficult terrain, with greater reward for the team bold enough to take it.",
           "difficulty": "hard",
           "taskFocus": ["bible-reasoning", "historical-context"],
           "stages": [
@@ -95,7 +102,7 @@
               "kind": "stage",
               "id": "mountain-1",
               "name": "The Mountain Pass",
-              "requiredSuccesses": 2,
+              "requiredSuccesses": 1,
               "arrivesAtMilestoneId": "antioch"
             }
           ]
@@ -104,9 +111,54 @@
     },
     {
       "kind": "stage",
-      "id": "westward-voyage",
-      "name": "Westward to Rome",
-      "requiredSuccesses": 3,
+      "id": "asia-minor-road",
+      "name": "Across Asia Minor",
+      "requiredSuccesses": 1,
+      "arrivesAtMilestoneId": "ephesus",
+      "taskFocus": ["historical-context", "scripture-knowledge"]
+    },
+    {
+      "kind": "fork",
+      "id": "aegean-fork",
+      "name": "The Aegean Crossing",
+      "routes": [
+        {
+          "id": "corinth-route",
+          "name": "By Sea to Corinth",
+          "description": "One success required. A sea crossing to the great trading city of Corinth.",
+          "difficulty": "easy",
+          "taskFocus": ["scripture-knowledge", "audio-listening"],
+          "stages": [
+            {
+              "kind": "stage",
+              "id": "corinth-1",
+              "name": "The Sea Route",
+              "requiredSuccesses": 1
+            }
+          ]
+        },
+        {
+          "id": "macedonia-route",
+          "name": "Overland through Macedonia",
+          "description": "One success required. A harder road on foot through Macedonia, retracing an earlier overland route.",
+          "difficulty": "hard",
+          "taskFocus": ["historical-context", "bible-reasoning"],
+          "stages": [
+            {
+              "kind": "stage",
+              "id": "macedonia-1",
+              "name": "The Overland Route",
+              "requiredSuccesses": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "stage",
+      "id": "appian-way",
+      "name": "The Appian Way",
+      "requiredSuccesses": 1,
       "arrivesAtMilestoneId": "rome",
       "taskFocus": ["historical-context", "hymn", "decision-strategy"]
     }
@@ -140,6 +192,35 @@
         "type": "reduce-next-stage-requirement",
         "amount": 1
       }
+    },
+    {
+      "id": "ephesus-event",
+      "kind": "relay",
+      "milestoneId": "ephesus",
+      "title": "The Lecture Hall",
+      "description": "The room gathers in a hall where teaching once continued for years on end. A shared challenge, answered in turn; the room succeeds together.",
+      "repeatable": false,
+      "taskCategory": "community",
+      "successThreshold": 2,
+      "reward": {
+        "type": "grant-resource-every-team",
+        "resource": "choice",
+        "amount": 1
+      }
+    },
+    {
+      "id": "rome-event",
+      "kind": "contribution",
+      "milestoneId": "rome",
+      "title": "The Journey's End",
+      "description": "The first team to arrive finds the whole room gathering for a closing act of generosity, even while others are still on the road. Teams may pledge resources; meeting the goal blesses everyone still travelling.",
+      "repeatable": false,
+      "acceptedResources": ["insight", "provision", "courage"],
+      "contributionThreshold": 4,
+      "reward": {
+        "type": "reduce-next-stage-requirement",
+        "amount": 1
+      }
     }
   ],
   "offeringOutcomes": [
@@ -150,16 +231,40 @@
       "effect": { "type": "grant-resource", "target": "offering-team", "resource": "choice", "amount": 1 }
     },
     {
+      "id": "offer-courage-kindled",
+      "category": "beneficial",
+      "announcement": "Your generosity kindles boldness. Receive one Courage.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "courage", "amount": 1 }
+    },
+    {
+      "id": "offer-insight-granted",
+      "category": "beneficial",
+      "announcement": "A word of wisdom returns to you. Receive one Insight.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "insight", "amount": 1 }
+    },
+    {
+      "id": "offer-provision-granted",
+      "category": "beneficial",
+      "announcement": "Your table is set again. Receive one Provision.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "provision", "amount": 1 }
+    },
+    {
       "id": "offer-scout-report",
       "category": "beneficial",
       "announcement": "A returning traveler shares news of the road ahead. You learn about your next stage.",
       "effect": { "type": "reveal-next-stage-info" }
     },
     {
-      "id": "offer-courage-kindled",
+      "id": "offer-open-scroll",
       "category": "beneficial",
-      "announcement": "Your generosity kindles boldness. Receive one Courage.",
-      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "courage", "amount": 1 }
+      "announcement": "An open scroll reveals what lies ahead. You learn about your next stage.",
+      "effect": { "type": "reveal-next-stage-info" }
+    },
+    {
+      "id": "offer-nudge-forward",
+      "category": "beneficial",
+      "announcement": "A fellow traveler leans in with a hint for the road ahead. You receive a free clue on your next task.",
+      "effect": { "type": "grant-clue-next-task", "target": "offering-team" }
     },
     {
       "id": "offer-shared-feast",
@@ -168,9 +273,21 @@
       "effect": { "type": "grant-resource", "target": "every-team", "resource": "provision", "amount": 1 }
     },
     {
+      "id": "offer-shared-strength",
+      "category": "community",
+      "announcement": "Word of your generosity spreads courage through the whole camp. Every team receives one Courage.",
+      "effect": { "type": "grant-resource", "target": "every-team", "resource": "courage", "amount": 1 }
+    },
+    {
       "id": "offer-encourager",
       "category": "community",
       "announcement": "Your gift travels to another camp. A different team receives a clue on its next task.",
+      "effect": { "type": "grant-clue-next-task", "target": "random-other-team" }
+    },
+    {
+      "id": "offer-traveling-word",
+      "category": "community",
+      "announcement": "News of your kindness travels down the road. Another team receives a clue on its next task.",
       "effect": { "type": "grant-clue-next-task", "target": "random-other-team" }
     },
     {
@@ -180,9 +297,33 @@
       "effect": { "type": "boost-next-community-event" }
     },
     {
+      "id": "offer-common-purse",
+      "category": "community",
+      "announcement": "Your gift is added to the common purse for the road ahead. The next community event will carry a bonus.",
+      "effect": { "type": "boost-next-community-event" }
+    },
+    {
       "id": "offer-runaway-donkey",
       "category": "humorous",
       "announcement": "The donkey carrying your gift bolts through the marketplace, scattering figs everywhere. The crowd cheers. Nothing else happens, but it was magnificent.",
+      "effect": { "type": "none" }
+    },
+    {
+      "id": "offer-argumentative-goat",
+      "category": "humorous",
+      "announcement": "A goat objects loudly to the whole transaction and headbutts a merchant's table. Nothing else happens, but everyone is still talking about it.",
+      "effect": { "type": "none" }
+    },
+    {
+      "id": "offer-overturned-cart",
+      "category": "humorous",
+      "announcement": "A cart overturns, spilling coins everywhere, and somehow more roll back to you than you gave. Choose one resource.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "choice", "amount": 1 }
+    },
+    {
+      "id": "offer-loud-blessing",
+      "category": "humorous",
+      "announcement": "An enthusiastic elder pronounces a blessing so long that three merchants fall asleep standing up. Nothing else happens, but it was heartfelt.",
       "effect": { "type": "none" }
     },
     {
@@ -190,6 +331,18 @@
       "category": "neutral",
       "announcement": "The gift is received quietly, and the journey continues. The act of service itself still counts.",
       "effect": { "type": "none" }
+    },
+    {
+      "id": "offer-passing-traveler",
+      "category": "neutral",
+      "announcement": "A passing traveler accepts the gift with a nod and continues on his way. The journey continues.",
+      "effect": { "type": "none" }
+    },
+    {
+      "id": "offer-recorded-scroll",
+      "category": "neutral",
+      "announcement": "A scribe quietly records your generosity for the record. Receive one Insight.",
+      "effect": { "type": "grant-resource", "target": "offering-team", "resource": "insight", "amount": 1 }
     }
   ]
 }
