@@ -198,6 +198,20 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     "Return" (works for "Enter"); not an app bug — real keyboards send
     "Enter", which is what the jsdom suites exercise.
 
+20. **Brian's Phase 5 NVDA verdict (2026-09-02): Decision 1 CONFIRMED.**
+    R/S/C/I and the `?` help menu worked under NVDA on the live site; one
+    team was played through the second stage. The scoped
+    `role="application"` on the host-controls region stays. Noted for a
+    later tweak, not now: the game keys only fire while focus is INSIDE
+    that region (by design — browse mode keeps the audience view
+    readable), so after reading the audience view Brian had to move focus
+    back down before some keys worked. Candidate tweak for Phase 10's
+    accessibility audit: a landmark/hotkey that jumps focus to the host
+    controls, or announcing "press Tab to return to the controls" when a
+    game key is pressed outside the region. Default team names
+    ("Team Cross" / "Team Lion") — no objection raised; stands unless
+    Brian says otherwise.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
