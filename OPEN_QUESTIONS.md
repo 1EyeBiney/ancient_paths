@@ -808,6 +808,9 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       Resume when capacity returns: ask Fable to "resume the content
       review"; the agent's context is preserved. Its findings, by id
       and kind of change only, will be appended here.
+    - **X6 ruled — yes (Brian, 2026-09-03)**: recent-use memory across
+      games goes into Phase 10 as specified (PHASE10_SPEC.md Group X6);
+      Open item 5 updated.
     2734 tests after the code fixes (2602 at Phase 9's completion; the
     difference is the new blind cost rule per task, the route-focus
     tests, and the reveal-alternatives case).
@@ -823,8 +826,10 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
    success-only, more-than-two-entries-behind, one resource of choice;
    configurable in `src/config/defaults.ts`.
 4. Whether a timed endgame / final challenge is offered (spec §37.7).
-5. Whether recent-task history persists between games automatically
-   (spec §37.10) — deferred; per-session memory only in version one.
+5. **DECIDED (2026-09-03, item 35)** — recent-task history persists
+   between games (spec §37.10): the last N games' task ids (default 3,
+   1-5) are excluded at setup, toggle default on; PHASE10_SPEC.md Group
+   X6. Supersedes the earlier "per-session memory only in version one".
 6. Final keyboard map after accessibility testing (spec §37.12) — the
    proposal in KEYBOARD_COMMANDS.md is a starting point.
 7. How team answer entry works in detail for host-as-player mode when the

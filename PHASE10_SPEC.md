@@ -63,7 +63,7 @@ Opened for this phase (plus the always-open `tests/`):
   pre-existing engine test green unchanged; no existing log-line text
   reworded; new state inside `EngineState`).
 - `src/persistence/*`, `src/ui/setup.ts`, `src/ui/app.ts` — Group X6
-  (recent-use memory) if Brian approves it (see X6).
+  (recent-use memory; Brian ruled yes).
 - `package.json` scripts only (no new dependency).
 
 Do NOT modify: the design doc, `src/content/schemas.ts`,
@@ -361,14 +361,13 @@ rotation categories), and the number of distinct tasks used across 1, 2,
 have zero repeats (128 tasks vs ~34 per session). Everything else is
 report → Phase 11 content-growth targets per category.
 
-## Group X6 — recent-use memory (BRIAN'S RULING REQUIRED; Fable recommends yes)
+## Group X6 — recent-use memory (DECIDED: yes — Brian, 2026-09-03)
 
 §29: "avoid tasks used in the last specified number of games." Open
-item 5 ruled "per-session memory only in version one"; item 32 offered
-it for Phase 10 ("say the word"). Everything it needs exists
-(`excludeTaskIds`, IndexedDB, the game's task ids). If Brian says no,
-skip this group and delete its count line from the definition of done;
-nothing else depends on it.
+item 5 had ruled "per-session memory only in version one"; item 32
+offered it for Phase 10 and Brian said yes (OPEN_QUESTIONS item 35).
+Everything it needs exists (`excludeTaskIds`, IndexedDB, the game's
+task ids). Implement it as specified below.
 
 - `SaveStore` gains `readRecentTasks(): Promise<RecentTasks | null>` and
   `writeRecentTasks(r: RecentTasks): Promise<void>`; `RecentTasks =
@@ -546,10 +545,10 @@ counts, ids and observations — no task text.
 4. **No timed endgame in v1** (Open item 4 → Phase 11 backlog): End
    session and the §21 comparator already exist; a timer is UI surface
    with no playtest evidence behind it yet.
-5. **X6 recent-use memory** is recommended and specified, pending
-   Brian's word (Open item 5 said per-session memory only; §29 says
-   "future versions should optionally maintain" it — it costs ~30 lines
-   now that IndexedDB and `excludeTaskIds` exist).
+5. **X6 recent-use memory — Brian ruled yes (2026-09-03).** Open item
+   5 had said per-session memory only; §29 says "future versions should
+   optionally maintain" it, and it costs ~30 lines now that IndexedDB
+   and `excludeTaskIds` exist. Supersedes Open item 5.
 6. **The report is a committed artifact checked by a test**, so the
    numbers Brian reads are always the numbers the code produces.
 

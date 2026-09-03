@@ -144,8 +144,8 @@ committed, test-checked `SIMULATION_REPORT.md`; length, economy,
 fairness and content-repeat analyses as findings plus proposals (no
 agent-side balance tuning); automated accessibility, focus and
 error-recovery audits against the real content; an NVDA checklist for
-Brian's own pass; route difficulty made real in the deck (X4b); recent
--use memory across games (X6) pending Brian's ruling; and the §35
+Brian's own pass; route difficulty made real in the deck (X4b); recent-use
+memory across games (X6 — Brian ruled yes); and the §35
 Definition of Done walked item by item. Rulings: OPEN_QUESTIONS item 35
 and the spec's "Decisions" section.
 

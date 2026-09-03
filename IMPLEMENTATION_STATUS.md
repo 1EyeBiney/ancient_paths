@@ -456,7 +456,7 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   findings-plus-proposals; automated accessibility, focus and
   error-recovery audits against the real content; an NVDA checklist
   for Brian's own pass; route difficulty made real in the deck (X4b);
-  recent-use memory across games (X6) pending Brian's ruling; and the
+  recent-use memory across games (X6, Brian ruled yes); and the
   §35 Definition of Done walked item by item.
 - Phase 11 — Content growth and the deferred items (timed endgame,
   melody tasks when Brian's note data arrives, audio-listening
