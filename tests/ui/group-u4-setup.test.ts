@@ -54,21 +54,21 @@ describe("U4 — a full pass through every step produces a valid BuildOptions", 
 });
 
 describe("U4 — team names prefill and are editable", () => {
-  it("prefills Team 1..Team N and preserves edits across a count change that keeps the index", () => {
+  it("prefills the preset symbol words and preserves edits across a count change that keeps the index", () => {
+    // Defaults are symbol words, not "Team N" (PHASE4_SPEC's wording): the
+    // engine says "Team ${name}", and "Team Team 1" is what the Phase 5
+    // browser check heard. Recorded in OPEN_QUESTIONS item 19.
     const wizard = makeWizard();
     wizard.setTeamCount(4);
-    expect(wizard.teamNames).toEqual(["Team 1", "Team 2", "Team 3", "Team 4"]);
+    expect(wizard.teamNames).toEqual(["Cross", "Lion", "Dove", "Anchor"]);
     wizard.setTeamName(1, "Antioch All-Stars");
     wizard.setTeamCount(3);
-    expect(wizard.teamNames).toEqual(["Team 1", "Antioch All-Stars", "Team 3"]);
+    expect(wizard.teamNames).toEqual(["Cross", "Antioch All-Stars", "Dove"]);
     wizard.setTeamCount(5);
-    expect(wizard.teamNames).toEqual([
-      "Team 1",
-      "Antioch All-Stars",
-      "Team 3",
-      "Team 4",
-      "Team 5",
-    ]);
+    expect(wizard.teamNames).toEqual(["Cross", "Antioch All-Stars", "Dove", "Anchor", "Star"]);
+    wizard.setTeamCount(8);
+    expect(wizard.teamNames[6]).toBe("Olive Branch");
+    expect(wizard.teamNames[7]).toBe("Crown");
   });
 
   it("clamps team count to 2-8", () => {

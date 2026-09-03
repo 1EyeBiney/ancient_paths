@@ -4,6 +4,38 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Completed
 
+- **Phase 5 — Audience Presentation — DONE.** All 8 test groups (V1-V8)
+  are green: 34 tests total (262 project-wide), `npx tsc --noEmit`
+  clean, `npm run build` clean (stylesheet bundled). New in `src/ui/`:
+  audience.ts, teamBadge.ts, communityProgress.ts, styles.css; plus
+  `scripts/make-dev-playtest.mjs` → `public/content/packs/dev-playtest.json`.
+  See PHASE5_SPEC.md for the contract.
+  - Group V1 closed the four Phase 4 review findings (OPEN_QUESTIONS
+    item 16): idle re-prompt wired, help menu rendered visibly, focus to
+    the new screen heading after each host action, community progress
+    derived from the event log (undo-safe; the UI counter is gone).
+  - The page now has one h1, an "Audience view" document region, and a
+    SCOPED `role="application"` "Host controls" region (Decision 1 —
+    Brian's NVDA pass decides whether it stays). `AudienceView` renders
+    on the same pass as the host screens: Now playing (badge, round,
+    location, stage progressbar), Task (prompt persists through
+    awaitingAnswer/reveal; answer only after reveal), Teams table,
+    Journey landmark strip, Community event progress, Game summary.
+    Group V2 asserts audience == engine after EVERY step of a full game;
+    V8 repeats that against the REAL Jerusalem-to-Rome journey.
+  - Team badges: glyph + name + color, accessible name "Team X, lion";
+    one preset color was darkened to pass 4.5:1 (V3). Reduced motion:
+    setup toggle else `prefers-reduced-motion`, stamped on `#app`; the
+    stylesheet's only animation is gated behind it (V7).
+  - Setup screen gained every control Phase 4 deferred (V8). The
+    dev-playtest pack (420 placeholder tasks, never ships) makes the
+    browser build playable; the manual browser check passed (details and
+    findings in OPEN_QUESTIONS item 19, including the deliberate
+    default-team-name deviation and a Phase 9 content note).
+  - `@types/node` added dev-only (OPEN_QUESTIONS item 18). No changes to
+    `src/engine/`, `src/session/`, `src/content/schemas.ts`, existing
+    sample content, or any spec file.
+
 - **Phase 4 — Accessible Host Interface — DONE.** All 10 test groups
   (U1-U10) are green: 100 tests total (on top of Phase 2+3's 128, for 228
   project-wide), `npx tsc --noEmit` clean, `npm run build` clean. Lives in
@@ -167,10 +199,9 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- Phase 5 — Audience presentation: PHASE5_SPEC.md written (2026-09-02)
-  after Fable's review of Phase 4 (findings in OPEN_QUESTIONS item 16,
-  folded into Group V1); test groups V1-V8. Implementation not yet
-  started.
+- (nothing in flight — Phase 5 complete; next is the map phase Brian
+  chose, OPEN_QUESTIONS item 17 / CLAUDE.md decision 9, to be spec'd by
+  Fable, then Phase 6 audio)
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the
@@ -180,7 +211,9 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Remaining
 
-- Phase 5 — Audience presentation (same single window per current plan).
+- The map (after Phase 5, before audio): shipped public-domain map image
+  with an SVG route/badge overlay, host-selectable background, per-
+  journey viewport + milestone coordinates (schema change) — decision 9.
 - Phase 6 — Audio system.
 - Phase 7 — Community and offering systems.
 - Phase 8 — Persistence and recovery.

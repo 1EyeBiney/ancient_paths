@@ -176,6 +176,26 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     `node:fs`/`node:path` typings. No runtime dependency added; the
     generator script itself is dependency-free.
 
+19. **Phase 5 manual browser check (2026-09-02) — results and one
+    deliberate deviation.** Startup → setup → three tasks → reveal →
+    stage completion (Journey Token earned, strip marker moved to
+    Caesarea) → relay community event → resolve → next team's turn, all
+    against dev-playtest + the real `jerusalem-rome.json`, with the
+    audience view and host screens in step at every point and no console
+    errors. Findings: (a) DEVIATION from PHASE4_SPEC's "prefilled Team 1…
+    Team N": the engine phrases everything as "Team ${name}", so default
+    names produced "Team Team 1" on screen and in speech. Defaults are
+    now the preset symbol words ("Cross", "Lion", "Dove", …), matching
+    each team's badge; a host can still type anything. Brian may veto.
+    (b) Content note for Phase 9, not fixable here (sample content is
+    off-limits): the sample journey's Caesarea relay has
+    `successThreshold: 7`, unreachable when 2 teams each answer once per
+    pass — the room simply fails and play continues; authoring should
+    size thresholds to team count or make relays multi-pass. (c) Tooling
+    note: the desktop Browser pane's key action sends `key: ""` for
+    "Return" (works for "Enter"); not an app bug — real keyboards send
+    "Enter", which is what the jsdom suites exercise.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

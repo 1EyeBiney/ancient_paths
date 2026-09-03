@@ -106,8 +106,18 @@ export class SetupWizard {
     this.reducedMotion = v;
   }
 
+  /** Default names are the preset symbol words ("Cross", "Lion", ...) so
+   * the engine's "Team ${name}" phrasing reads "Team Lion", not the
+   * "Team Team 1" the Phase 5 browser check heard (OPEN_QUESTIONS 19). */
+  private defaultTeamName(index: number): string {
+    return TEAM_PRESETS[index % TEAM_PRESETS.length]!.symbol
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
   private defaultTeamNames(count: number): string[] {
-    return Array.from({ length: count }, (_, i) => `Team ${i + 1}`);
+    return Array.from({ length: count }, (_, i) => this.defaultTeamName(i));
   }
 
   // -- setters (each validates/clamps its own input) ----------------------
@@ -119,7 +129,7 @@ export class SetupWizard {
   setTeamCount(n: number): void {
     const count = clamp(Math.round(n), MIN_TEAMS, MAX_TEAMS);
     const names = this.teamNames.slice(0, count);
-    while (names.length < count) names.push(`Team ${names.length + 1}`);
+    while (names.length < count) names.push(this.defaultTeamName(names.length));
     this.teamCount = count;
     this.teamNames = names;
   }

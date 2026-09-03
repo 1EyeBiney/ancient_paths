@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 4 COMPLETE (2026-09-02) — next up: Phase 5, audience presentation
+## Status: PHASE 5 COMPLETE (2026-09-02) — next up: the map phase (decision 9), then Phase 6 audio
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (228/228
@@ -21,14 +21,16 @@ error; formula stands — OPEN_QUESTIONS item 11). The game now has a real
 UI: `index.html`/`src/main.ts` boot `src/ui/app.ts`, replacing the old
 Phase 1 boot page.
 
-**Phase 5 is specified and ready to implement**: see **PHASE5_SPEC.md**
-(the binding contract — audience view region rendered on the same pass
-as the host controls, team badges, journey strip, progress/resource
-panels, reduced motion, the setup controls Phase 4 deferred, a generated
-dev-playtest pack, and Group V1 = the Phase 4 review fixes recorded in
-OPEN_QUESTIONS item 16; test groups V1-V8, definition of done). Two
-decisions await Brian's veto/NVDA ear: a scoped `role="application"` on
-the host-controls region, and the dev-playtest pack.
+**Phase 5 is done** (PHASE5_SPEC.md, groups V1-V8, 262 tests): the
+audience view renders on the same pass as the host controls, team
+badges, journey strip, progress panels, a real stylesheet with reduced
+motion, the full setup screen, and a generated never-ships
+`dev-playtest` pack that makes the browser build playable
+(`npm run dev`). Awaiting Brian's NVDA/sighted pass on: the scoped
+`role="application"` host region (Decision 1), the visual scale, and
+the default team names now being symbol words ("Team Lion" — see
+OPEN_QUESTIONS 19). Next: Fable specs the map phase (decision 9), then
+Phase 6 audio.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 
