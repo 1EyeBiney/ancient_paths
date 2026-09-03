@@ -60,5 +60,9 @@ Notes:
   pending "choose a resource" grant gets a "share with Team X" row per
   other team alongside its own take-the-resource rows (absent once that
   grant is itself a received gift — gifts can't be re-shared).
+- Phase 8 added no new keys either: Welcome's "Resume game" (shown above
+  "New game" when a save exists) and the game menu's "Game log…" and
+  "Delete saved game" are ordinary Tab-reachable buttons, same precedent
+  as Phase 7's above.
 - This file is the living record; update it whenever `KEY_BINDINGS`
   changes in `src/ui/keys.ts`.

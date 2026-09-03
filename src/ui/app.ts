@@ -18,7 +18,8 @@ import { createEngine, type Command, type EngineOptions, type GameEngine } from 
 import { createRng } from "../engine/rng";
 import { RecordingEngine } from "../persistence/recorder";
 import { IndexedDbSaveStore, type SaveStore } from "../persistence/store";
-import { SAVE_SCHEMA_VERSION, type SavedGame } from "../persistence/schema";
+import { SAVE_SCHEMA_VERSION, parseSavedGame, type SavedGame } from "../persistence/schema";
+import { rebuildFromSave } from "../persistence/replay";
 import { Presenter, type PresenterOptions } from "./presenter";
 import { KeyboardController, type KeyBinding } from "./keys";
 import { ModalManager } from "./modal";
@@ -149,6 +150,13 @@ export class App {
   private saveInFlight = false;
   private saveDirty = false;
   private saveFailedAnnounced = false;
+  /** "Delete saved game" (Group P5) stops autosaving for the rest of this
+   * game — otherwise the very next command would just recreate it. */
+  private saveDisabledForSession = false;
+  /** A valid save found at boot, offered on Welcome as "Resume game". */
+  private pendingSave: SavedGame | null = null;
+  /** Set when a save exists but failed to parse; cleared once shown once. */
+  private pendingSaveError: string | null = null;
   private renderer: ScreenRenderer | null = null;
   private undoController: UndoController | null = null;
   private keyboard: KeyboardController | null = null;
@@ -237,6 +245,34 @@ export class App {
 
     this.applyReducedMotion();
     this.renderStartup();
+    void this.checkForSavedGame();
+  }
+
+  /** Boot-time check (Group P5): loads the store, validates it, and — if
+   * still on the Welcome screen when it resolves (a fast test or user may
+   * already have navigated away) — re-renders with the Resume option or
+   * the "could not be read" notice. Quarantines anything invalid; never
+   * deletes it, and never throws regardless of what the store returns. */
+  private async checkForSavedGame(): Promise<void> {
+    let raw: unknown = null;
+    try {
+      raw = await this.saveStore.load();
+    } catch {
+      raw = null;
+    }
+    if (raw === null || raw === undefined) return;
+    const parsed = parseSavedGame(raw);
+    if (parsed.ok) {
+      this.pendingSave = parsed.game;
+    } else {
+      this.pendingSaveError = parsed.reason;
+      try {
+        await this.saveStore.quarantine(raw);
+      } catch {
+        // Nothing more we can do; the invalid save just stays where it was.
+      }
+    }
+    if (this.mode === "startup") this.renderStartup();
   }
 
   dispose(): void {
@@ -353,10 +389,30 @@ export class App {
       return;
     }
 
+    let resumeCard = "";
+    if (this.pendingSave) {
+      resumeCard = this.resumeCardText(this.pendingSave);
+      this.contentContainer.appendChild(el("p", { text: resumeCard, className: "resume-card" }));
+      const resumeButton = document.createElement("button");
+      resumeButton.type = "button";
+      resumeButton.textContent = "Resume game";
+      resumeButton.addEventListener("click", () => void this.resumeSavedGame());
+      this.contentContainer.appendChild(resumeButton);
+    }
+    let invalidSaveNotice = "";
+    if (this.pendingSaveError) {
+      invalidSaveNotice = "A saved game could not be read and was set aside.";
+      this.contentContainer.appendChild(el("p", { text: invalidSaveNotice }));
+      this.pendingSaveError = null; // shown once
+    }
+
     const startButton = document.createElement("button");
     startButton.type = "button";
     startButton.textContent = "New game";
-    startButton.addEventListener("click", () => this.renderSetup());
+    startButton.addEventListener("click", () => {
+      if (this.pendingSave) this.openNewGameOverSaveConfirm();
+      else this.renderSetup();
+    });
     this.contentContainer.appendChild(startButton);
 
     const soundCheckButton = document.createElement("button");
@@ -365,7 +421,89 @@ export class App {
     soundCheckButton.addEventListener("click", () => this.renderSoundCheck());
     this.contentContainer.appendChild(soundCheckButton);
 
-    this.presenter.present({ visual: "Ready. Press Enter, or choose New game, to set up a session. Sound check tests your speakers." });
+    const readyLine = this.pendingSave
+      ? `${resumeCard} Press Enter, or choose Resume game, to continue. Or choose New game to start a new session.`
+      : "Ready. Press Enter, or choose New game, to set up a session. Sound check tests your speakers.";
+    this.presenter.present({ visual: invalidSaveNotice ? `${invalidSaveNotice} ${readyLine}` : readyLine });
+  }
+
+  /** "{journey title}. {n} teams: {names}. Round {r}, {active team}'s turn.
+   * Saved {savedAt as a short local date-time}." (PHASE8_SPEC.md Group P5). */
+  private resumeCardText(save: SavedGame): string {
+    const journeyTitle = this.options.journeys.find((j) => j.journeyId === save.content.journeyId)?.title ?? save.content.journeyId;
+    const teamNames = save.teams.map((t) => t.name).join(", ");
+    const activeTeam = save.snapshot.teams[save.snapshot.activeTeamIndex]?.name ?? "?";
+    const savedAt = new Date(save.savedAt).toLocaleString();
+    return `${journeyTitle}. ${save.teams.length} teams: ${teamNames}. Round ${save.snapshot.roundNumber}, ${activeTeam}'s turn. Saved ${savedAt}.`;
+  }
+
+  private openNewGameOverSaveConfirm(): void {
+    this.modal.open({
+      title: "Start a new game? The saved game will be replaced.",
+      present: (i) => this.presenter.present(i),
+      build: (container) => {
+        const confirmBtn = document.createElement("button");
+        confirmBtn.type = "button";
+        confirmBtn.textContent = "Start a new game";
+        confirmBtn.addEventListener("click", () => {
+          this.modal.close();
+          this.pendingSave = null;
+          void this.saveStore.clear();
+          this.renderSetup();
+        });
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.addEventListener("click", () => this.modal.close());
+        container.append(confirmBtn, cancelBtn);
+      },
+    });
+  }
+
+  /** Rebuilds the saved game and enters playing at the resumed state
+   * (PHASE8_SPEC.md Group P5). A failed rebuild quarantines the save
+   * (never deletes it) and returns to Welcome without it. */
+  private async resumeSavedGame(): Promise<void> {
+    const save = this.pendingSave;
+    if (!save) return;
+    const result = rebuildFromSave(save, {
+      journeys: this.options.journeys,
+      packs: this.options.packs,
+      onCommitted: () => this.scheduleSave(),
+    });
+    if ("error" in result) {
+      this.pendingSave = null;
+      try {
+        await this.saveStore.quarantine(save);
+      } catch {
+        // Nothing more we can do.
+      }
+      this.presenter.present({
+        visual: `This saved game could not be resumed (${result.error}). Choose New game to start a new session.`,
+        channel: "assertive",
+      });
+      this.renderStartup();
+      return;
+    }
+
+    this.wizard.applySnapshot(save.setup);
+    this.audioManager.setSettings(save.audio.settings);
+    this.audioManager.setSpeechMode(save.audio.speechMode);
+
+    const journey = this.wizard.journey!;
+    const packs = this.wizard.packs.filter((p) => this.wizard.enabledPackIds.includes(p.packId));
+    const allTasks: Task[] = packs.flatMap((p) => p.tasks);
+    this.tasksById = new Map(allTasks.map((t) => [t.id, t]));
+    const assets = new Map<string, AudioAsset>();
+    for (const pack of packs) for (const asset of pack.audioAssets ?? []) assets.set(asset.assetId, asset);
+    for (const asset of journey.audioAssets ?? []) assets.set(asset.assetId, asset);
+    this.audioAssets = assets;
+    this.currentJourney = journey;
+    this.audioManager.unlock(); // the Resume click IS the user gesture
+
+    this.pendingSave = null;
+    this.presenter.present({ visual: "Resumed.", channel: "assertive" });
+    this.enterPlaying(result.engine);
   }
 
   // -- sound check ----------------------------------------------------------
@@ -802,8 +940,18 @@ export class App {
    * engine"). Assumes currentJourney/tasksById are already set. */
   private enterPlaying(recordingEngine: RecordingEngine): void {
     this.saveFailedAnnounced = false;
+    this.saveDisabledForSession = false;
     this.saveInFlight = false;
     this.saveDirty = false;
+    // A resumed game's event log already has the whole prior history in it
+    // — pre-seed these so the first render doesn't try to voice the entire
+    // backlog as "new" lines or replay every clue as freshly revealed (a
+    // fresh game's log is empty at this point, so this is a no-op there).
+    // AudioManager state itself is never persisted (§26 "where practical"),
+    // so lastAudioPresentationKey stays null on purpose: the resumed task's
+    // clip plays once more, from the top, as a fresh presentation.
+    this.lastEventLogLength = recordingEngine.getSession().eventLog.length;
+    this.lastCluesRevealedCount = recordingEngine.getCurrentTaskPublic()?.cluesRevealed.length ?? 0;
     this.recordingEngine = recordingEngine;
     this.engine = recordingEngine;
     this.undoController = new UndoController({
@@ -871,7 +1019,7 @@ export class App {
    * coalesced so the LATEST state wins rather than queuing a second write. */
   private scheduleSave(): void {
     if (!this.engine || !this.recordingEngine) return;
-    if (this.saveFailedAnnounced) return;
+    if (this.saveFailedAnnounced || this.saveDisabledForSession) return;
     if (this.saveInFlight) {
       this.saveDirty = true;
       return;
@@ -1216,12 +1364,22 @@ export class App {
         audio.textContent = "Audio…";
         audio.addEventListener("click", () => this.openAudioDialog());
 
+        const gameLog = document.createElement("button");
+        gameLog.type = "button";
+        gameLog.textContent = "Game log…";
+        gameLog.addEventListener("click", () => this.openGameLogDialog());
+
+        const deleteSave = document.createElement("button");
+        deleteSave.type = "button";
+        deleteSave.textContent = "Delete saved game";
+        deleteSave.addEventListener("click", () => this.openDeleteSaveConfirm());
+
         const endSession = document.createElement("button");
         endSession.type = "button";
         endSession.textContent = "End session";
         endSession.addEventListener("click", () => this.openEndSessionConfirm());
 
-        container.append(resume, status, audio, endSession);
+        container.append(resume, status, audio, gameLog, deleteSave, endSession);
       },
     });
   }
@@ -1231,6 +1389,57 @@ export class App {
       title: "Audio",
       present: (i) => this.presenter.present(i),
       build: (container) => this.buildAudioSettings(container),
+    });
+  }
+
+  /** The last 50 event-log lines, newest last, with a Copy button when the
+   * clipboard API is available (silently absent otherwise). §26. */
+  private openGameLogDialog(): void {
+    const lines = (this.engine?.getSession().eventLog ?? []).slice(-50).map((e) => e.text);
+    this.modal.open({
+      title: "Game log",
+      present: (i) => this.presenter.present(i),
+      build: (container) => {
+        const list = document.createElement("ol");
+        for (const line of lines) list.appendChild(el("li", { text: line }));
+        container.appendChild(list);
+        const clipboard = (navigator as { clipboard?: { writeText?: (text: string) => Promise<void> } }).clipboard;
+        if (clipboard?.writeText) {
+          const copyBtn = document.createElement("button");
+          copyBtn.type = "button";
+          copyBtn.textContent = "Copy";
+          copyBtn.addEventListener("click", () => {
+            clipboard.writeText!(lines.join("\n")).catch(() => {});
+          });
+          container.appendChild(copyBtn);
+        }
+      },
+    });
+  }
+
+  /** Press-twice confirm, same shape as End session. Stops autosaving for
+   * the rest of this game — otherwise the very next committed command
+   * would just recreate the save this button just deleted. */
+  private openDeleteSaveConfirm(): void {
+    this.modal.open({
+      title: "Delete saved game?",
+      present: (i) => this.presenter.present(i),
+      build: (container) => {
+        const confirmBtn = document.createElement("button");
+        confirmBtn.type = "button";
+        confirmBtn.textContent = "Delete saved game";
+        confirmBtn.addEventListener("click", () => {
+          this.modal.close();
+          this.saveDisabledForSession = true;
+          void this.saveStore.clear();
+          this.presenter.present({ visual: "Saved game deleted. This game will no longer autosave." });
+        });
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.addEventListener("click", () => this.modal.close());
+        container.append(confirmBtn, cancelBtn);
+      },
     });
   }
 

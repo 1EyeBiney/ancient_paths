@@ -9,6 +9,7 @@ import { crossValidate, fetchJson, validateContentPack, validateJourney } from "
 import type { ContentPack, Journey } from "./content/schemas";
 import { App } from "./ui/app";
 import { mapManifestSchema, type MapManifest } from "./ui/mapProjection";
+import { IndexedDbSaveStore } from "./persistence/store";
 
 const PACK_FILES = ["content/packs/dev-sample.json", "content/packs/dev-playtest.json"];
 const JOURNEY_FILES = ["content/journeys/jerusalem-rome.json"];
@@ -52,7 +53,14 @@ async function boot(): Promise<void> {
     console.warn(`Map manifest could not be loaded, playing without a map: ${err instanceof Error ? err.message : err}`);
   }
 
-  new App({ root, journeys, packs, mapManifest, loadErrors: loadErrors.length > 0 ? loadErrors : undefined });
+  new App({
+    root,
+    journeys,
+    packs,
+    mapManifest,
+    loadErrors: loadErrors.length > 0 ? loadErrors : undefined,
+    saveStore: new IndexedDbSaveStore(),
+  });
 }
 
 void boot();
