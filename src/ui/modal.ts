@@ -25,6 +25,14 @@ export class ModalManager {
     this.overlay = document.createElement("div");
     this.overlay.setAttribute("role", "dialog");
     this.overlay.setAttribute("aria-modal", "true");
+    // PHASE10_SPEC Group X7a: the dialog element itself had no accessible
+    // name (only the one-time present() announcement carried the title) —
+    // an automated check, or a screen reader announcing role+name on
+    // entry, would hear a bare "dialog". The heading is recreated fresh
+    // in open() every time but always with this same id, so a static
+    // aria-labelledby set once here is always correct once the dialog is
+    // visible.
+    this.overlay.setAttribute("aria-labelledby", "modal-heading");
     this.overlay.hidden = true;
     this.root.appendChild(this.overlay);
   }
@@ -42,6 +50,7 @@ export class ModalManager {
     this.overlay.innerHTML = "";
 
     const heading = document.createElement("h2");
+    heading.id = "modal-heading";
     heading.textContent = options.title;
     heading.tabIndex = -1;
     this.overlay.appendChild(heading);

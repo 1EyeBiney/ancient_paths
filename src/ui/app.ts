@@ -914,6 +914,15 @@ export class App {
     this.contentContainer.appendChild(beginButton);
 
     this.presenter.present({ visual: "Session setup. Choose a journey, team count, names, pace, and seed." });
+    // PHASE10_SPEC Group X7c: renderCurrentScreen() already parks focus on
+    // the current screen's heading on every render (playing); setup never
+    // did, so entering it (e.g. from Welcome's "New game") left DOM focus
+    // on body until the host's first Tab or click. Same fix, same place.
+    const heading = this.contentContainer.querySelector<HTMLElement>("h2");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus();
+    }
   }
 
   private checkbox(id: string, labelText: string, checked: boolean, onChange: (on: boolean) => void): HTMLElement {

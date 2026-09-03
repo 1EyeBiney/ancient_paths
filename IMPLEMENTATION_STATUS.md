@@ -450,6 +450,42 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Groups X7a/X7c/X7d/X7e/X7f done (2026-09-03, 4 new tests, 2867
+  project-wide):** the automated accessibility audit's per-action checks
+  (names/structure, focus, speech hygiene, no-flooding) plus the U10
+  dual-modality proof extended to the real journey and general-bible
+  pack (blind), all in `tests/audit/` against a new shared driver
+  (`tests/audit/harness.ts`) that reuses U10's keyboard-only/mouse-only
+  state machine with a per-action hook. Three real, fixed defects the
+  audit caught before it went green:
+  - The modal dialog (`src/ui/modal.ts`) had no accessible name — only
+    a one-time spoken announcement carried its title, so an automated
+    check (or a screen reader announcing role+name on entry) heard a
+    bare "dialog". Fixed with a stable `aria-labelledby` pointing at
+    the heading, set once in the constructor.
+  - `CursorList` (`src/ui/cursorList.ts`) built each option's DOM id
+    from just the option's own value, so lists that share an option
+    (Duration/Pace/Difficulty all have "standard") produced multiple
+    elements with the identical id on the same setup screen — any
+    `aria-activedescendant`/`aria-labelledby` reference to it was
+    ambiguous. Fixed with a per-instance numeric prefix.
+  - Clicking a `CursorList` row moved selection and state but never DOM
+    focus (a plain `role="option"` div isn't natively focusable), and
+    entering the setup screen at all left focus on `<body>` — the
+    "playing" screens already park focus on their own heading on every
+    render (`renderCurrentScreen`); setup never did. Both fixed the
+    same way: a click now also focuses the list's container (keeping
+    the existing aria-activedescendant model, not making rows
+    separately focusable), and `renderSetup()` now focuses its heading
+    on entry, exactly like every other screen already does.
+  One false positive corrected in the audit's OWN check, not the app:
+  hymn lyric-completion prompts legitimately quote a line "with a
+  blank" using underscores (CONTENT_AUTHORING §3) — the visual-text
+  forbidden-character check now excludes underscore (it stays forbidden
+  in the SPOKEN channel, where `sanitizeForSpeech` already strips it —
+  a spoken underscore would mean that guarantee broke). The "exactly
+  one h2" check is scoped to `playing` mode only; the setup wizard is
+  deliberately many sections on one page by design (PHASE4_SPEC).
   **Group X6 done (2026-09-03, 12 new tests, 2863 project-wide):**
   recent-use memory across games (Brian ruled yes, item 35).
   `SaveStore` gains `readRecentTasks`/`writeRecentTasks` (a new

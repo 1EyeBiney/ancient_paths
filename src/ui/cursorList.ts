@@ -24,6 +24,15 @@ export interface CursorListOptions {
 }
 
 export class CursorList {
+  // PHASE10_SPEC Group X7a: item DOM ids used to be just `cursor-item-
+  // ${item.id}` — several setup lists share an option value ("standard"
+  // appears in Duration, Pace, AND Difficulty), so three elements ended
+  // up with the identical id on the same page, making any
+  // aria-activedescendant/aria-labelledby reference to it ambiguous.
+  // Each CursorList instance now gets its own numeric prefix.
+  private static nextInstanceId = 0;
+  private readonly instanceId = CursorList.nextInstanceId++;
+
   private cursor = 0;
   private readonly rowElements: HTMLElement[] = [];
 
@@ -42,14 +51,21 @@ export class CursorList {
     items.forEach((item, index) => {
       const row = document.createElement("div");
       row.setAttribute("role", "option");
-      row.id = `cursor-item-${item.id}`;
+      row.id = `cursor-item-${this.instanceId}-${item.id}`;
       row.textContent = item.label;
       // Mouse parity (dual-modality, CLAUDE.md decision #2): a click both
       // selects and confirms, the mouse equivalent of arrowing-to-it then
-      // pressing Enter.
+      // pressing Enter. A plain role="option" div isn't natively
+      // focusable, so without this a mouse click left DOM focus wherever
+      // it happened to be (often nowhere) — the container is the correct
+      // target, not the row itself: this widget's model keeps DOM focus
+      // ON THE CONTAINER throughout, with aria-activedescendant (set in
+      // applySelection()) naming the virtually-active row, exactly as
+      // arrow-key navigation already does (PHASE10_SPEC Group X7c).
       row.addEventListener("click", () => {
         this.cursor = index;
         this.applySelection();
+        this.options.container.focus();
         this.options.present({ visual: `${item.label} chosen.` });
         this.options.onConfirm(item, index);
       });
