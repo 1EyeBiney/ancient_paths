@@ -111,6 +111,28 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     `getTeachingText()`/`getCommunityEventProgress()`-style getters to
     remove the workarounds if it's ever touched again.
 
+16. **Phase 4 review (Fable, 2026-09-02) — findings, all folded into
+    PHASE5_SPEC Group V1 rather than patched out of band.** (a) The idle
+    re-prompt is never wired: `Presenter.setIdleWatcher()` exists and is
+    unit-tested, but `App` never calls it. (b) The help menu has no
+    visible list — `KeyboardController` announces rows but nothing renders
+    them, contrary to Brian's "displayed on the screen" ruling and the
+    parity principle. (c) Focus falls to `<body>` after every host action
+    because the screen container is wiped and rebuilt; Phase 5 moves it
+    to the new screen heading (a response to the user's own action).
+    (d) `screens.ts` tracks community-event progress in a local object
+    that `undo` cannot revert; Phase 5 derives it from the event log.
+    Also noted, not for Phase 5: Phase 2's `dispatch()` pushes the
+    pre-undo snapshot onto history even for an `undo` command, so a
+    second Ctrl+Z after an undo acts as a redo — accepted Phase 2
+    behavior, but worth a deliberate ruling before Phase 8's action log.
+    Two design decisions in PHASE5_SPEC for Brian's veto: the host-
+    controls region gets a SCOPED `role="application"` (NVDA browse mode
+    swallows single-letter hotkeys; the audience view stays a document);
+    and a generated, obviously-fake `dev-playtest` pack (420 tasks) is
+    added so the browser build is actually playable — `dev-sample`'s 8
+    tasks cannot pass the sufficiency check for the real journey.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

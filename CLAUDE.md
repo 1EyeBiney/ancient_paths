@@ -21,10 +21,14 @@ error; formula stands — OPEN_QUESTIONS item 11). The game now has a real
 UI: `index.html`/`src/main.ts` boot `src/ui/app.ts`, replacing the old
 Phase 1 boot page.
 
-Phase 5 (audience presentation — the visual/map layer over the same DOM,
-per design doc §34) is not yet specified. When ready, Fable writes
-PHASE5_SPEC.md next, following the same review-then-spec handoff pattern
-used for Phases 3 and 4.
+**Phase 5 is specified and ready to implement**: see **PHASE5_SPEC.md**
+(the binding contract — audience view region rendered on the same pass
+as the host controls, team badges, journey strip, progress/resource
+panels, reduced motion, the setup controls Phase 4 deferred, a generated
+dev-playtest pack, and Group V1 = the Phase 4 review fixes recorded in
+OPEN_QUESTIONS item 16; test groups V1-V8, definition of done). Two
+decisions await Brian's veto/NVDA ear: a scoped `role="application"` on
+the host-controls region, and the dev-playtest pack.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 
