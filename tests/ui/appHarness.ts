@@ -9,12 +9,15 @@ import { App, type AppOptions } from "../../src/ui/app";
 import type { ContentPack, Journey, Task } from "../../src/content/schemas";
 import { testJourney, bigPack } from "../session/fixtures";
 import { FakeAudioBackend } from "../../src/ui/audio/backend";
+import { MemorySaveStore } from "../../src/persistence/store";
 
 export interface AppHarness {
   app: App;
   root: HTMLElement;
   tick: (() => void) | null;
   clock: { now: number };
+  /** PHASE8_SPEC.md Group P4: the in-memory store this App autosaves to. */
+  saveStore: MemorySaveStore;
   dispose: () => void;
 }
 
@@ -40,6 +43,7 @@ export function makeApp(
   document.body.appendChild(root);
   const clock = { now: 0 };
   let tick: (() => void) | null = null;
+  const saveStore = new MemorySaveStore();
   const app = new App({
     root,
     journeys: opts.journeys ?? [testJourney],
@@ -54,6 +58,7 @@ export function makeApp(
       idleThresholdMs: 12_000,
     },
     audioBackend: new FakeAudioBackend(),
+    saveStore,
     ...opts.extra,
   });
   return {
@@ -63,6 +68,7 @@ export function makeApp(
       return tick;
     },
     clock,
+    saveStore: (opts.extra?.saveStore as MemorySaveStore | undefined) ?? saveStore,
     dispose: () => {
       app.dispose();
       root.remove();

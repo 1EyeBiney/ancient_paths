@@ -14,8 +14,11 @@
 // to give them their own on-screen controls too.
 
 import type { AudioAsset, ContentPack, Journey, Task } from "../content/schemas";
-import { createEngine, type EngineOptions, type GameEngine } from "../engine/engine";
+import { createEngine, type Command, type EngineOptions, type GameEngine } from "../engine/engine";
 import { createRng } from "../engine/rng";
+import { RecordingEngine } from "../persistence/recorder";
+import { IndexedDbSaveStore, type SaveStore } from "../persistence/store";
+import { SAVE_SCHEMA_VERSION, type SavedGame } from "../persistence/schema";
 import { Presenter, type PresenterOptions } from "./presenter";
 import { KeyboardController, type KeyBinding } from "./keys";
 import { ModalManager } from "./modal";
@@ -105,6 +108,9 @@ export interface AppOptions {
   /** Test-ergonomics only (matches EngineOptions.startingResources from Phase 2):
    * real play always starts every team at zero. */
   startingResources?: EngineOptions["startingResources"];
+  /** Injectable so tests use a MemorySaveStore instead of real IndexedDB
+   * (PHASE8_SPEC.md Group P4); main.ts passes an IndexedDbSaveStore. */
+  saveStore?: SaveStore;
 }
 
 function el(tag: string, opts: { text?: string; className?: string } = {}): HTMLElement {
@@ -138,6 +144,11 @@ export class App {
   private audioAssets: Map<string, AudioAsset> = new Map();
 
   private engine: GameEngine | null = null;
+  private recordingEngine: RecordingEngine | null = null;
+  private readonly saveStore: SaveStore;
+  private saveInFlight = false;
+  private saveDirty = false;
+  private saveFailedAnnounced = false;
   private renderer: ScreenRenderer | null = null;
   private undoController: UndoController | null = null;
   private keyboard: KeyboardController | null = null;
@@ -156,6 +167,7 @@ export class App {
   constructor(private readonly options: AppOptions) {
     this.root = options.root;
     this.root.innerHTML = "";
+    this.saveStore = options.saveStore ?? new IndexedDbSaveStore();
 
     this.politeRegion = el("div");
     this.politeRegion.className = "sr-only";
@@ -770,7 +782,7 @@ export class App {
     this.tasksById = tasksById;
     this.audioManager.unlock(); // the Begin-journey click IS the user gesture; no audio before this
 
-    this.engine = createEngine({
+    const innerEngine = createEngine({
       journey,
       packs,
       teams: outcome.teams,
@@ -780,17 +792,32 @@ export class App {
       config: { catchUp: { ...DEFAULTS.catchUp, enabled: this.wizard.communityCatchup } },
       ...(this.options.startingResources ? { startingResources: this.options.startingResources } : {}),
     });
+    const recordingEngine = new RecordingEngine({ engine: innerEngine, onCommitted: () => this.scheduleSave() });
+    this.enterPlaying(recordingEngine);
+  }
+
+  /** Wraps entering "playing" from an already-constructed RecordingEngine —
+   * shared by beginJourney and Resume (PHASE8_SPEC.md Group P4/P5: Resume
+   * "enters playing exactly as beginJourney does but with the rebuilt
+   * engine"). Assumes currentJourney/tasksById are already set. */
+  private enterPlaying(recordingEngine: RecordingEngine): void {
+    this.saveFailedAnnounced = false;
+    this.saveInFlight = false;
+    this.saveDirty = false;
+    this.recordingEngine = recordingEngine;
+    this.engine = recordingEngine;
     this.undoController = new UndoController({
       engine: this.engine,
       present: (i) => this.presenter.present(i),
     });
     this.renderer = new ScreenRenderer({
-      journey,
-      tasksById,
+      journey: this.currentJourney!,
+      tasksById: this.tasksById!,
       present: (i) => this.presenter.present(i),
       onNewGame: () => {
         this.audioManager.killAll();
         this.engine = null;
+        this.recordingEngine = null;
         this.renderer = null;
         this.undoController = null;
         this.renderSetup();
@@ -802,8 +829,8 @@ export class App {
       },
     });
     this.audience = new AudienceView({
-      journey,
-      tasksById,
+      journey: this.currentJourney!,
+      tasksById: this.tasksById!,
       mapManifest: this.options.mapManifest,
       mapStyle: this.wizard.mapStyle,
     });
@@ -814,6 +841,67 @@ export class App {
     this.attachKeyboard();
     this.presenter.setIdleWatcher({ getPrompt: () => this.idlePrompt() });
     this.renderCurrentScreen();
+    this.scheduleSave();
+  }
+
+  // -- persistence (Phase 8) -------------------------------------------------
+
+  private buildSavedGame(): SavedGame | null {
+    if (!this.engine || !this.recordingEngine) return null;
+    const session = this.engine.getSession();
+    return {
+      saveSchemaVersion: SAVE_SCHEMA_VERSION,
+      savedAt: new Date().toISOString(),
+      content: {
+        journeyId: session.journeyId,
+        journeyVersion: session.journeyVersion,
+        packs: { ...session.contentPackVersions },
+      },
+      setup: this.wizard.toSnapshot(),
+      teams: session.teams.map((t) => ({ id: t.id, name: t.name, color: t.color, symbol: t.symbol })),
+      turnTaskLimit: session.turnTaskLimit,
+      commands: [...this.recordingEngine.getCommands()],
+      snapshot: session,
+      audio: { settings: { ...this.wizard.audio }, speechMode: this.audioManager.getSpeechMode() },
+    };
+  }
+
+  /** After beginJourney/Resume and after every committed command (Group
+   * P4): at most one save in flight; a save requested mid-flight is
+   * coalesced so the LATEST state wins rather than queuing a second write. */
+  private scheduleSave(): void {
+    if (!this.engine || !this.recordingEngine) return;
+    if (this.saveFailedAnnounced) return;
+    if (this.saveInFlight) {
+      this.saveDirty = true;
+      return;
+    }
+    this.performSave();
+  }
+
+  private performSave(): void {
+    const game = this.buildSavedGame();
+    if (!game) return;
+    this.saveInFlight = true;
+    this.saveStore.save(game).then(
+      () => {
+        this.saveInFlight = false;
+        if (this.saveDirty) {
+          this.saveDirty = false;
+          this.performSave();
+        }
+      },
+      () => {
+        this.saveInFlight = false;
+        this.saveDirty = false;
+        if (!this.saveFailedAnnounced) {
+          this.saveFailedAnnounced = true;
+          this.presenter.present({
+            visual: "Saving is unavailable in this browser. Play continues, but this game cannot be resumed.",
+          });
+        }
+      },
+    );
   }
 
   // -- playing -------------------------------------------------------------
@@ -1158,6 +1246,7 @@ export class App {
           this.modal.close();
           this.audioManager.killAll();
           this.engine = null;
+          this.recordingEngine = null;
           this.renderer = null;
           this.undoController = null;
           this.renderSetup();

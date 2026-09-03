@@ -4,7 +4,7 @@
 // integrity check only) — the replayed engine IS the resumed game.
 
 import type { ContentPack, Journey } from "../content/schemas";
-import { createEngine, type Command, type GameEngine, type TeamSetup } from "../engine/engine";
+import { createEngine, type Command, type TeamSetup } from "../engine/engine";
 import type { PlaySession } from "../engine/types";
 import { createRng } from "../engine/rng";
 import { buildSessionDeck, type SessionDeck } from "../session/builder";
@@ -20,7 +20,7 @@ export interface RebuildOptions {
 }
 
 export type RebuildResult =
-  | { engine: GameEngine; deck: SessionDeck; teams: TeamSetup[]; turnTaskLimit: number }
+  | { engine: RecordingEngine; deck: SessionDeck; teams: TeamSetup[]; turnTaskLimit: number }
   | { error: string };
 
 /** Deep structural equality for plain JSON-shaped data (no Date/Map/Set),
