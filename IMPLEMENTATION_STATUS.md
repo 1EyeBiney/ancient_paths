@@ -39,6 +39,16 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   (Caesarea's relay threshold needs 7+ teams to be reachable under the
   current one-turn-per-team relay design) flagged for Phase 9, not a
   code issue. KEYBOARD_COMMANDS.md's notes updated (no new keys).
+  **Review addendum (Fable, 2026-09-03; OPEN_QUESTIONS item 28):**
+  offering log lines now precede the Service line so the joined
+  announcement reads in order; cues are deduplicated per render and an
+  offering's cue supersedes `serviceEarned`; the summary's
+  accomplishment lines are grammatical; the sample journey's event
+  thresholds lowered to reachable values (relay 7 → 2, contribution
+  4 → 3). Surfaced a pre-existing design gap — no "normal stage reward"
+  exists, so the resource economy is nearly unreachable from the real
+  0/0/0 start — proposed a configurable stage-completion reward, awaiting
+  Brian's ruling before implementing.
 
 - **Phase 6 — Audio System — DONE.** All 8 test groups (A1-A8) are green:
   61 new tests (364 project-wide), `npx tsc --noEmit` clean, `npm run

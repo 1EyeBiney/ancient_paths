@@ -120,7 +120,7 @@
       "description": "All teams pause at Herod's harbor for a shared challenge before the roads divide. Teams answer in turn; the room succeeds together.",
       "repeatable": false,
       "taskCategory": "community",
-      "successThreshold": 7,
+      "successThreshold": 2,
       "reward": {
         "type": "grant-resource-every-team",
         "resource": "choice",
@@ -135,7 +135,7 @@
       "description": "The church at Antioch is sending out missionaries. Teams may pledge resources to equip them; generosity earns Service, and meeting the goal blesses the whole room.",
       "repeatable": false,
       "acceptedResources": ["insight", "provision", "courage"],
-      "contributionThreshold": 4,
+      "contributionThreshold": 3,
       "reward": {
         "type": "reduce-next-stage-requirement",
         "amount": 1

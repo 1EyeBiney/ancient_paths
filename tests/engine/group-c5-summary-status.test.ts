@@ -137,7 +137,7 @@ describe("C5 — a full game's community accomplishments", () => {
       "2 surplus successes were offered.",
       "3 resources were pledged to community events.",
       "Team Alpha made an exceptional contribution.",
-      "1 gifts were shared between teams.",
+      "1 gift was shared between teams.",
     ]);
   });
 

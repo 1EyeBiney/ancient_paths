@@ -881,13 +881,20 @@ export class App {
   private voiceNewEventLogLines(fromIndex: number, toIndex: number): void {
     const session = this.engine!.getSession();
     const toSpeak: string[] = [];
+    const cues = new Set<CueId>();
     for (let i = fromIndex; i < toIndex; i++) {
       const text = session.eventLog[i]!.text;
       const row = EVENT_LOG_VOICE.find((r) => r.pattern.test(text));
       if (!row) continue;
-      if (row.cue) this.audioManager.playCue(row.cue);
+      if (row.cue) cues.add(row.cue);
       if (row.present) toSpeak.push(text);
     }
+    // Cues play immediately and overlap, so one render plays each distinct
+    // cue at most once (three catch-up grants = one ding, not three), and
+    // an offering IS the Service moment — its own cue stands in for the
+    // serviceEarned ding that the same render would otherwise stack on it.
+    if (cues.has("offering")) cues.delete("serviceEarned");
+    for (const cue of cues) this.audioManager.playCue(cue);
     if (toSpeak.length > 0) this.presenter.present({ visual: toSpeak.join(" ") });
   }
 

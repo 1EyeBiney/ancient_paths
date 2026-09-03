@@ -134,8 +134,12 @@ describe("C6 — an offering voices both lines in one announcement and plays its
     amplifyAndOfferViaUi(h);
 
     expect(cueSpy.mock.calls.some((c) => c[0] === "offering")).toBe(true);
+    // The offering IS the Service moment: its cue stands in for the
+    // serviceEarned ding the same render would otherwise stack on it.
+    expect(cueSpy.mock.calls.some((c) => c[0] === "serviceEarned")).toBe(false);
     const last = h.app.getPresenterLog().at(-1)!;
-    expect(last.visual).toMatch(/offers a surplus success: .+ Offering effect: .+$/);
+    // Heard in this order: the offering, what it did, then the Service it earned.
+    expect(last.visual).toMatch(/^Team .+ offers a surplus success: .+ Offering effect: .+ Team .+ earns 1 Service\.$/);
   });
 });
 

@@ -1027,10 +1027,14 @@ class Engine implements GameEngine {
     }
     const team = this.currentTeam();
     const outcome = drawOfferingOutcome(this.rng, this.config.offeringWeights, this.journey.offeringOutcomes);
+    // Log order matters: the UI joins every voiced line from one render
+    // into a single announcement, so the offering must be heard before
+    // the Service it earned ("offers … / effect … / earns 1 Service"),
+    // not the other way round.
     const summary = this.applyOfferingEffect(team, outcome);
-    this.awardService(team, this.config.serviceAwards.offerSurplus);
     this.log(`Team ${team.name} offers a surplus success: ${outcome.announcement}`);
     this.log(`Offering effect: ${summary}`);
+    this.awardService(team, this.config.serviceAwards.offerSurplus);
     this.state.pendingSurplus--;
     if (this.state.pendingSurplus === 0) this.finalizeStageCompletion(team);
   }
@@ -1301,21 +1305,29 @@ class Engine implements GameEngine {
       if (m) lines.push(`The room fell short at ${m[1]}.`);
     }
 
+    // These are read aloud at the end of the game, so they are grammatical
+    // (PHASE7_SPEC's literal templates were singular-blind; OPEN_QUESTIONS 28).
+    const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
     const offerCount = log.filter((e) => /^Team .+ offers a surplus success: /.test(e.text)).length;
-    if (offerCount > 0) lines.push(`${offerCount} surplus successes were offered.`);
+    if (offerCount > 0) {
+      lines.push(`${offerCount} surplus ${plural(offerCount, "success was", "successes were")} offered.`);
+    }
 
     const pledgedTotal = log.reduce((sum, e) => {
       const m = /^Team .+ contributes (\d+) (?:insight|provision|courage)\.$/.exec(e.text);
       return m ? sum + Number(m[1]) : sum;
     }, 0);
-    if (pledgedTotal > 0) lines.push(`${pledgedTotal} resources were pledged to community events.`);
+    if (pledgedTotal > 0) {
+      lines.push(`${pledgedTotal} ${plural(pledgedTotal, "resource was", "resources were")} pledged to community events.`);
+    }
 
     for (const entry of log) {
       if (/^Team .+ made an exceptional contribution\.$/.test(entry.text)) lines.push(entry.text);
     }
 
     const shareCount = log.filter((e) => /^Team .+ shares its gift with Team /.test(e.text)).length;
-    if (shareCount > 0) lines.push(`${shareCount} gifts were shared between teams.`);
+    if (shareCount > 0) lines.push(`${shareCount} ${plural(shareCount, "gift was", "gifts were")} shared between teams.`);
 
     return lines;
   }

@@ -452,6 +452,57 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     - Brian's ear/eyes are still the final check on the cue character and
       screen layout for the parts that WERE reached live.
 
+28. **Fable's review of Phase 7 (2026-09-03) — four small fixes made, one
+    real design gap surfaced (needs Brian's ruling).** The implementation
+    is sound: every rule the spec set for opening `src/engine/` held, and
+    nothing Sonnet reached in the browser misbehaved. Fixed:
+    - Log order in `cmdOfferSurplus`: the Service line was logged BEFORE
+      the offering lines, so the joined announcement read "earns 1
+      Service" before saying why. Now: offering, effect, then Service.
+      (Reordering is allowed — only line TEXTS are frozen.)
+    - Cues stacked: one render could fire `offering` AND `serviceEarned`
+      together, or three `serviceEarned` dings for three catch-up
+      grants, all overlapping. Now each distinct cue plays at most once
+      per render, and an offering's own cue stands in for `serviceEarned`
+      in that render. `communitySuccess` + `serviceEarned` (a successful
+      event that also grants catch-up) still overlap — Brian's ear.
+    - The summary's accomplishment lines were singular-blind ("1 gifts
+      were shared") — my spec's literal templates. Now grammatical; the
+      spec's wording is amended by this item.
+    - **Sample content (item 27's finding)**: `jerusalem-rome.json`'s
+      Caesarea relay `successThreshold` 7 → 2 (each team gets exactly one
+      relay turn, so the old value needed 7+ teams); Antioch's
+      `contributionThreshold` 4 → 3 (one unit from each of three teams).
+    **The design gap — the resource economy never starts.** The only
+    things that ever GRANT Insight/Provision/Courage are: keeping a
+    surplus, a community event's reward, an offering outcome, and (now)
+    catch-up. A surplus needs an amplified success, which costs Courage;
+    an event reward needs a met threshold; offerings need a surplus.
+    From the real 0/0/0 start, the sole bootstrap is a perfect stage →
+    Journey Token → free amplify → surplus → keep — and the token needs
+    exact timing (amplify only when already one short of the
+    requirement) on a task that happens to support Courage. In two live
+    games every team finished with 0/0/0 and no offering ever happened.
+    So the resource layer (assist, amplify, extra clues, recovery,
+    pledges, offerings, sharing) is nearly unreachable in play. This
+    predates Phase 7 (Phase 2 implemented exactly what PHASE2_SPEC said);
+    Phase 7's browser check is what exposed it. The design doc does
+    assume a faucet it never defines: §9 "a perfect stage grants the
+    normal stage reward; applicable surplus rewards; a Journey Token",
+    §7.6 "use an authored stage reward rule", §20.11 "finish all current
+    stage rewards" — a "normal stage reward" is referenced three times
+    and specified nowhere. **Proposed ruling (simplest reversible, §37
+    rule)**: every stage completion grants one resource of the team's
+    choice, configurable as `stageCompletionReward: { resource:
+    "choice", amount: 1 }` in `src/config/defaults.ts`, granted in
+    `finalizeStageCompletion` (before any surplus decision), logged as
+    the existing "may choose a resource (a stage reward)" line, resolved
+    through the existing pending-choice picker (and shareable — the
+    §11 "choose the community" action gets a regular decision point).
+    Journeys could later override per stage (schema change, Phase 9).
+    Not implemented — it changes the economy and §1 says preserve
+    mechanics without approval; waiting on Brian.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
