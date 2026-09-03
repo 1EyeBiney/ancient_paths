@@ -16,8 +16,8 @@
 import type { ContentPack, Journey, Task } from "../content/schemas";
 import { createEngine, type GameEngine } from "../engine/engine";
 import { createRng } from "../engine/rng";
-import { Presenter, type PresenterElements } from "./presenter";
-import { KeyboardController } from "./keys";
+import { Presenter, type PresenterOptions } from "./presenter";
+import { KeyboardController, type KeyBinding } from "./keys";
 import { ModalManager } from "./modal";
 import { UndoController } from "./undo";
 import { ScreenRenderer, type ScreenRender } from "./screens";
@@ -34,6 +34,8 @@ export interface AppOptions {
   journeys: Journey[];
   packs: ContentPack[];
   loadErrors?: string[];
+  /** Injectable presenter clock/timer so tests can drive the idle re-prompt manually. */
+  presenterTimer?: Pick<PresenterOptions, "now" | "setIntervalFn" | "clearIntervalFn" | "idleThresholdMs">;
 }
 
 function el(tag: string, opts: { text?: string; className?: string } = {}): HTMLElement {
@@ -86,7 +88,8 @@ export class App {
       politeRegion: this.politeRegion,
       assertiveRegion: this.assertiveRegion,
       statusLine: this.statusLine,
-    } as PresenterElements);
+      ...options.presenterTimer,
+    });
     this.modal = new ModalManager(this.modalRoot);
     this.wizard = new SetupWizard({ journeys: options.journeys, packs: options.packs });
 
@@ -138,6 +141,7 @@ export class App {
       getState: () => this.engine!.getState(),
       dispatchCommand: (id) => this.dispatchCommand(id),
       present: (text) => this.presenter.present({ visual: text }),
+      onHelpChange: (rows, cursor) => this.renderHelpList(rows, cursor),
     });
     this.windowKeydownHandler = (e) => this.keyboard!.handleKeyDown(e);
     window.addEventListener("keydown", this.windowKeydownHandler);
@@ -147,6 +151,38 @@ export class App {
     if (this.windowKeydownHandler) window.removeEventListener("keydown", this.windowKeydownHandler);
     this.windowKeydownHandler = null;
     this.keyboard = null;
+    this.presenter.setIdleWatcher(null);
+    this.renderHelpList([], null);
+  }
+
+  /** The on-screen twin of the spoken help rows (parity; Brian's ruling). */
+  private renderHelpList(rows: KeyBinding[], cursor: number | null): void {
+    const existing = this.modalRoot.querySelector("#help-menu");
+    if (existing) existing.remove();
+    if (cursor === null) return;
+    const list = document.createElement("ul");
+    list.id = "help-menu";
+    list.setAttribute("role", "listbox");
+    list.setAttribute("aria-label", "Help menu");
+    rows.forEach((row, i) => {
+      const item = document.createElement("li");
+      item.id = `help-row-${row.id}`;
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", i === cursor ? "true" : "false");
+      item.textContent = `${row.keyDisplay}: ${row.label}`;
+      list.appendChild(item);
+    });
+    const current = rows[cursor];
+    if (current) list.setAttribute("aria-activedescendant", `help-row-${current.id}`);
+    this.modalRoot.appendChild(list);
+  }
+
+  /** While playing, the idle re-prompt repeats the current screen's
+   * heading only while a host action is actually pending. */
+  private idlePrompt(): string | null {
+    if (this.mode !== "playing" || this.modal.isOpen()) return null;
+    if (!this.lastRender || this.lastRender.actions.length === 0) return null;
+    return this.lastRender.heading;
   }
 
   private disposeCursorLists(): void {
@@ -364,14 +400,24 @@ export class App {
     this.mode = "playing";
     this.disposeCursorLists();
     this.attachKeyboard();
+    this.presenter.setIdleWatcher({ getPrompt: () => this.idlePrompt() });
     this.renderCurrentScreen();
   }
 
   // -- playing -------------------------------------------------------------
 
+  /** Every call here is a response to a host action (there are no
+   * non-user-initiated renders), so moving focus to the new screen's
+   * heading is consistent with "focus moves only when the user acts" —
+   * and without it, wiping the container drops focus to <body>. */
   private renderCurrentScreen(): void {
     if (!this.engine || !this.renderer) return;
     this.lastRender = this.renderer.render(this.engine, this.contentContainer);
+    const heading = this.contentContainer.querySelector<HTMLElement>("h2");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus();
+    }
   }
 
   private dispatchCommand(id: string): void {

@@ -226,6 +226,10 @@ export interface KeyboardControllerOptions {
   getState: () => GameState;
   dispatchCommand: (id: string, event: KeyboardEvent) => void;
   present: (text: string) => void;
+  /** Fires whenever the help menu opens (rows + cursor), moves its cursor,
+   * or closes (cursor null) — the caller renders the visible list, so the
+   * spoken rows always have an on-screen twin (parity; Brian's ruling). */
+  onHelpChange?: (rows: KeyBinding[], cursor: number | null) => void;
 }
 
 export class KeyboardController {
@@ -334,11 +338,13 @@ export class KeyboardController {
     const rows = this.getHelpRows();
     const first = rows[0];
     const intro = "Help menu. Up and down to browse, question mark or escape to close.";
+    this.options.onHelpChange?.(rows, 0);
     this.options.present(first ? `${intro} ${first.keyDisplay}. ${first.label}.` : intro);
   }
 
   private closeHelp(): void {
     this.mode = "normal";
+    this.options.onHelpChange?.([], null);
     this.options.present("Help closed.");
   }
 
@@ -357,6 +363,7 @@ export class KeyboardController {
     if (rows.length === 0) return;
     this.helpCursor = (this.helpCursor + delta + rows.length) % rows.length;
     const row = rows[this.helpCursor]!;
+    this.options.onHelpChange?.(rows, this.helpCursor);
     this.options.present(`${row.keyDisplay}. ${row.label}.`);
   }
 

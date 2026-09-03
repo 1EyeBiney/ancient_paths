@@ -20,6 +20,7 @@ import type { Journey, Task } from "../content/schemas";
 import type { ResourceType, TaskResult } from "../engine/types";
 import type { PresentInput } from "./presenter";
 import { CursorList } from "./cursorList";
+import { communityProgress } from "./communityProgress";
 import {
   buildMultipleChoicePrompt,
   buildEliminateAnnouncement,
@@ -76,15 +77,7 @@ function el(tag: string, opts: { text?: string; className?: string } = {}): HTML
   return e;
 }
 
-interface CommunityTracker {
-  eventId: string;
-  answeredTeamIds: string[]; // relay: teams who've had a turn this pass
-  roomProgress: number; // relay: correct count, UI-tracked
-  pledged: Record<string, { resource: ResourceType; amount: number } | "declined">; // contribution
-}
-
 export class ScreenRenderer {
-  private community: CommunityTracker | null = null;
   private activeCursorList: CursorList | null = null;
 
   constructor(private readonly options: ScreenRendererOptions) {}
@@ -480,19 +473,12 @@ export class ScreenRenderer {
 
   // -- communityEvent --------------------------------------------------
 
-  private eventForCurrentMilestone(engine: GameEngine) {
-    const lastMilestone = engine.getSession().triggeredMilestones.at(-1);
-    return this.options.journey.communityEvents.find((e) => e.milestoneId === lastMilestone);
-  }
-
   private renderCommunityEvent(engine: GameEngine, container: HTMLElement): ScreenRender {
-    const event = this.eventForCurrentMilestone(engine);
-    if (!event) throw new Error("screens.renderCommunityEvent: no matching community event definition found");
-
-    if (!this.community || this.community.eventId !== event.id) {
-      this.community = { eventId: event.id, answeredTeamIds: [], roomProgress: 0, pledged: {} };
-    }
-    const tracker = this.community;
+    // Progress is derived from the engine's event log (communityProgress.ts)
+    // rather than a local counter, so it survives undo.
+    const progress = communityProgress(engine, this.options.journey);
+    if (!progress) throw new Error("screens.renderCommunityEvent: no matching community event definition found");
+    const { event } = progress;
     const teams = engine.getSession().teams;
 
     const heading = event.title;
@@ -503,15 +489,13 @@ export class ScreenRenderer {
     const pledgeActions: ScreenAction[] = [];
 
     if (event.kind === "relay") {
-      container.appendChild(el("p", { text: `Room progress: ${tracker.roomProgress} of ${event.successThreshold}.` }));
-      const remaining = teams.filter((t) => !tracker.answeredTeamIds.includes(t.id));
+      container.appendChild(el("p", { text: `Room progress: ${progress.roomProgress} of ${event.successThreshold}.` }));
+      const remaining = teams.filter((t) => !progress.answeredTeamIds.includes(t.id));
       const current = remaining[0];
 
       if (current) {
         container.appendChild(el("p", { text: `Now answering: Team ${current.name}.` }));
         const relayRule = (correct: boolean) => {
-          if (correct) tracker.roomProgress++;
-          tracker.answeredTeamIds.push(current.id);
           engine.dispatch({ type: "relayAnswer", teamId: current.id, correct });
         };
         actions.push(
@@ -519,14 +503,15 @@ export class ScreenRenderer {
           { id: "ruleIncorrect", label: `Team ${current.name}: incorrect`, run: () => relayRule(false) },
         );
         this.present({
-          visual: `${heading}. Room progress ${tracker.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
+          visual: `${heading}. Room progress ${progress.roomProgress} of ${event.successThreshold}. Now answering: Team ${current.name}.`,
         });
       } else {
         container.appendChild(el("p", { text: "Every team has answered." }));
         this.present({ visual: `${heading}. Every team has answered. Resolve when ready.` });
       }
     } else {
-      const remaining = teams.filter((t) => !(t.id in tracker.pledged));
+      container.appendChild(el("p", { text: `Pledged: ${progress.pledgedTotal} of ${event.contributionThreshold}.` }));
+      const remaining = teams.filter((t) => !progress.respondedTeamIds.includes(t.id));
       const current = remaining[0];
 
       if (current) {
@@ -537,19 +522,13 @@ export class ScreenRenderer {
           pledgeActions.push({
             id: `contribute-${resource}`,
             label: `Team ${current.name}: contribute 1 ${resource}`,
-            run: () => {
-              tracker.pledged[current.id] = { resource, amount: 1 };
-              engine.dispatch({ type: "contribute", teamId: current.id, resource, amount: 1 });
-            },
+            run: () => engine.dispatch({ type: "contribute", teamId: current.id, resource, amount: 1 }),
           });
         }
         pledgeActions.push({
           id: "declineContribution",
           label: `Team ${current.name}: decline`,
-          run: () => {
-            tracker.pledged[current.id] = "declined";
-            engine.dispatch({ type: "declineContribution", teamId: current.id });
-          },
+          run: () => engine.dispatch({ type: "declineContribution", teamId: current.id }),
         });
         actions.push(...pledgeActions);
         this.present({ visual: `${heading}. Now pledging: Team ${current.name}.` });
@@ -562,10 +541,7 @@ export class ScreenRenderer {
     actions.push({
       id: "resolveCommunityEvent",
       label: "Resolve event",
-      run: () => {
-        this.community = null;
-        engine.dispatch({ type: "resolveCommunityEvent" });
-      },
+      run: () => engine.dispatch({ type: "resolveCommunityEvent" }),
     });
 
     if (pledgeActions.length > 0) {
