@@ -4,6 +4,361 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Completed
 
+- **Phase 10 — Accessibility and balance audit — DONE.** All 11 groups (X1-X11) are green: 2882 tests project-wide, `npx tsc --noEmit` clean, `npm run build` clean, no new dependency, no frozen file modified. Built against PHASE10_SPEC.md.
+  **Group X11 done (2026-09-03):** the manual browser check, real content,
+  keyboard only — `npm run dev`, Welcome through a full setup wizard by
+  Tab/arrows/Enter (4 teams, General Bible only), 3 real-time rounds
+  covering every required checkpoint (the Caesarea relay, a granted-choice
+  share, three fork choices, the Antioch contribution with a real pledge,
+  an assisted form, an amplified form that triggered `surplusDecision`, a
+  surplus offer, `?` help, second-`?` explorer, Escape → game menu → Game
+  log → Escape back to the reopened menu, reload → Resume → Ctrl+Z twice,
+  End session), zero console errors throughout, three screenshots
+  confirming a visible focus indicator (Welcome, setup's "Begin journey",
+  the open game menu), `SIMULATION_REPORT.md` read and sensible. Then
+  `npm run build && npm run preview`: Welcome, New game showing only
+  General Bible (dev packs correctly excluded from the production
+  bundle), one full turn played, zero console errors. No app defects
+  found. Full writeup (counts/ids/observations, no task text) in
+  OPEN_QUESTIONS item 41, including one testing-tool caveat (not a game
+  finding) about devtools-evaluation calls interleaved between Ctrl+Z
+  presses spuriously cancelling the arm — a batched, uninterrupted press
+  pair worked correctly on the first try.
+  **Group X10 done (2026-09-03, 3 new tests, 2882 project-wide):** the
+  simulation report. `src/sim/report.ts`'s `generateReport(journey, packs)`
+  is a pure function that runs its OWN smaller batches (length 2/cell vs.
+  X2's 3, economy 5/preset vs. X3's 10, fairness 30 seats-rotated games vs.
+  X4's 120, Service 5/preset vs. X4's 10, repeats one 4-session chain, same
+  as X5) through the SAME `simulateGame`/`summarizeBatch`/
+  `winShareBySeat`/`firstToFinishShareBySeat` this phase's own X2-X5 tests
+  already assert against, and renders `SIMULATION_REPORT.md`: a dated
+  header naming the success-model constants and presets, one table per
+  group, a Findings list, and a Proposals list mirroring OPEN_QUESTIONS
+  items 37/39/40. `tests/sim/group-x10-report.test.ts` checks
+  determinism, that the committed file matches a fresh generation (WRITES
+  + fails with "SIMULATION_REPORT.md regenerated — review it, then
+  commit" on any difference — the next run passes, same idea as the
+  dev-playtest generator's own committed-file test), and that no real
+  task id or prompt string appears anywhere in it. Two things fixed along
+  the way, neither an app defect: the report's header used `new Date()`
+  at first, which would have made the committed file fail its own
+  determinism check every day going forward on pure date drift — replaced
+  with a fixed `REPORT_DATE` constant a human updates on a deliberate
+  regeneration; and the "is deterministic" test's own second
+  `generateReport()` call (~5s) needs a longer per-test timeout once it's
+  contending with the rest of `tests/sim` for CPU in the same run (fine
+  alone, timed out at vitest's default 5000ms otherwise) — given an
+  explicit 20s. Whole `tests/sim` directory: 112 tests, ~13s. One
+  interesting-but-expected number surfaced while reviewing the generated
+  report: the fairness batch's contribution goal-met rate came out at 0%
+  — traced to the rotation's own preset mix (3 of 4 rotated presets have
+  `contribution: "hoarder"`, an always-decline; only GENEROUS ever
+  pledges), not a game-balance defect — the report says so inline rather
+  than reading as unexplained.
+  **Group X9 done (2026-09-03):** `NVDA_CHECKLIST.md`, a 17-section
+  numbered walkthrough for Brian to run by hand with NVDA in Chrome —
+  boot/Welcome, the setup wizard's cursor lists and input firewall, a full
+  turn, assisted/amplified forms, a fork, a relay and a contribution, a
+  granted choice and a share, surplus keep/offer plus the offering
+  announcement and the Journey Token, S/A/T/R checked in five different
+  states, help/explorer/an unmapped key, Escape → game menu → Game log →
+  Copy, Ctrl+Z arm/confirm wording (including the Phase 8 race fix),
+  reload → Resume → Ctrl+Z, End session, Sound check's Tab+Enter/Space/X/N
+  transport, reduced motion on the map (sighted-helper step), and the
+  audience region read in browse mode. Every expected announcement is
+  quoted from the real source strings this phase's own audit tests already
+  verified (undo.ts's arm/confirm wording, modal.ts's "dialog opened",
+  keys.ts's help/explorer lines, KEYBOARD_COMMANDS.md's key table) — no
+  task prompt or answer text anywhere, per CONTENT_AUTHORING §1. Closes
+  with the five decisions PHASE10_SPEC asks Brian to record afterward
+  (role="application" keep/drop, visual scale, "Team Lion" symbol names,
+  X7e's 3-4-announcements-per-action ceiling, anything that felt slow) as
+  a template for a new dated OPEN_QUESTIONS item. No code changed; no new
+  test (this group is Brian's manual pass, agent-authored document only).
+  **Group X8 done (2026-09-03, 9 new tests, 2879 project-wide):** the
+  error-recovery matrix (§23.7), `tests/audit/group-x8-recovery.test.ts`,
+  real journey + general-bible pack (blind: ids/categories only). For four
+  mistakes a host can make (wrong route, wrong ruling, wrong resource
+  spent, Present-task-too-early) — one `describe` per mistake, parameterized
+  over a shared `MistakeScenario` table — Ctrl+Z's arm press names the
+  reversed action in plain words and its confirm press restores the exact
+  prior session and screen heading, proven twice: once as a plain in-memory
+  undo, and once for a mistake that was made, autosaved, reloaded through
+  the real Resume flow (which uses `rebuildFromSave` internally), and only
+  THEN undone (Phase 8 had proven one such case; this proves all four). A
+  fifth mistake, skipped narration, is a different recovery shape (N/R/L,
+  not Ctrl+Z) and gets its own test. No app defects found this group — every
+  failure along the way was in the test's own assumptions:
+  - `PublicTask.canAssist`/`canAmplify`/`canExtraClue` are content flags
+    ("this task supports the form"), not affordability checks — a team
+    with 0 Provision still sees a "Spend Provision" button. Clicking it
+    dispatches a command that throws `IllegalCommandError` inside
+    `dispatch()`, silently rolled back and never recorded (by design — an
+    unaffordable spend is exactly the kind of accidental double-click undo
+    exists for). The "spent the wrong resource" scenario now looks up each
+    candidate spend's real `{resource, amount}` cost from the loaded pack
+    and only attempts one the active team can actually afford.
+  - Assist/amplify buttons have no dedicated keyboard binding (unlike
+    Enter/C/I, which the app's own keyboard ladder maps to the current
+    screen's primary/ruling action) — driving one needs a direct `.click()`
+    (matching `group-x7b-status.test.ts`'s own established pattern), not a
+    synthetic Enter keydown, which jsdom never converts into a native
+    button activation the way a real browser does.
+  - `startingResources` (a test-only `AppOptions` override used elsewhere
+    in this phase) can't be used for any scenario proven through save +
+    Resume: it only seeds the LIVE engine, and `rebuildFromSave` has no
+    such override, so a replayed game would start its teams at 0/0/0 and
+    genuinely diverge from the original — not an undo bug, a test-fixture
+    mismatch. The resource-spend scenario earns its resource the normal
+    way (a real stage-completion reward) instead.
+  - Spending a resource changes the in-progress task's active variant
+    (assisted/amplified), which lives on the engine's internal
+    `currentTask`, not on `PlaySession` — so a before/after comparison
+    based on `getSession()` alone saw "no visual difference" even though
+    the mistake (and undo) were both real. Fixed by folding the active
+    variant kind into the comparable snapshot for every scenario.
+  - The shipped `general-bible` pack currently has no real `audioAssets`
+    at all (Phase 6 status: narration is placeholder) — see OPEN_QUESTIONS
+    item 40 — so the N/R/L test augments an in-memory copy of the real
+    pack with one synthetic asset on every audio-listening task (never
+    written to the committed file) to exercise L's replay/fallback
+    branches at all.
+  **Group X7g done (2026-09-03, 2 new tests, 2870 project-wide):** modals —
+  `tests/audit/group-x7g-modals.test.ts` checks every `ModalManager`
+  dialog (game menu, Audio, Game log, Delete saved game, Forget recent
+  tasks, End session, and the New-game guard from Welcome) for a stable
+  accessible title, Tab/Shift+Tab wrap, Escape-closes, and a sane
+  post-close focus target. Two real defects fixed in `src/ui/modal.ts`
+  and `src/ui/app.ts`:
+  - Escape only ever closed a modal via the app's global keyboard
+    ladder (`dispatchCommand("cancel")`), which is attached only while
+    `mode === "playing"` — a modal opened from Welcome or Setup (the
+    New-game guard) had no Escape handling at all, only its Cancel
+    button. `ModalManager` now owns its own Escape-to-close, attached
+    on the overlay for the lifetime of every open dialog regardless of
+    app mode, with `stopPropagation` so it doesn't also reach the
+    app-level ladder while playing (which would otherwise see the
+    modal already closed and reopen the game menu from its own "cancel
+    with nothing to cancel" fallback).
+  - Audio, Game log, Delete saved game, and Forget recent tasks are all
+    launched from buttons that are themselves children of the game
+    menu's own `ModalManager` content. Since every dialog shares one
+    overlay, opening any of them clears that content — detaching the
+    very button `close()` was going to refocus. Focus was silently
+    lost (`.focus()` on a detached element is a no-op) rather than
+    landing anywhere sensible. Fixed two ways: `ModalManager.close()`
+    now supports a dialog reopening itself from `onClose` without the
+    outer call clobbering the new one's state (captures `invoker`/
+    `onClose` in locals, and only restores focus to the old invoker if
+    nothing reopened in the meantime); those four dialogs now pass
+    `onClose: () => this.openGameMenu()`, so closing any of them —
+    Escape or Cancel — genuinely returns you to the menu you came
+    from. End session is deliberately excluded: its confirm path tears
+    the whole game down and switches to the setup screen, and
+    reopening a menu with nothing left to act on right before that
+    transition would leave a stray dialog on top of the new screen —
+    Cancel-closing it remains a known, undocumented-until-now focus
+    gap (recorded, not fixed, in OPEN_QUESTIONS).
+  One bug in the test itself, not the app: the original draft dispatched
+  Escape to `window`, which never reaches a listener on the overlay
+  (dispatching an event AT a target only fires that target's own
+  listeners — nothing bubbles back down into descendants). Real Escape
+  presses always originate from whatever has focus *inside* the trapped
+  modal and bubble up through the overlay to `window`; fixed by
+  dispatching to the dialog element itself, matching that.
+  **Group X7b done (2026-09-03, 1 new test, 2868 project-wide):**
+  status everywhere, `tests/audit/group-x7b-status.test.ts` — drives a
+  real game (with `startingResources` so recover/assist/amplify are
+  reachable without farming resources through real play first, a
+  test-only override the engine already exposed) until all 12 reachable
+  states are visited, exercising R/S/A/T (state and session unchanged,
+  a genuinely new announcement, S names the team and, in a task state,
+  "successes") and `?`/Escape (help opens with rows, closes) in every
+  one. Two bugs in the test itself along the way, not the app: cursor-
+  list navigation keys must be dispatched to the focused LIST element
+  (its own keydown listener), not `window`; and the presenter's log is
+  a capped ring buffer, so "did a new announcement fire" has to compare
+  the last entry by reference, not by log length (the same gotcha
+  U10's own test already documents).
+  **Groups X7a/X7c/X7d/X7e/X7f done (2026-09-03, 4 new tests, 2867
+  project-wide):** the automated accessibility audit's per-action checks
+  (names/structure, focus, speech hygiene, no-flooding) plus the U10
+  dual-modality proof extended to the real journey and general-bible
+  pack (blind), all in `tests/audit/` against a new shared driver
+  (`tests/audit/harness.ts`) that reuses U10's keyboard-only/mouse-only
+  state machine with a per-action hook. Three real, fixed defects the
+  audit caught before it went green:
+  - The modal dialog (`src/ui/modal.ts`) had no accessible name — only
+    a one-time spoken announcement carried its title, so an automated
+    check (or a screen reader announcing role+name on entry) heard a
+    bare "dialog". Fixed with a stable `aria-labelledby` pointing at
+    the heading, set once in the constructor.
+  - `CursorList` (`src/ui/cursorList.ts`) built each option's DOM id
+    from just the option's own value, so lists that share an option
+    (Duration/Pace/Difficulty all have "standard") produced multiple
+    elements with the identical id on the same setup screen — any
+    `aria-activedescendant`/`aria-labelledby` reference to it was
+    ambiguous. Fixed with a per-instance numeric prefix.
+  - Clicking a `CursorList` row moved selection and state but never DOM
+    focus (a plain `role="option"` div isn't natively focusable), and
+    entering the setup screen at all left focus on `<body>` — the
+    "playing" screens already park focus on their own heading on every
+    render (`renderCurrentScreen`); setup never did. Both fixed the
+    same way: a click now also focuses the list's container (keeping
+    the existing aria-activedescendant model, not making rows
+    separately focusable), and `renderSetup()` now focuses its heading
+    on entry, exactly like every other screen already does.
+  One false positive corrected in the audit's OWN check, not the app:
+  hymn lyric-completion prompts legitimately quote a line "with a
+  blank" using underscores (CONTENT_AUTHORING §3) — the visual-text
+  forbidden-character check now excludes underscore (it stays forbidden
+  in the SPOKEN channel, where `sanitizeForSpeech` already strips it —
+  a spoken underscore would mean that guarantee broke). The "exactly
+  one h2" check is scoped to `playing` mode only; the setup wizard is
+  deliberately many sections on one page by design (PHASE4_SPEC).
+  **Group X6 done (2026-09-03, 12 new tests, 2863 project-wide):**
+  recent-use memory across games (Brian ruled yes, item 35).
+  `SaveStore` gains `readRecentTasks`/`writeRecentTasks` (a new
+  `RecentTasks` record, `src/persistence/schema.ts`, up to 5 remembered
+  sessions, oldest dropped; a corrupt record is ignored and overwritten,
+  never fatal — unlike a save, it isn't quarantined). `SetupSnapshot`
+  gained `avoidRecentTasks`/`recentGamesToRemember`, bumping
+  `SAVE_SCHEMA_VERSION` 1 → 2 (existing saves quarantine via the
+  already-tested version-mismatch path — no separate migration needed).
+  `SetupWizard` gained the two fields plus `recentSessions` (loaded by
+  App, not part of the snapshot — it's play history, not a host choice)
+  and `recentTaskIdsToExclude()` (the last N remembered sessions,
+  oldest first); `toBuildOptions()` passes it through as
+  `excludeTaskIds` automatically. `App`: loads the record at boot,
+  records a session's ids (taskHistory plus every relay's drawn
+  community task id, collected as they occur since neither survives in
+  `PlaySession`) at `gameSummary` and at an End-session with ≥ 10
+  attempts; the setup screen gained the "Avoid tasks from recent games"
+  checkbox (default on) and "Games to remember (1-5)" field, plus one
+  plain sentence on the estimate line when a discarded preview build
+  would need to relax an exclusion; the game menu gained "Forget recent
+  tasks" (press-twice, independent of "Delete saved game," which does
+  NOT clear it). `tests/persistence/group-x6-recent-tasks.test.ts`
+  covers the store round trip, the wizard logic, and five full-App
+  scenarios (recording at summary with every id verified short against
+  the REAL pack, a second session appending, Forget vs. Delete, the
+  10-attempt threshold, and the relaxation sentence appearing only when
+  earned). OPEN_QUESTIONS item 38: the spec's claim that P2 already had
+  a "fake-IDB path" for testing `IndexedDbSaveStore` didn't match
+  reality (no test anywhere exercises it — jsdom has no `indexedDB`
+  global, and rule 5 was never invoked for a fake-IndexedDB dependency);
+  `readRecentTasks`/`writeRecentTasks` on the real store are verified by
+  the manual browser check (folded into Group X11) like every other
+  `IndexedDbSaveStore` method already was.
+  **Group X5 done (2026-09-03, 5 new tests, 2851 project-wide):**
+  content-repeat analysis, `tests/sim/group-x5-repeats.test.ts` — a
+  four-session chain (4/2/8/4 teams) confirms one-session memory never
+  needs to relax an exclusion in sessions 1-3 and never actually
+  repeats a task; a three-session-memory variant records the chain's
+  shape (first relaxation, first repeat, distinct-task growth) as data
+  for `SIMULATION_REPORT.md` rather than a hard gate, per the spec.
+  `simulateGame` gained an `excludeTaskIds` option and a `deckWarnings`
+  field on `SimResult` so the sim harness can drive chained sessions
+  the same way the app will. One useful distinction the first pass
+  surfaced: `buildSessionDeck` emits two different warning shapes — an
+  actual "exclusion relaxed" (a real problem for repeat-avoidance) and
+  a general "content supply is tight" margin caution (not a sign
+  anything actually repeated) — the test now checks for the former
+  specifically rather than treating any warning as a failure.
+  **Group X4 + X4b done (2026-09-03, 20 new tests, 2846 project-wide):**
+  `src/session/builder.ts` — a fork route's own `difficulty` now shifts
+  its stages' draw weights one step relative to the session setting
+  (easy gentler, hard harder, moderate unchanged, clamped at the ends);
+  before this, `route.difficulty` was decorative and the route with the
+  fewest required successes was always strictly dominant.
+  `tests/session/group-x4b-route-difficulty.test.ts` confirms the shift,
+  the clamping at both ends, and that determinism and category rotation
+  are unaffected. `tests/sim/group-x4-fairness.test.ts`: routes, catch-
+  up frequency, community-event stats, and Service-by-preset (HOARDER
+  earns near-zero, GENEROUS earns the most) all check out; seat order
+  surfaced a genuine, unfixed finding — every seat's win share sits
+  above the spec's own [0.15, 0.40] bound (this journey commonly ends
+  with more than one team finishing, which §21 rules acceptable, so a
+  single-winner-shaped bound doesn't fit), but *first*-to-finish share
+  by seat shows a real ~3x skew toward seat 0 from how the "finish the
+  round" ending rule grants its grace period. Recorded with numbers and
+  two unimplemented proposals in OPEN_QUESTIONS item 37, per the spec's
+  own instruction for this case: report, don't redesign.
+  **Group X3 done (2026-09-03, 15 new tests, 2826 project-wide):**
+  resource economy, `tests/sim/group-x3-economy.test.ts` — the assisted/
+  amplified faucet is reachable in practice (BOLD reaches the amplified
+  form in every one of 10 sampled games; CAUTIOUS reaches the assisted
+  form well above the spec's 60% floor); no preset floods every team to
+  the resource cap in more than 10% of games or discards at the cap in
+  more than 25%; the Journey Token rate for BOLD cleared the spec's 30%
+  informational floor with no note needed. New `src/sim/aggregate.ts`
+  turns a batch of `SimResult`s into the summary statistics X3 (and
+  later X4/X10) need, so the report and the tests always read the same
+  numbers from the same computation.
+  **Group X2 done (2026-09-03, 56 new tests, 2811 project-wide):** game
+  length and sufficiency under realistic play, `tests/sim/group-x2-
+  length.test.ts` — a 7-team-count × 3-difficulty × 3-preset matrix (3
+  seeds per cell, not the spec's 12 — OPEN_QUESTIONS item 36) confirms
+  zero exhausted games at gentle or standard for every team count and
+  preset; median rounds land within [0.5x, 2.0x] of `planSession`'s own
+  estimate at standard for every team count; a dedicated check on
+  challenging at 7-8 teams (the one place exhaustion is expected to be
+  possible) verifies any exhaustion there coincides with the builder's
+  own "content supply is tight" warning at build time — none actually
+  exhausted in this run, so the check currently passes vacuously, but it
+  stays in place as the sufficiency-formula regression guard the spec
+  calls for.
+  **Group X1 done (2026-09-03, 21 new tests, 2755 project-wide):** the
+  simulation harness, `src/sim/` (not imported by `src/ui` or `main.ts` —
+  build output unchanged in size, confirming Vite tree-shakes it out).
+  `policy.ts`: the documented success-model parameters (0.85/0.65/0.45
+  base rates, assisted/amplified/clue/eliminate/skip factors) and five
+  named team-policy presets (PASSIVE, CAUTIOUS, BOLD, GENEROUS, HOARDER).
+  `simulate.ts`: `simulateGame()` plays one complete game headlessly
+  against the real engine and a real `SessionDeck`, resolving every
+  decision point (fork route, resource-window spending, recover,
+  surplus, relay answers, contribution pledges, granted-choice
+  sharing) per the active team's policy, with its own `${seed}:sim`
+  rng kept separate from the engine's and the deck's. One real bug
+  caught by the tests before commit: the recover path double-counted
+  the replacement task's id in `taskIds` (pushed once explicitly, then
+  again when the loop naturally re-entered `resourceWindow` for it) —
+  fixed by letting the ordinary branch record it once. Every preset
+  reaches `gameSummary` cleanly at 2/4/8 teams standard with zero
+  illegal commands and no repeated task within a session; PASSIVE
+  spends nothing; BOLD reaches the amplified form in ≥ 90 of 100 seeds.
+
+
+  **§35 Definition of Done** (design doc §35's 22 items):
+
+  | # | Criterion | Proven by |
+  |---|---|---|
+  | 1 | A host can configure and run a complete game using only the keyboard. | Phase 4 (U-groups), X7f/X11 keyboard-only full games, `KEYBOARD_COMMANDS.md` |
+  | 2 | A blind host can determine the current state at all times. | S/A/T/R (Phase 4/6), `tests/audit/group-x7b-status.test.ts` (all 12 states), `NVDA_CHECKLIST.md` §9 |
+  | 3 | Blind players receive all information required to make every decision. | Host-as-player reveal-to-room model (Decision 3, Phase 2), `tests/ui/audience/*`, X7's audience-region checks |
+  | 4 | Two to eight teams can complete the Jerusalem-to-Rome journey. | `tests/sim/group-x1-harness.test.ts` ("every preset finishes cleanly at 2, 4, 8 teams standard"), `tests/sim/group-x2-length.test.ts` |
+  | 5 | Forks are transparent, locked after selection, and reconnect properly. | `tests/engine/group-*fork*`, `tests/sim/group-x4-fairness.test.ts` (routes), X11 manual (3 forks exercised) |
+  | 6 | Stage successes accumulate across turns and are never lost through ordinary failure. | `tests/engine/*` stage-progress groups, Provision recover mechanic tests |
+  | 7 | Insight, Provision, and Courage perform distinct functions. | `tests/engine/*` resource-effect groups, `tests/sim/group-x3-economy.test.ts` |
+  | 8 | Amplified tasks use authored variants and award two successes only when completed. | `amplifiedVariantSchema` (`successValue: literal(2)`), `tests/engine/*` amplify groups, X11 manual (amplified success triggered `surplusDecision`) |
+  | 9 | Surplus successes can be kept or offered. | `tests/engine/*` surplus groups, X11 manual (surplus offer exercised) |
+  | 10 | Offering outcomes are controlled, safe, and capable of producing humor or cooperation. | Phase 7 offering-effects groups, `CONTENT_AUTHORING.md` §offering categories (beneficial/community/humorous/neutral) |
+  | 11 | Service is tracked independently and supports the Barnabas Award. | Phase 7 Service-score groups, `GameSummary.serviceAwardName`, `tests/sim/group-x4-fairness.test.ts` (Service by preset, Barnabas-tie) |
+  | 12 | Milestones trigger room-wide Community Events. | Phase 2/7/9 community-event groups, `tests/sim/group-x10-report.test.ts` (community-event stats) |
+  | 13 | The host needs no external answer sheet. | Host-as-player reveal design (`answerReveal` shows the official answer to the whole room), `tests/engine/*` reveal groups |
+  | 14 | The game reveals official answers and concise teaching content. | `teachingReveal` state groups, X11 manual ("Teaching moment." exercised) |
+  | 15 | Content comes from validated external packs rather than engine code. | `src/content/schemas.ts` + `loader.ts`, `tests/content/*`, project-wide "no hard-coded content" rule |
+  | 16 | Session generation avoids duplication and extreme category streaks. | Phase 3 `SessionDeck` groups, `tests/sim/group-x5-repeats.test.ts`, Group X6 recent-use memory |
+  | 17 | Produced audio can fail without preventing gameplay. | Phase 6 A7 deliverable (whole game completes on fallback text with audio entirely broken), `tests/audit/group-x8-recovery.test.ts` (N/R/L fallback branch) |
+  | 18 | The game autosaves and can recover after interruption. | Phase 8 persistence groups, `tests/audit/group-x8-recovery.test.ts` (save + `rebuildFromSave` + undo matrix), X11 manual (reload → Resume) |
+  | 19 | Consequential host mistakes can be undone. | Phase 8 undo groups, `tests/audit/group-x8-recovery.test.ts` (4-mistake matrix), `NVDA_CHECKLIST.md` §12, X11 manual (Ctrl+Z twice) |
+  | 20 | All automated tests pass. | `npm test` — 2882 passing, `npx tsc --noEmit` clean, `npm run build` clean |
+  | 21 | A keyboard and screen-reader audit finds no blocking issue. | Automated: Group X7 (a-g) found and fixed three real defects, zero remaining. **Pending Brian's own NVDA pass** — `NVDA_CHECKLIST.md`, written and ready. |
+  | 22 | A complete Standard game finishes near the intended 50-60-minute target under normal playtest conditions. | `estimator.ts` (OPEN_QUESTIONS item 11's resolved formula) + `SIMULATION_REPORT.md`'s length data model the mechanic; **pending Brian's own timed playtest** under real conditions. |
+
+  Items 21 and 22 are Brian's to close — everything else in this table
+  is proven by a committed test or report section as of this phase.
+
 - **Phase 9 — Version-One Content — DONE.** All 12 test groups (N1-N12)
   are green: `general-bible` (2602 project-wide tests at completion,
   2734 after Fable's review; `npx tsc --noEmit` clean, `npm run build`
@@ -446,332 +801,6 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   with room rewards, journey `offeringOutcomes` weighted pool (all four
   categories required). Sample journey/pack updated; 24 tests passing.
   PHASE2_SPEC.md written as the unattended-implementation contract.
-
-## Active
-
-- Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
-  **Group X11 done (2026-09-03):** the manual browser check, real content,
-  keyboard only — `npm run dev`, Welcome through a full setup wizard by
-  Tab/arrows/Enter (4 teams, General Bible only), 3 real-time rounds
-  covering every required checkpoint (the Caesarea relay, a granted-choice
-  share, three fork choices, the Antioch contribution with a real pledge,
-  an assisted form, an amplified form that triggered `surplusDecision`, a
-  surplus offer, `?` help, second-`?` explorer, Escape → game menu → Game
-  log → Escape back to the reopened menu, reload → Resume → Ctrl+Z twice,
-  End session), zero console errors throughout, three screenshots
-  confirming a visible focus indicator (Welcome, setup's "Begin journey",
-  the open game menu), `SIMULATION_REPORT.md` read and sensible. Then
-  `npm run build && npm run preview`: Welcome, New game showing only
-  General Bible (dev packs correctly excluded from the production
-  bundle), one full turn played, zero console errors. No app defects
-  found. Full writeup (counts/ids/observations, no task text) in
-  OPEN_QUESTIONS item 41, including one testing-tool caveat (not a game
-  finding) about devtools-evaluation calls interleaved between Ctrl+Z
-  presses spuriously cancelling the arm — a batched, uninterrupted press
-  pair worked correctly on the first try.
-  **Group X10 done (2026-09-03, 3 new tests, 2882 project-wide):** the
-  simulation report. `src/sim/report.ts`'s `generateReport(journey, packs)`
-  is a pure function that runs its OWN smaller batches (length 2/cell vs.
-  X2's 3, economy 5/preset vs. X3's 10, fairness 30 seats-rotated games vs.
-  X4's 120, Service 5/preset vs. X4's 10, repeats one 4-session chain, same
-  as X5) through the SAME `simulateGame`/`summarizeBatch`/
-  `winShareBySeat`/`firstToFinishShareBySeat` this phase's own X2-X5 tests
-  already assert against, and renders `SIMULATION_REPORT.md`: a dated
-  header naming the success-model constants and presets, one table per
-  group, a Findings list, and a Proposals list mirroring OPEN_QUESTIONS
-  items 37/39/40. `tests/sim/group-x10-report.test.ts` checks
-  determinism, that the committed file matches a fresh generation (WRITES
-  + fails with "SIMULATION_REPORT.md regenerated — review it, then
-  commit" on any difference — the next run passes, same idea as the
-  dev-playtest generator's own committed-file test), and that no real
-  task id or prompt string appears anywhere in it. Two things fixed along
-  the way, neither an app defect: the report's header used `new Date()`
-  at first, which would have made the committed file fail its own
-  determinism check every day going forward on pure date drift — replaced
-  with a fixed `REPORT_DATE` constant a human updates on a deliberate
-  regeneration; and the "is deterministic" test's own second
-  `generateReport()` call (~5s) needs a longer per-test timeout once it's
-  contending with the rest of `tests/sim` for CPU in the same run (fine
-  alone, timed out at vitest's default 5000ms otherwise) — given an
-  explicit 20s. Whole `tests/sim` directory: 112 tests, ~13s. One
-  interesting-but-expected number surfaced while reviewing the generated
-  report: the fairness batch's contribution goal-met rate came out at 0%
-  — traced to the rotation's own preset mix (3 of 4 rotated presets have
-  `contribution: "hoarder"`, an always-decline; only GENEROUS ever
-  pledges), not a game-balance defect — the report says so inline rather
-  than reading as unexplained.
-  **Group X9 done (2026-09-03):** `NVDA_CHECKLIST.md`, a 17-section
-  numbered walkthrough for Brian to run by hand with NVDA in Chrome —
-  boot/Welcome, the setup wizard's cursor lists and input firewall, a full
-  turn, assisted/amplified forms, a fork, a relay and a contribution, a
-  granted choice and a share, surplus keep/offer plus the offering
-  announcement and the Journey Token, S/A/T/R checked in five different
-  states, help/explorer/an unmapped key, Escape → game menu → Game log →
-  Copy, Ctrl+Z arm/confirm wording (including the Phase 8 race fix),
-  reload → Resume → Ctrl+Z, End session, Sound check's Tab+Enter/Space/X/N
-  transport, reduced motion on the map (sighted-helper step), and the
-  audience region read in browse mode. Every expected announcement is
-  quoted from the real source strings this phase's own audit tests already
-  verified (undo.ts's arm/confirm wording, modal.ts's "dialog opened",
-  keys.ts's help/explorer lines, KEYBOARD_COMMANDS.md's key table) — no
-  task prompt or answer text anywhere, per CONTENT_AUTHORING §1. Closes
-  with the five decisions PHASE10_SPEC asks Brian to record afterward
-  (role="application" keep/drop, visual scale, "Team Lion" symbol names,
-  X7e's 3-4-announcements-per-action ceiling, anything that felt slow) as
-  a template for a new dated OPEN_QUESTIONS item. No code changed; no new
-  test (this group is Brian's manual pass, agent-authored document only).
-  **Group X8 done (2026-09-03, 9 new tests, 2879 project-wide):** the
-  error-recovery matrix (§23.7), `tests/audit/group-x8-recovery.test.ts`,
-  real journey + general-bible pack (blind: ids/categories only). For four
-  mistakes a host can make (wrong route, wrong ruling, wrong resource
-  spent, Present-task-too-early) — one `describe` per mistake, parameterized
-  over a shared `MistakeScenario` table — Ctrl+Z's arm press names the
-  reversed action in plain words and its confirm press restores the exact
-  prior session and screen heading, proven twice: once as a plain in-memory
-  undo, and once for a mistake that was made, autosaved, reloaded through
-  the real Resume flow (which uses `rebuildFromSave` internally), and only
-  THEN undone (Phase 8 had proven one such case; this proves all four). A
-  fifth mistake, skipped narration, is a different recovery shape (N/R/L,
-  not Ctrl+Z) and gets its own test. No app defects found this group — every
-  failure along the way was in the test's own assumptions:
-  - `PublicTask.canAssist`/`canAmplify`/`canExtraClue` are content flags
-    ("this task supports the form"), not affordability checks — a team
-    with 0 Provision still sees a "Spend Provision" button. Clicking it
-    dispatches a command that throws `IllegalCommandError` inside
-    `dispatch()`, silently rolled back and never recorded (by design — an
-    unaffordable spend is exactly the kind of accidental double-click undo
-    exists for). The "spent the wrong resource" scenario now looks up each
-    candidate spend's real `{resource, amount}` cost from the loaded pack
-    and only attempts one the active team can actually afford.
-  - Assist/amplify buttons have no dedicated keyboard binding (unlike
-    Enter/C/I, which the app's own keyboard ladder maps to the current
-    screen's primary/ruling action) — driving one needs a direct `.click()`
-    (matching `group-x7b-status.test.ts`'s own established pattern), not a
-    synthetic Enter keydown, which jsdom never converts into a native
-    button activation the way a real browser does.
-  - `startingResources` (a test-only `AppOptions` override used elsewhere
-    in this phase) can't be used for any scenario proven through save +
-    Resume: it only seeds the LIVE engine, and `rebuildFromSave` has no
-    such override, so a replayed game would start its teams at 0/0/0 and
-    genuinely diverge from the original — not an undo bug, a test-fixture
-    mismatch. The resource-spend scenario earns its resource the normal
-    way (a real stage-completion reward) instead.
-  - Spending a resource changes the in-progress task's active variant
-    (assisted/amplified), which lives on the engine's internal
-    `currentTask`, not on `PlaySession` — so a before/after comparison
-    based on `getSession()` alone saw "no visual difference" even though
-    the mistake (and undo) were both real. Fixed by folding the active
-    variant kind into the comparable snapshot for every scenario.
-  - The shipped `general-bible` pack currently has no real `audioAssets`
-    at all (Phase 6 status: narration is placeholder) — see OPEN_QUESTIONS
-    item 40 — so the N/R/L test augments an in-memory copy of the real
-    pack with one synthetic asset on every audio-listening task (never
-    written to the committed file) to exercise L's replay/fallback
-    branches at all.
-  **Group X7g done (2026-09-03, 2 new tests, 2870 project-wide):** modals —
-  `tests/audit/group-x7g-modals.test.ts` checks every `ModalManager`
-  dialog (game menu, Audio, Game log, Delete saved game, Forget recent
-  tasks, End session, and the New-game guard from Welcome) for a stable
-  accessible title, Tab/Shift+Tab wrap, Escape-closes, and a sane
-  post-close focus target. Two real defects fixed in `src/ui/modal.ts`
-  and `src/ui/app.ts`:
-  - Escape only ever closed a modal via the app's global keyboard
-    ladder (`dispatchCommand("cancel")`), which is attached only while
-    `mode === "playing"` — a modal opened from Welcome or Setup (the
-    New-game guard) had no Escape handling at all, only its Cancel
-    button. `ModalManager` now owns its own Escape-to-close, attached
-    on the overlay for the lifetime of every open dialog regardless of
-    app mode, with `stopPropagation` so it doesn't also reach the
-    app-level ladder while playing (which would otherwise see the
-    modal already closed and reopen the game menu from its own "cancel
-    with nothing to cancel" fallback).
-  - Audio, Game log, Delete saved game, and Forget recent tasks are all
-    launched from buttons that are themselves children of the game
-    menu's own `ModalManager` content. Since every dialog shares one
-    overlay, opening any of them clears that content — detaching the
-    very button `close()` was going to refocus. Focus was silently
-    lost (`.focus()` on a detached element is a no-op) rather than
-    landing anywhere sensible. Fixed two ways: `ModalManager.close()`
-    now supports a dialog reopening itself from `onClose` without the
-    outer call clobbering the new one's state (captures `invoker`/
-    `onClose` in locals, and only restores focus to the old invoker if
-    nothing reopened in the meantime); those four dialogs now pass
-    `onClose: () => this.openGameMenu()`, so closing any of them —
-    Escape or Cancel — genuinely returns you to the menu you came
-    from. End session is deliberately excluded: its confirm path tears
-    the whole game down and switches to the setup screen, and
-    reopening a menu with nothing left to act on right before that
-    transition would leave a stray dialog on top of the new screen —
-    Cancel-closing it remains a known, undocumented-until-now focus
-    gap (recorded, not fixed, in OPEN_QUESTIONS).
-  One bug in the test itself, not the app: the original draft dispatched
-  Escape to `window`, which never reaches a listener on the overlay
-  (dispatching an event AT a target only fires that target's own
-  listeners — nothing bubbles back down into descendants). Real Escape
-  presses always originate from whatever has focus *inside* the trapped
-  modal and bubble up through the overlay to `window`; fixed by
-  dispatching to the dialog element itself, matching that.
-  **Group X7b done (2026-09-03, 1 new test, 2868 project-wide):**
-  status everywhere, `tests/audit/group-x7b-status.test.ts` — drives a
-  real game (with `startingResources` so recover/assist/amplify are
-  reachable without farming resources through real play first, a
-  test-only override the engine already exposed) until all 12 reachable
-  states are visited, exercising R/S/A/T (state and session unchanged,
-  a genuinely new announcement, S names the team and, in a task state,
-  "successes") and `?`/Escape (help opens with rows, closes) in every
-  one. Two bugs in the test itself along the way, not the app: cursor-
-  list navigation keys must be dispatched to the focused LIST element
-  (its own keydown listener), not `window`; and the presenter's log is
-  a capped ring buffer, so "did a new announcement fire" has to compare
-  the last entry by reference, not by log length (the same gotcha
-  U10's own test already documents).
-  **Groups X7a/X7c/X7d/X7e/X7f done (2026-09-03, 4 new tests, 2867
-  project-wide):** the automated accessibility audit's per-action checks
-  (names/structure, focus, speech hygiene, no-flooding) plus the U10
-  dual-modality proof extended to the real journey and general-bible
-  pack (blind), all in `tests/audit/` against a new shared driver
-  (`tests/audit/harness.ts`) that reuses U10's keyboard-only/mouse-only
-  state machine with a per-action hook. Three real, fixed defects the
-  audit caught before it went green:
-  - The modal dialog (`src/ui/modal.ts`) had no accessible name — only
-    a one-time spoken announcement carried its title, so an automated
-    check (or a screen reader announcing role+name on entry) heard a
-    bare "dialog". Fixed with a stable `aria-labelledby` pointing at
-    the heading, set once in the constructor.
-  - `CursorList` (`src/ui/cursorList.ts`) built each option's DOM id
-    from just the option's own value, so lists that share an option
-    (Duration/Pace/Difficulty all have "standard") produced multiple
-    elements with the identical id on the same setup screen — any
-    `aria-activedescendant`/`aria-labelledby` reference to it was
-    ambiguous. Fixed with a per-instance numeric prefix.
-  - Clicking a `CursorList` row moved selection and state but never DOM
-    focus (a plain `role="option"` div isn't natively focusable), and
-    entering the setup screen at all left focus on `<body>` — the
-    "playing" screens already park focus on their own heading on every
-    render (`renderCurrentScreen`); setup never did. Both fixed the
-    same way: a click now also focuses the list's container (keeping
-    the existing aria-activedescendant model, not making rows
-    separately focusable), and `renderSetup()` now focuses its heading
-    on entry, exactly like every other screen already does.
-  One false positive corrected in the audit's OWN check, not the app:
-  hymn lyric-completion prompts legitimately quote a line "with a
-  blank" using underscores (CONTENT_AUTHORING §3) — the visual-text
-  forbidden-character check now excludes underscore (it stays forbidden
-  in the SPOKEN channel, where `sanitizeForSpeech` already strips it —
-  a spoken underscore would mean that guarantee broke). The "exactly
-  one h2" check is scoped to `playing` mode only; the setup wizard is
-  deliberately many sections on one page by design (PHASE4_SPEC).
-  **Group X6 done (2026-09-03, 12 new tests, 2863 project-wide):**
-  recent-use memory across games (Brian ruled yes, item 35).
-  `SaveStore` gains `readRecentTasks`/`writeRecentTasks` (a new
-  `RecentTasks` record, `src/persistence/schema.ts`, up to 5 remembered
-  sessions, oldest dropped; a corrupt record is ignored and overwritten,
-  never fatal — unlike a save, it isn't quarantined). `SetupSnapshot`
-  gained `avoidRecentTasks`/`recentGamesToRemember`, bumping
-  `SAVE_SCHEMA_VERSION` 1 → 2 (existing saves quarantine via the
-  already-tested version-mismatch path — no separate migration needed).
-  `SetupWizard` gained the two fields plus `recentSessions` (loaded by
-  App, not part of the snapshot — it's play history, not a host choice)
-  and `recentTaskIdsToExclude()` (the last N remembered sessions,
-  oldest first); `toBuildOptions()` passes it through as
-  `excludeTaskIds` automatically. `App`: loads the record at boot,
-  records a session's ids (taskHistory plus every relay's drawn
-  community task id, collected as they occur since neither survives in
-  `PlaySession`) at `gameSummary` and at an End-session with ≥ 10
-  attempts; the setup screen gained the "Avoid tasks from recent games"
-  checkbox (default on) and "Games to remember (1-5)" field, plus one
-  plain sentence on the estimate line when a discarded preview build
-  would need to relax an exclusion; the game menu gained "Forget recent
-  tasks" (press-twice, independent of "Delete saved game," which does
-  NOT clear it). `tests/persistence/group-x6-recent-tasks.test.ts`
-  covers the store round trip, the wizard logic, and five full-App
-  scenarios (recording at summary with every id verified short against
-  the REAL pack, a second session appending, Forget vs. Delete, the
-  10-attempt threshold, and the relaxation sentence appearing only when
-  earned). OPEN_QUESTIONS item 38: the spec's claim that P2 already had
-  a "fake-IDB path" for testing `IndexedDbSaveStore` didn't match
-  reality (no test anywhere exercises it — jsdom has no `indexedDB`
-  global, and rule 5 was never invoked for a fake-IndexedDB dependency);
-  `readRecentTasks`/`writeRecentTasks` on the real store are verified by
-  the manual browser check (folded into Group X11) like every other
-  `IndexedDbSaveStore` method already was.
-  **Group X5 done (2026-09-03, 5 new tests, 2851 project-wide):**
-  content-repeat analysis, `tests/sim/group-x5-repeats.test.ts` — a
-  four-session chain (4/2/8/4 teams) confirms one-session memory never
-  needs to relax an exclusion in sessions 1-3 and never actually
-  repeats a task; a three-session-memory variant records the chain's
-  shape (first relaxation, first repeat, distinct-task growth) as data
-  for `SIMULATION_REPORT.md` rather than a hard gate, per the spec.
-  `simulateGame` gained an `excludeTaskIds` option and a `deckWarnings`
-  field on `SimResult` so the sim harness can drive chained sessions
-  the same way the app will. One useful distinction the first pass
-  surfaced: `buildSessionDeck` emits two different warning shapes — an
-  actual "exclusion relaxed" (a real problem for repeat-avoidance) and
-  a general "content supply is tight" margin caution (not a sign
-  anything actually repeated) — the test now checks for the former
-  specifically rather than treating any warning as a failure.
-  **Group X4 + X4b done (2026-09-03, 20 new tests, 2846 project-wide):**
-  `src/session/builder.ts` — a fork route's own `difficulty` now shifts
-  its stages' draw weights one step relative to the session setting
-  (easy gentler, hard harder, moderate unchanged, clamped at the ends);
-  before this, `route.difficulty` was decorative and the route with the
-  fewest required successes was always strictly dominant.
-  `tests/session/group-x4b-route-difficulty.test.ts` confirms the shift,
-  the clamping at both ends, and that determinism and category rotation
-  are unaffected. `tests/sim/group-x4-fairness.test.ts`: routes, catch-
-  up frequency, community-event stats, and Service-by-preset (HOARDER
-  earns near-zero, GENEROUS earns the most) all check out; seat order
-  surfaced a genuine, unfixed finding — every seat's win share sits
-  above the spec's own [0.15, 0.40] bound (this journey commonly ends
-  with more than one team finishing, which §21 rules acceptable, so a
-  single-winner-shaped bound doesn't fit), but *first*-to-finish share
-  by seat shows a real ~3x skew toward seat 0 from how the "finish the
-  round" ending rule grants its grace period. Recorded with numbers and
-  two unimplemented proposals in OPEN_QUESTIONS item 37, per the spec's
-  own instruction for this case: report, don't redesign.
-  **Group X3 done (2026-09-03, 15 new tests, 2826 project-wide):**
-  resource economy, `tests/sim/group-x3-economy.test.ts` — the assisted/
-  amplified faucet is reachable in practice (BOLD reaches the amplified
-  form in every one of 10 sampled games; CAUTIOUS reaches the assisted
-  form well above the spec's 60% floor); no preset floods every team to
-  the resource cap in more than 10% of games or discards at the cap in
-  more than 25%; the Journey Token rate for BOLD cleared the spec's 30%
-  informational floor with no note needed. New `src/sim/aggregate.ts`
-  turns a batch of `SimResult`s into the summary statistics X3 (and
-  later X4/X10) need, so the report and the tests always read the same
-  numbers from the same computation.
-  **Group X2 done (2026-09-03, 56 new tests, 2811 project-wide):** game
-  length and sufficiency under realistic play, `tests/sim/group-x2-
-  length.test.ts` — a 7-team-count × 3-difficulty × 3-preset matrix (3
-  seeds per cell, not the spec's 12 — OPEN_QUESTIONS item 36) confirms
-  zero exhausted games at gentle or standard for every team count and
-  preset; median rounds land within [0.5x, 2.0x] of `planSession`'s own
-  estimate at standard for every team count; a dedicated check on
-  challenging at 7-8 teams (the one place exhaustion is expected to be
-  possible) verifies any exhaustion there coincides with the builder's
-  own "content supply is tight" warning at build time — none actually
-  exhausted in this run, so the check currently passes vacuously, but it
-  stays in place as the sufficiency-formula regression guard the spec
-  calls for.
-  **Group X1 done (2026-09-03, 21 new tests, 2755 project-wide):** the
-  simulation harness, `src/sim/` (not imported by `src/ui` or `main.ts` —
-  build output unchanged in size, confirming Vite tree-shakes it out).
-  `policy.ts`: the documented success-model parameters (0.85/0.65/0.45
-  base rates, assisted/amplified/clue/eliminate/skip factors) and five
-  named team-policy presets (PASSIVE, CAUTIOUS, BOLD, GENEROUS, HOARDER).
-  `simulate.ts`: `simulateGame()` plays one complete game headlessly
-  against the real engine and a real `SessionDeck`, resolving every
-  decision point (fork route, resource-window spending, recover,
-  surplus, relay answers, contribution pledges, granted-choice
-  sharing) per the active team's policy, with its own `${seed}:sim`
-  rng kept separate from the engine's and the deck's. One real bug
-  caught by the tests before commit: the recover path double-counted
-  the replacement task's id in `taskIds` (pushed once explicitly, then
-  again when the loop naturally re-entered `resourceWindow` for it) —
-  fixed by letting the ordinary branch record it once. Every preset
-  reaches `gameSummary` cleanly at 2/4/8 teams standard with zero
-  illegal commands and no repeated task within a session; PASSIVE
-  spends nothing; BOLD reaches the amplified form in ≥ 90 of 100 seeds.
 
 ## Remaining
 
