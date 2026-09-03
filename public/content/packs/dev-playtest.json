@@ -9683,9 +9683,13 @@
         "Placeholder clue 190 one.",
         "Placeholder clue 190 two."
       ],
+      "clueAudio": [
+        "placeholder-2",
+        "placeholder-2"
+      ],
       "teachingReveal": "Placeholder teaching reveal 190.",
       "historicalNote": null,
-      "audioAsset": null,
+      "audioAsset": "placeholder-2",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -10185,10 +10189,17 @@
       },
       "assistedVariant": null,
       "amplifiedVariant": null,
-      "clues": [],
+      "clues": [
+        "Placeholder clue 200 one.",
+        "Placeholder clue 200 two."
+      ],
+      "clueAudio": [
+        "placeholder-3",
+        "placeholder-3"
+      ],
       "teachingReveal": "Placeholder teaching reveal 200.",
       "historicalNote": null,
-      "audioAsset": null,
+      "audioAsset": "placeholder-3",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -10700,10 +10711,17 @@
         ],
         "successValue": 2
       },
-      "clues": [],
+      "clues": [
+        "Placeholder clue 210 one.",
+        "Placeholder clue 210 two."
+      ],
+      "clueAudio": [
+        "placeholder-4",
+        "placeholder-4"
+      ],
       "teachingReveal": "Placeholder teaching reveal 210.",
       "historicalNote": "Placeholder historical note 210.",
-      "audioAsset": null,
+      "audioAsset": "placeholder-4",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -11213,9 +11231,13 @@
         "Placeholder clue 220 one.",
         "Placeholder clue 220 two."
       ],
+      "clueAudio": [
+        "placeholder-5",
+        "placeholder-5"
+      ],
       "teachingReveal": "Placeholder teaching reveal 220.",
       "historicalNote": null,
-      "audioAsset": null,
+      "audioAsset": "placeholder-5",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -11715,10 +11737,17 @@
         ],
         "successValue": 2
       },
-      "clues": [],
+      "clues": [
+        "Placeholder clue 230 one.",
+        "Placeholder clue 230 two."
+      ],
+      "clueAudio": [
+        "placeholder-6",
+        "placeholder-6"
+      ],
       "teachingReveal": "Placeholder teaching reveal 230.",
       "historicalNote": null,
-      "audioAsset": null,
+      "audioAsset": "placeholder-6",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -12230,10 +12259,17 @@
       },
       "assistedVariant": null,
       "amplifiedVariant": null,
-      "clues": [],
+      "clues": [
+        "Placeholder clue 240 one.",
+        "Placeholder clue 240 two."
+      ],
+      "clueAudio": [
+        "placeholder-1",
+        "placeholder-1"
+      ],
       "teachingReveal": "Placeholder teaching reveal 240.",
       "historicalNote": null,
-      "audioAsset": null,
+      "audioAsset": "placeholder-1",
       "tags": [
         "dev-playtest",
         "placeholder"
@@ -12274,7 +12310,21 @@
         "prompt": "Assisted: Dev playtest task 241 (placeholder — never real content).",
         "successValue": 1
       },
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 241 (placeholder — never real content).",
+        "answer": "Placeholder answer 241",
+        "acceptedAnswers": [
+          "Placeholder answer 241"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-2",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 241 one.",
         "Placeholder clue 241 two."
@@ -12289,7 +12339,7 @@
       "resourceInteractions": {
         "insight": true,
         "provision": true,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -12432,7 +12482,21 @@
         "successValue": 1
       },
       "assistedVariant": null,
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 244 (placeholder — never real content).",
+        "answer": "Placeholder answer 244",
+        "acceptedAnswers": [
+          "Placeholder answer 244"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-1",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 244 one.",
         "Placeholder clue 244 two."
@@ -12447,7 +12511,7 @@
       "resourceInteractions": {
         "insight": false,
         "provision": false,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -12591,7 +12655,9 @@
         "acceptedAnswers": [
           "Placeholder answer 247"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-4",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 247 one.",
@@ -12737,7 +12803,9 @@
         "acceptedAnswers": [
           "Placeholder answer 250"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-3",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 250 one.",
@@ -12886,7 +12954,21 @@
         "prompt": "Assisted: Dev playtest task 253 (placeholder — never real content).",
         "successValue": 1
       },
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 253 (placeholder — never real content).",
+        "answer": "Placeholder answer 253",
+        "acceptedAnswers": [
+          "Placeholder answer 253"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-2",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 253 one.",
         "Placeholder clue 253 two."
@@ -12901,7 +12983,7 @@
       "resourceInteractions": {
         "insight": true,
         "provision": true,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -13044,7 +13126,21 @@
         "successValue": 1
       },
       "assistedVariant": null,
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 256 (placeholder — never real content).",
+        "answer": "Placeholder answer 256",
+        "acceptedAnswers": [
+          "Placeholder answer 256"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-1",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 256 one.",
         "Placeholder clue 256 two."
@@ -13059,7 +13155,7 @@
       "resourceInteractions": {
         "insight": false,
         "provision": false,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -13203,7 +13299,9 @@
         "acceptedAnswers": [
           "Placeholder answer 259"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-4",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 259 one.",
@@ -13349,7 +13447,9 @@
         "acceptedAnswers": [
           "Placeholder answer 262"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-3",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 262 one.",
@@ -13498,7 +13598,21 @@
         "prompt": "Assisted: Dev playtest task 265 (placeholder — never real content).",
         "successValue": 1
       },
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 265 (placeholder — never real content).",
+        "answer": "Placeholder answer 265",
+        "acceptedAnswers": [
+          "Placeholder answer 265"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-2",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 265 one.",
         "Placeholder clue 265 two."
@@ -13513,7 +13627,7 @@
       "resourceInteractions": {
         "insight": true,
         "provision": true,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -13656,7 +13770,21 @@
         "successValue": 1
       },
       "assistedVariant": null,
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 268 (placeholder — never real content).",
+        "answer": "Placeholder answer 268",
+        "acceptedAnswers": [
+          "Placeholder answer 268"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-1",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 268 one.",
         "Placeholder clue 268 two."
@@ -13671,7 +13799,7 @@
       "resourceInteractions": {
         "insight": false,
         "provision": false,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -13815,7 +13943,9 @@
         "acceptedAnswers": [
           "Placeholder answer 271"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-4",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 271 one.",
@@ -13961,7 +14091,9 @@
         "acceptedAnswers": [
           "Placeholder answer 274"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-3",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 274 one.",
@@ -14110,7 +14242,21 @@
         "prompt": "Assisted: Dev playtest task 277 (placeholder — never real content).",
         "successValue": 1
       },
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 277 (placeholder — never real content).",
+        "answer": "Placeholder answer 277",
+        "acceptedAnswers": [
+          "Placeholder answer 277"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-2",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 277 one.",
         "Placeholder clue 277 two."
@@ -14125,7 +14271,7 @@
       "resourceInteractions": {
         "insight": true,
         "provision": true,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -14268,7 +14414,21 @@
         "successValue": 1
       },
       "assistedVariant": null,
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 280 (placeholder — never real content).",
+        "answer": "Placeholder answer 280",
+        "acceptedAnswers": [
+          "Placeholder answer 280"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-1",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 280 one.",
         "Placeholder clue 280 two."
@@ -14283,7 +14443,7 @@
       "resourceInteractions": {
         "insight": false,
         "provision": false,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -14427,7 +14587,9 @@
         "acceptedAnswers": [
           "Placeholder answer 283"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-4",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 283 one.",
@@ -14573,7 +14735,9 @@
         "acceptedAnswers": [
           "Placeholder answer 286"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-3",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 286 one.",
@@ -14722,7 +14886,21 @@
         "prompt": "Assisted: Dev playtest task 289 (placeholder — never real content).",
         "successValue": 1
       },
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 289 (placeholder — never real content).",
+        "answer": "Placeholder answer 289",
+        "acceptedAnswers": [
+          "Placeholder answer 289"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-2",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 289 one.",
         "Placeholder clue 289 two."
@@ -14737,7 +14915,7 @@
       "resourceInteractions": {
         "insight": true,
         "provision": true,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -14880,7 +15058,21 @@
         "successValue": 1
       },
       "assistedVariant": null,
-      "amplifiedVariant": null,
+      "amplifiedVariant": {
+        "available": true,
+        "cost": {
+          "resource": "courage",
+          "amount": 1
+        },
+        "prompt": "Amplified: Dev playtest task 292 (placeholder — never real content).",
+        "answer": "Placeholder answer 292",
+        "acceptedAnswers": [
+          "Placeholder answer 292"
+        ],
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-1",
+        "maxPlays": 1
+      },
       "clues": [
         "Placeholder clue 292 one.",
         "Placeholder clue 292 two."
@@ -14895,7 +15087,7 @@
       "resourceInteractions": {
         "insight": false,
         "provision": false,
-        "courage": false
+        "courage": true
       },
       "estimatedSeconds": 30
     },
@@ -15039,7 +15231,9 @@
         "acceptedAnswers": [
           "Placeholder answer 295"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-4",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 295 one.",
@@ -15185,7 +15379,9 @@
         "acceptedAnswers": [
           "Placeholder answer 298"
         ],
-        "successValue": 2
+        "successValue": 2,
+        "audioAsset": "placeholder-tune-3",
+        "maxPlays": 1
       },
       "clues": [
         "Placeholder clue 298 one.",
@@ -21424,6 +21620,260 @@
         "courage": false
       },
       "estimatedSeconds": 30
+    }
+  ],
+  "audioAssets": [
+    {
+      "assetId": "placeholder-1",
+      "filePath": "audio/dev/placeholder-1.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 1 (obviously fake, never real content).",
+      "durationSeconds": 0.5,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 440 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-2",
+      "filePath": "audio/dev/placeholder-2.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 2 (obviously fake, never real content).",
+      "durationSeconds": 0.5,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 494 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-3",
+      "filePath": "audio/dev/placeholder-3.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 3 (obviously fake, never real content).",
+      "durationSeconds": 0.5,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 554 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-4",
+      "filePath": "audio/dev/placeholder-4.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 4 (obviously fake, never real content).",
+      "durationSeconds": 0.6,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 587 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-5",
+      "filePath": "audio/dev/placeholder-5.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 5 (obviously fake, never real content).",
+      "durationSeconds": 0.6,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 659 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-6",
+      "filePath": "audio/dev/placeholder-6.wav",
+      "assetType": "task-audio",
+      "transcript": "Placeholder tone 6 (obviously fake, never real content).",
+      "durationSeconds": 0.7,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tone (about 740 hertz) would play here.",
+      "attribution": null
+    },
+    {
+      "assetId": "placeholder-tune-1",
+      "melody": {
+        "melodyId": "placeholder-tune-1",
+        "title": "Placeholder tune 1 (ascending scale)",
+        "tempoBpm": 100,
+        "notes": [
+          {
+            "midi": 60,
+            "beats": 1
+          },
+          {
+            "midi": 62,
+            "beats": 1
+          },
+          {
+            "midi": 64,
+            "beats": 1
+          },
+          {
+            "midi": 65,
+            "beats": 1
+          },
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 69,
+            "beats": 1
+          },
+          {
+            "midi": 71,
+            "beats": 1
+          },
+          {
+            "midi": 72,
+            "beats": 1
+          }
+        ],
+        "attribution": "Synthetic placeholder — not a real hymn tune."
+      },
+      "assetType": "hymn",
+      "transcript": "Placeholder tune 1 (ascending scale): a synthetic placeholder tune, not a real hymn.",
+      "durationSeconds": 4.8,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tune would play here.",
+      "attribution": "Synthetic placeholder — not a real hymn tune."
+    },
+    {
+      "assetId": "placeholder-tune-2",
+      "melody": {
+        "melodyId": "placeholder-tune-2",
+        "title": "Placeholder tune 2 (arpeggio)",
+        "tempoBpm": 90,
+        "notes": [
+          {
+            "midi": 60,
+            "beats": 1
+          },
+          {
+            "midi": 64,
+            "beats": 1
+          },
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 72,
+            "beats": 1
+          },
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 64,
+            "beats": 1
+          },
+          {
+            "midi": 60,
+            "beats": 1
+          }
+        ],
+        "attribution": "Synthetic placeholder — not a real hymn tune."
+      },
+      "assetType": "hymn",
+      "transcript": "Placeholder tune 2 (arpeggio): a synthetic placeholder tune, not a real hymn.",
+      "durationSeconds": 4.666666666666667,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tune would play here.",
+      "attribution": "Synthetic placeholder — not a real hymn tune."
+    },
+    {
+      "assetId": "placeholder-tune-3",
+      "melody": {
+        "melodyId": "placeholder-tune-3",
+        "title": "Placeholder tune 3 (descending scale)",
+        "tempoBpm": 100,
+        "notes": [
+          {
+            "midi": 72,
+            "beats": 1
+          },
+          {
+            "midi": 71,
+            "beats": 1
+          },
+          {
+            "midi": 69,
+            "beats": 1
+          },
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 65,
+            "beats": 1
+          },
+          {
+            "midi": 64,
+            "beats": 1
+          },
+          {
+            "midi": 62,
+            "beats": 1
+          },
+          {
+            "midi": 60,
+            "beats": 1
+          }
+        ],
+        "attribution": "Synthetic placeholder — not a real hymn tune."
+      },
+      "assetType": "hymn",
+      "transcript": "Placeholder tune 3 (descending scale): a synthetic placeholder tune, not a real hymn.",
+      "durationSeconds": 4.8,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tune would play here.",
+      "attribution": "Synthetic placeholder — not a real hymn tune."
+    },
+    {
+      "assetId": "placeholder-tune-4",
+      "melody": {
+        "melodyId": "placeholder-tune-4",
+        "title": "Placeholder tune 4 (short motif)",
+        "tempoBpm": 110,
+        "notes": [
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 71,
+            "beats": 1
+          },
+          {
+            "midi": 74,
+            "beats": 1
+          },
+          {
+            "midi": 71,
+            "beats": 1
+          },
+          {
+            "midi": 67,
+            "beats": 1
+          },
+          {
+            "midi": 71,
+            "beats": 1
+          },
+          {
+            "midi": 74,
+            "beats": 1
+          },
+          {
+            "midi": 79,
+            "beats": 1
+          }
+        ],
+        "attribution": "Synthetic placeholder — not a real hymn tune."
+      },
+      "assetType": "hymn",
+      "transcript": "Placeholder tune 4 (short motif): a synthetic placeholder tune, not a real hymn.",
+      "durationSeconds": 4.363636363636363,
+      "replayAllowed": true,
+      "fallbackText": "A short placeholder tune would play here.",
+      "attribution": "Synthetic placeholder — not a real hymn tune."
     }
   ]
 }
