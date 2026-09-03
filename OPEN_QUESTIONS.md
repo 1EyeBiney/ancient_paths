@@ -797,17 +797,47 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       `general-bible.json` is itself a publicly served static file, as
       any static-site content must be; Brian's honor system was always
       the model (CONTENT_AUTHORING §1), this just states it once.
-    - **Content review — PENDING (API capacity).** A factual review of
-      all 128 tasks (answers, references, distractors that might also
-      be right, hymn dates, note prefixes, church-setting fit) was set
-      up to run in a separate, isolated agent so that no task text
-      enters Brian's transcript — that is why it is not done inline.
-      Five consecutive attempts (two models) were terminated by
-      server-side overload (HTTP 529) before any edit was made; the
-      pack on disk is exactly the reviewed-code commit's version.
-      Resume when capacity returns: ask Fable to "resume the content
-      review"; the agent's context is preserved. Its findings, by id
-      and kind of change only, will be appended here.
+    - **Content review — DONE (2026-09-03), by an isolated agent** so
+      that no task text entered Brian's transcript (five attempts were
+      killed by server-side overload before the sixth ran clean; ~10
+      minutes, 38 tool calls). All 128 tasks read against the reviewer's
+      own knowledge of the KJV text, hymnody and history. **15 tasks
+      corrected** (35 lines, counts unchanged), by kind: quotations
+      taken from a modern (copyrighted) translation replaced with KJV
+      wording — `gb-br-008`, `gb-br-009`, `gb-hc-009`; a citation
+      widened to the verse that states the claim — `gb-sk-010`, and one
+      added — `gb-al-008`; accepted answers broadened where an equally
+      correct form existed — `gb-sk-014`, `gb-sk-028`, `gb-hc-002`,
+      `gb-hc-016`, `gb-cm-005`; a distractor that was defensible under
+      KJV vocabulary replaced — `gb-hc-002`, `gb-hc-016` (reveals now
+      explain the difference); a transliteration in a clue corrected to
+      the KJV spelling — `gb-hc-008`; an amplified form that asked for
+      a detail its own read-aloud prompt already contained reworked,
+      its clue softened (it stated the answer) — `gb-al-008`; hymn
+      dates corrected — `gb-hy-002` (the earlier date rests on a later
+      legend), `gb-hy-007` (composition vs publication); a meaningless
+      phrase removed from an amplified prompt — `gb-hy-005`.
+      **Verdict**: accuracy high, errors narrow; distractors in-domain
+      and good; difficulty sound with the hard tier occasionally a
+      notch generous; reasoning and decision-strategy the strongest
+      craft. **Church-setting**: nothing to change; `gb-ds-012` touches
+      a sensitive theme even-handedly, as a reasoning task should.
+      **Judgement calls raised, and Fable's rulings**: (a) *systemic —
+      a purchasable clue hands over the very detail the amplified form
+      asks for* in `gb-sk-011`, `-015`, `-017`, `-018`, `-020`, `-022`,
+      `-024`, `-026`, `-030`, `-031`, `-032`, `gb-br-012`, `gb-al-006`,
+      and marginally `gb-hc-013`, `gb-br-010`. Ruled a content defect,
+      not economy: Courage's two-success gamble (§8.3) must not be
+      convertible into a one-Insight purchase; clues help the base
+      question only (new CONTENT_AUTHORING §5 rule). Fixed consistently
+      in a follow-up pass by the same isolated reviewer (below).
+      (b) `gb-sk-035` reads a notch easy for its "hard" label — left;
+      one task, and the pack's ratios are pinned. (c) `gb-al-001`,
+      `-002`, `-003` read-aloud transcripts lightly adapt the KJV rather
+      than quote it — left; the transcript IS the text the host reads,
+      and PHASE9's rule allows paraphrase. (d) `gb-cm-006`'s citation
+      runs one verse past the enumerated set — tightened in the
+      follow-up.
     - **X6 ruled — yes (Brian, 2026-09-03)**: recent-use memory across
       games goes into Phase 10 as specified (PHASE10_SPEC.md Group X6);
       Open item 5 updated.
