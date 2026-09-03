@@ -609,11 +609,60 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     worse — and saves are short-lived, so it stands; if it ever bites,
     record `config` in the save and pass it to `createEngine` on rebuild.
 
+32. **DECIDED (2026-09-03) — Phase 9 design (PHASE9_SPEC.md).**
+    - **A gap found while planning, fixed first (Group N1)**: PHASE2_SPEC
+      says a relay's shared prompt "comes from `nextCommunityTask`", but
+      `cmdBeginCommunityEvent` never draws one — a relay today is a
+      question-less "Now answering: Team X" with correct/incorrect
+      buttons, and the `community` category, the builder's per-relay
+      reserve and `taskCategory` are dead paths. No test caught it
+      because relay tests only exercise thresholds. N1 draws the task,
+      shows the prompt on both screens, and reveals the answer on
+      resolve (host-as-player: nobody hears it before every team has
+      answered). `ArrayTaskSource` gets its own community cursor and
+      returns null when it has none, so every existing relay test stays
+      green unchanged.
+    - **Journey length**: 7 total required successes (was 9), five
+      milestones (Ephesus added; Greece appears as the Aegean fork's
+      two routes rather than a sixth milestone), four events. With the
+      estimator's current constants, 7 is what 55 minutes buys at 3-4
+      teams (item 11); 9 already read 73 minutes for 4 teams. Adding a
+      Corinth milestone would push it back to 8-9. Revisit when Phase
+      10's game-length simulation has real timings — this resolves Open
+      item 1 for v1.
+    - **Relay thresholds are 2** (item 27's finding): each team answers
+      once per relay, so thresholds above the team count are
+      unreachable.
+    - **Audio in v1**: none in the production pack. Audio-listening
+      tasks are text-delivered and tagged `audio-pending`; hymn tasks are
+      text-only until Brian's melody data arrives (item 23). Rejected:
+      placeholder tones in real play (a beep before a task), and
+      authoring asset records for files that don't exist yet (a 404 per
+      task in a church hall). Rejected for now: agent-transcribed hymn
+      melodies — accuracy is unverifiable without a hearing reviewer.
+    - **Dev packs by id convention** (`dev-*`) rather than a schema
+      flag: nothing to migrate, `dev-sample.json` untouched.
+    - **Secrecy made operational**: blind tests (id + rule name only),
+      pack written by Write tool in few large chunks, counts-only
+      commits and summaries. **Brian: do not expand the Write/Edit tool
+      calls of the Phase 9 session, and do not open
+      `public/content/packs/general-bible.json`.**
+    - **Deferred, needs Brian's ruling**: "avoid tasks from the previous
+      session" as a real feature. The builder already supports
+      `excludeTaskIds` and IndexedDB now exists, so remembering the last
+      session's task ids and offering a setup toggle is ~30 lines — but
+      §37.10 was ruled "per-session memory only in version one" (Open
+      item 5), so Phase 9 proves the deliverable with a test instead.
+      Say the word and it goes into Phase 10.
+    - **Pending, not the agent's to do**: sighted proofreading of the
+      pack by someone other than Brian (CONTENT_AUTHORING §1).
+
 ## Open
 
-1. Final milestone list and exact stage layout for the composite journey
-   (current sample uses Jerusalem → Caesarea → Antioch → Rome; Asia Minor
-   and Greece milestones to be added when the journey is authored fully).
+1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
+   Caesarea, Antioch, Ephesus, Rome), Greece as the Aegean fork's routes,
+   7 total required successes; PHASE9_SPEC.md Group N2. Revisit with
+   Phase 10's timings.
 2. Exact Journey Token power (spec §37.4) — awaiting balance testing.
 3. **DECIDED (2026-09-03, item 26)** — Community Event catch-up rules:
    success-only, more-than-two-entries-behind, one resource of choice;

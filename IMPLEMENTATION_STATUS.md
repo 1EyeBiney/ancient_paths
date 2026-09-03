@@ -384,9 +384,19 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Active
 
-(none — Phase 8 complete; Phase 9 not yet planned)
+- Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
+  after Fable's review of Phase 8. Group N1 first: the relay prompt —
+  PHASE2_SPEC's "shared prompt comes from `nextCommunityTask`" was never
+  implemented, so a relay asks nothing today; N1 draws the community
+  task, shows it on both screens, reveals the answer on resolve. Then the
+  full journey (five milestones, 7 required successes, 4 events, 20
+  offerings), the `general-bible` pack (128 tasks across seven
+  categories, authored under the secrecy protocol — counts and ids only
+  anywhere Brian reads), `dev-*` packs excluded from production builds,
+  blind content tests, a sufficiency matrix, and the §34 deliverable as a
+  test: two full sessions with ≤ 5% task overlap. Groups N1-N12.
+  Implementation not yet started. Rulings in OPEN_QUESTIONS.md item 32.
 
 ## Remaining
 
-- Phase 9 — Version-one content (full General Bible pack, full journey).
 - Phase 10 — Accessibility and balance audit.

@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 8 (PERSISTENCE & RECOVERY) COMPLETE (2026-09-03) — Phase 9 not yet planned
+## Status: PHASE 8 COMPLETE + REVIEWED, PHASE 9 (VERSION-ONE CONTENT) SPECIFIED (2026-09-03) — implement PHASE9_SPEC.md next
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (460/460
@@ -108,10 +108,26 @@ a game menu with Game log… and Delete saved game. Manual browser check
 (Group P8) confirmed autosave, Resume (host/audience match verified by
 screenshot), a real post-resume Ctrl+Z (undo history survived reload),
 Game log, and the New-game guard — zero console errors; one pre-existing
-Phase 6 accessibility nuance flagged (not fixed): the undo arm/confirm
-message is immediately overwritten by the screen's own re-render
-announcement. Rulings and the browser-check writeup: OPEN_QUESTIONS
-items 29-30.
+Phase 6 accessibility nuance flagged: the undo arm/confirm message was
+immediately overwritten by the screen's own re-render announcement.
+Rulings and the browser-check writeup: OPEN_QUESTIONS items 29-30.
+Fable's review (item 31, 460 tests) fixed four small things: Resume now
+applies the saved reduced-motion choice; `IndexedDbSaveStore` resolves
+on transaction completion (not request success); the replay integrity
+check ignores undefined-valued keys; and the undo nuance — an arming
+Ctrl+Z no longer re-renders over its message, a confirming one
+announces the confirmation and the new screen together.
+
+**Phase 9 (version-one content) is specified and ready to implement**:
+see **PHASE9_SPEC.md** and its SECRECY PROTOCOL. Group N1 first: the
+relay prompt (PHASE2_SPEC's "shared prompt comes from
+`nextCommunityTask`" was never implemented — a relay asks nothing
+today). Then the full journey (five milestones, 7 required successes,
+4 events, 20 offerings — public content), the `general-bible` pack (128
+tasks; **never quoted anywhere Brian reads — counts and ids only**),
+`dev-*` packs excluded from production builds, blind content tests, and
+the §34 deliverable as a test: two full sessions with ≤ 5% overlap.
+Rulings: OPEN_QUESTIONS item 32.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

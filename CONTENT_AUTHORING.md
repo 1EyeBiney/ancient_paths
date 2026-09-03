@@ -136,3 +136,35 @@ files, but all synthesis happens client-side — no server needed).
 4 Community Events, 20 Offering outcomes, and location introductions for
 all landmarks — authored under the secrecy policy above, validated by the
 schema, with placeholder tones standing in for unproduced audio.
+PHASE9_SPEC.md raises the task targets (128 total, so two 4-team
+sessions draw without repeats) and binds the authoring rules.
+
+## 5. Operational rules added with Phase 9 (2026-09-03)
+
+- **Development packs are `dev-*`.** A pack whose id starts with `dev-`
+  never loads in a production build and defaults to unchecked in setup
+  whenever a production pack is present. No schema flag — the id IS the
+  flag. `dev-sample` stays the one pack Brian reads; `dev-playtest` is
+  generated placeholder content.
+- **Tests over production content are blind.** Every assertion reduces
+  to a boolean whose failure message carries only a task id and a rule
+  name; no test compares, snapshots, or prints a production task's text.
+  Diagnosis is by opening the pack file yourself, silently.
+- **Asset ids and transcripts never reveal an answer.** The Sound check
+  screen lists every loaded asset by id and the transcript stands in for
+  the audio wherever it can't play; a melody asset for a "name this
+  hymn" task is therefore `gb-hymn-tune-03` with a transcript like "the
+  first eight notes of the tune", never the hymn's name — the ANSWER
+  names it.
+- **A journey file is not secret.** Milestone introductions, route
+  descriptions, event titles/descriptions and offering announcements are
+  read aloud to the whole room; only tasks are secret.
+- **A relay asks a shared community task** (PHASE9_SPEC Group N1 closes
+  the gap where the engine never drew one): open-list prompts, judged by
+  `hostGuidance` that states the rule without listing the answers, with
+  the full set revealed to the room when the event resolves.
+- **Unproduced audio in v1**: audio-listening tasks are text-delivered
+  (the prompt is the transcript), `audioAsset: null`, tagged
+  `audio-pending`; hymn tasks are text-only until Brian's melody data
+  arrives (OPEN_QUESTIONS 23). No placeholder tones ship in a production
+  pack — a beep before a real task is worse than no clip.
