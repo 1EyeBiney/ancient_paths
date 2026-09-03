@@ -3048,6 +3048,448 @@
       "estimatedSeconds": 40
     },
     {
+      "id": "gb-al-002",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "A Voice from Heaven",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": [],
+      "difficulty": "easy",
+      "prompt": "The host reads this sequence aloud: 'And a voice came from heaven, saying, This is my beloved Son, in whom I am well pleased.' Where does this voice come from — a person nearby, or from heaven?",
+      "answer": "A voice from heaven",
+      "acceptedAnswers": ["A voice from heaven", "From heaven"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Matthew 3:17"],
+      "normalVariant": {
+        "prompt": "The host reads this sequence aloud: 'And a voice came from heaven, saying, This is my beloved Son, in whom I am well pleased.' Where does this voice come from — a person nearby, or from heaven?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Does the sequence say the voice came from heaven, or from a person standing nearby?",
+        "options": ["From heaven", "From a person nearby", "It doesn't say"],
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["The sequence names exactly where the voice came from."],
+      "teachingReveal": "This sequence describes the voice heard at Jesus' baptism, declaring Him God's beloved Son — a voice that came from heaven itself.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "baptism"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 30
+    },
+    {
+      "id": "gb-al-003",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Good Tidings",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": [],
+      "difficulty": "easy",
+      "prompt": "The host reads this sequence aloud: 'Then the angel said to the shepherds, Fear not: for behold, I bring you good tidings of great joy.' Who is speaking these words in this sequence?",
+      "answer": "An angel",
+      "acceptedAnswers": ["An angel", "Angel"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Luke 2:10"],
+      "normalVariant": {
+        "prompt": "The host reads this sequence aloud: 'Then the angel said to the shepherds, Fear not: for behold, I bring you good tidings of great joy.' Who is speaking these words in this sequence?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was the speaker an angel, a shepherd, or a king?",
+        "options": ["An angel", "A shepherd", "A king"],
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["The sequence names the speaker directly at the start."],
+      "teachingReveal": "This sequence describes an angel announcing the birth of Jesus to shepherds in the fields near Bethlehem.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "nativity"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 30
+    },
+    {
+      "id": "gb-al-004",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Two Voices on the Water",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": ["galilee"],
+      "difficulty": "easy",
+      "prompt": "The host reads this exchange aloud: 'Peter said, Lord, if it be thou, bid me come unto thee on the water. And He said, Come.' How many different speakers take part in this exchange?",
+      "answer": "Two",
+      "acceptedAnswers": ["Two", "2"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Matthew 14:28-29"],
+      "normalVariant": {
+        "prompt": "The host reads this exchange aloud: 'Peter said, Lord, if it be thou, bid me come unto thee on the water. And He said, Come.' How many different speakers take part in this exchange?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it two speakers, one speaker, or three speakers?",
+        "options": ["Two", "One", "Three"],
+        "successValue": 1
+      },
+      "amplifiedVariant": null,
+      "clues": ["One speaker asks a question; the other answers with a single word."],
+      "teachingReveal": "This exchange records two speakers: Peter asking to walk on the water, and Jesus answering with a single word, 'Come.'",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "peter"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": false },
+      "estimatedSeconds": 30
+    },
+    {
+      "id": "gb-al-005",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "A Storm, Then a Calm",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": ["galilee"],
+      "difficulty": "moderate",
+      "prompt": "The host reads this two-part sequence aloud: first, 'There arose a great storm of wind, and the waves beat into the ship.' Then: 'The wind ceased, and there was a great calm.' What change in the weather does this sequence describe?",
+      "answer": "A violent storm calming into stillness",
+      "acceptedAnswers": ["A violent storm calming into stillness", "A storm calming into a great calm", "Storm to calm"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Mark 4:37-39"],
+      "normalVariant": {
+        "prompt": "The host reads this two-part sequence aloud: first, 'There arose a great storm of wind, and the waves beat into the ship.' Then: 'The wind ceased, and there was a great calm.' What change in the weather does this sequence describe?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Does the weather go from calm to storm, or from storm to calm?",
+        "options": ["Storm to calm", "Calm to storm", "It stays the same throughout"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Describe the weather change, and name who calmed the storm in this account.",
+        "answer": "A violent storm calming into stillness, when Jesus rebuked the wind and sea",
+        "acceptedAnswers": ["Storm to calm, calmed by Jesus"],
+        "successValue": 2
+      },
+      "clues": ["The first part describes danger; the second part describes sudden peace."],
+      "teachingReveal": "This sequence describes a violent storm on the Sea of Galilee giving way to a sudden, great calm after Jesus rebuked the wind and the waves.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "miracles"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "gb-al-006",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "The Sound at Peter's Denial",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": ["jerusalem"],
+      "difficulty": "moderate",
+      "prompt": "The host reads this sequence aloud: 'And immediately the cock crew. And Peter remembered the word of Jesus... and he went out, and wept bitterly.' What sound in this sequence marks the story's turning point?",
+      "answer": "A rooster crowing",
+      "acceptedAnswers": ["A rooster crowing", "A cock crowing"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Matthew 26:74-75"],
+      "normalVariant": {
+        "prompt": "The host reads this sequence aloud: 'And immediately the cock crew. And Peter remembered the word of Jesus... and he went out, and wept bitterly.' What sound in this sequence marks the story's turning point?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was the sound a rooster crowing, a trumpet, or thunder?",
+        "options": ["A rooster crowing", "A trumpet", "Thunder"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Name the sound, and what Peter had done just before hearing it, according to the wider story.",
+        "answer": "A rooster crowing, right after Peter denied knowing Jesus a third time",
+        "acceptedAnswers": ["A rooster crowing, after his third denial"],
+        "successValue": 2
+      },
+      "clues": ["This sound immediately follows Peter's third denial of knowing Jesus."],
+      "teachingReveal": "The crowing of a rooster marks the moment Peter remembered Jesus' earlier warning, right after denying Him a third time — and he wept bitterly.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "peter"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "gb-al-007",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "A Rushing Wind",
+      "biblePeriods": ["early-church"],
+      "locations": ["jerusalem"],
+      "difficulty": "moderate",
+      "prompt": "The host reads this sequence aloud, describing Pentecost: 'And suddenly there came a sound from heaven as of a rushing mighty wind, and it filled all the house.' What kind of sound is described filling the house?",
+      "answer": "The sound of a rushing, mighty wind",
+      "acceptedAnswers": ["The sound of a rushing, mighty wind", "A rushing mighty wind", "Rushing wind"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Acts 2:2"],
+      "normalVariant": {
+        "prompt": "The host reads this sequence aloud, describing Pentecost: 'And suddenly there came a sound from heaven as of a rushing mighty wind, and it filled all the house.' What kind of sound is described filling the house?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was the sound like rushing wind, distant singing, or falling rain?",
+        "options": ["Rushing wind", "Distant singing", "Falling rain"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Describe the sound, and name the day and event this sequence describes.",
+        "answer": "A rushing mighty wind, on the day of Pentecost",
+        "acceptedAnswers": ["Rushing wind, at Pentecost"],
+        "successValue": 2
+      },
+      "clues": ["This sound accompanied the Holy Spirit's arrival on a specific Jewish festival day."],
+      "teachingReveal": "On the day of Pentecost, believers heard a sound like a rushing, mighty wind filling the house, just before the Holy Spirit came upon them.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "pentecost"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "gb-al-008",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "The Second Command",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": [],
+      "difficulty": "moderate",
+      "prompt": "The host reads this two-part sequence aloud: first, 'Lazarus, come forth.' Then, 'Loose him, and let him go.' Why did the onlookers need to be told to loose him?",
+      "answer": "Because he was still wrapped in burial cloths",
+      "acceptedAnswers": ["Because he was still wrapped in burial cloths", "Bound in burial cloths"],
+      "hostGuidance": null,
+      "scriptureReferences": ["John 11:43-44"],
+      "normalVariant": {
+        "prompt": "The host reads this two-part sequence aloud: first, 'Lazarus, come forth.' Then, 'Loose him, and let him go.' Why did the onlookers need to be told to loose him?",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it because he was still bound in burial cloths, because he was too weak to stand, or because the tomb door was still shut?",
+        "options": ["Bound in burial cloths", "Too weak to stand", "The tomb door was shut"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Explain why the second command was necessary, and name the man who had been in the tomb.",
+        "answer": "He was still wrapped in burial cloths, and the man was Lazarus",
+        "acceptedAnswers": ["Wrapped in burial cloths; the man was Lazarus"],
+        "successValue": 2
+      },
+      "clues": ["The man addressed had been in a tomb, still wrapped as the dead were prepared for burial."],
+      "teachingReveal": "After calling Lazarus out of the tomb, Jesus told the onlookers to loose him and let him go, since he emerged still bound in burial cloths.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "lazarus"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "gb-al-009",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Voice Portrait: Fleeing the Call",
+      "biblePeriods": ["divided-kingdom-exile"],
+      "locations": [],
+      "difficulty": "hard",
+      "prompt": "In character, a voice says: 'I fled by ship in the opposite direction, instead of going where God had sent me. Who am I?'",
+      "answer": "Jonah",
+      "acceptedAnswers": ["Jonah"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Jonah 1:3"],
+      "normalVariant": {
+        "prompt": "In character, a voice says: 'I fled by ship in the opposite direction, instead of going where God had sent me. Who am I?'",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it Jonah, Elijah, or Peter?",
+        "options": ["Jonah", "Elijah", "Peter"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Guess who is speaking, based on this first clue alone, before hearing any more.",
+        "answer": "Jonah",
+        "acceptedAnswers": ["Jonah"],
+        "successValue": 2
+      },
+      "clues": [
+        "I was thrown overboard during a violent storm to save the sailors on my ship.",
+        "I spent three days and three nights inside a great fish before it brought me back to dry land."
+      ],
+      "teachingReveal": "This voice belongs to Jonah, who fled from God's call to preach to Nineveh, was thrown overboard in a storm, and spent three days inside a great fish before obeying.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "voice-portrait"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 65
+    },
+    {
+      "id": "gb-al-010",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Voice Portrait: A Shepherd's Courage",
+      "biblePeriods": ["united-kingdom"],
+      "locations": [],
+      "difficulty": "hard",
+      "prompt": "In character, a voice says: 'I was a shepherd boy who defeated a mighty warrior with nothing but a sling and a stone. Who am I?'",
+      "answer": "David",
+      "acceptedAnswers": ["David"],
+      "hostGuidance": null,
+      "scriptureReferences": ["1 Samuel 17:49-50"],
+      "normalVariant": {
+        "prompt": "In character, a voice says: 'I was a shepherd boy who defeated a mighty warrior with nothing but a sling and a stone. Who am I?'",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it David, Saul, or Jonathan?",
+        "options": ["David", "Saul", "Jonathan"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Guess who is speaking, based on this first clue alone, before hearing any more.",
+        "answer": "David",
+        "acceptedAnswers": ["David"],
+        "successValue": 2
+      },
+      "clues": [
+        "I later became king over Israel, though I was once anointed in secret, long before I took the throne.",
+        "I wrote many of the songs found in the book of Psalms."
+      ],
+      "teachingReveal": "This voice belongs to David, the shepherd boy who defeated Goliath, was anointed king in secret, and later wrote many of the Psalms.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "voice-portrait"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 65
+    },
+    {
+      "id": "gb-al-011",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Voice Portrait: Seeing to Believe",
+      "biblePeriods": ["life-of-jesus"],
+      "locations": [],
+      "difficulty": "hard",
+      "prompt": "In character, a voice says: 'I doubted the reports of my friend's resurrection, until I could see and touch the wounds myself. Who am I?'",
+      "answer": "Thomas",
+      "acceptedAnswers": ["Thomas"],
+      "hostGuidance": null,
+      "scriptureReferences": ["John 20:24-28"],
+      "normalVariant": {
+        "prompt": "In character, a voice says: 'I doubted the reports of my friend's resurrection, until I could see and touch the wounds myself. Who am I?'",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it Thomas, Philip, or Andrew?",
+        "options": ["Thomas", "Philip", "Andrew"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Guess who is speaking, based on this first clue alone, before hearing any more.",
+        "answer": "Thomas",
+        "acceptedAnswers": ["Thomas"],
+        "successValue": 2
+      },
+      "clues": [
+        "I was one of the twelve disciples, but I was absent the first time the risen Jesus appeared to the others.",
+        "Once I finally saw Him myself, I declared, 'My Lord and my God.'"
+      ],
+      "teachingReveal": "This voice belongs to Thomas, who doubted the other disciples' report of the resurrection until he saw and touched Jesus' wounds himself, then declared, 'My Lord and my God.'",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "voice-portrait"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 65
+    },
+    {
+      "id": "gb-al-012",
+      "schemaVersion": 1,
+      "packId": "general-bible",
+      "category": "audio-listening",
+      "title": "Voice Portrait: A Light on the Road",
+      "biblePeriods": ["early-church"],
+      "locations": ["damascus"],
+      "difficulty": "hard",
+      "prompt": "In character, a voice says: 'I was a zealous persecutor of the church, until a blinding light on the road to Damascus changed my life forever. Who am I?'",
+      "answer": "Paul",
+      "acceptedAnswers": ["Paul", "Saul"],
+      "hostGuidance": null,
+      "scriptureReferences": ["Acts 9:3-6"],
+      "normalVariant": {
+        "prompt": "In character, a voice says: 'I was a zealous persecutor of the church, until a blinding light on the road to Damascus changed my life forever. Who am I?'",
+        "successValue": 1
+      },
+      "assistedVariant": {
+        "available": true,
+        "cost": { "resource": "insight", "amount": 1 },
+        "prompt": "Was it Paul, Barnabas, or Silas?",
+        "options": ["Paul", "Barnabas", "Silas"],
+        "successValue": 1
+      },
+      "amplifiedVariant": {
+        "available": true,
+        "cost": { "resource": "courage", "amount": 1 },
+        "prompt": "Guess who is speaking, based on this first clue alone, before hearing any more.",
+        "answer": "Paul",
+        "acceptedAnswers": ["Paul"],
+        "successValue": 2
+      },
+      "clues": [
+        "I was originally known by a different name before my ministry among the Gentiles began.",
+        "I went on to write a large portion of the New Testament in letters to churches I helped establish."
+      ],
+      "teachingReveal": "This voice belongs to Paul, formerly called Saul, who was struck blind on the road to Damascus and became one of the early church's greatest missionaries and writers.",
+      "historicalNote": null,
+      "audioAsset": null,
+      "tags": ["general-bible", "audio-pending", "voice-portrait"],
+      "resourceInteractions": { "insight": true, "provision": true, "courage": true },
+      "estimatedSeconds": 65
+    },
+    {
       "id": "gb-hy-001",
       "schemaVersion": 1,
       "packId": "general-bible",

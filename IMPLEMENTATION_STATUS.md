@@ -386,11 +386,21 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 - Phase 9 — Version-one content: PHASE9_SPEC.md written (2026-09-03)
   after Fable's review of Phase 8. Remaining: authoring `general-bible`'s
-  other two categories up to their targets (audio-listening 12,
-  community 12 — counts and ids only anywhere Brian reads, per the
-  secrecy protocol), a sufficiency matrix, and the §34 deliverable as a
-  test: two full sessions with ≤ 5% task overlap. Groups N9-N12 remain.
-  Rulings in OPEN_QUESTIONS.md item 32.
+  last category up to its target (community 12 — counts and ids only
+  anywhere Brian reads, per the secrecy protocol), a sufficiency matrix,
+  and the §34 deliverable as a test: two full sessions with ≤ 5% task
+  overlap. Groups N10-N12 remain. Rulings in OPEN_QUESTIONS.md item 32.
+  **Group N9 done (2026-09-03):** audio-listening authored to its target
+  of 12 tasks (4 easy, 4 moderate, 4 hard), ids `gb-al-001` through
+  `gb-al-012`, all text-delivered per §30.1 (`audioAsset: null`, tagged
+  `audio-pending` for later recording). Four of the twelve (the hard
+  tier) are in the Voice Portrait shape (CONTENT_AUTHORING §3b):
+  progressive first-person clues, prompt as the first clue, amplified
+  form answering from that first clue alone for extra credit. One task
+  was reworded mid-group after the blind tests caught a near-verbatim
+  restatement of a quoted command as its own answer; two others needed
+  an MC option added to `acceptedAnswers` to satisfy the schema's
+  exact-match rule, the same fix pattern seen in Groups N5-N6.
   **Group N8 done (2026-09-03):** hymn authored to its target of 12
   tasks (4 easy, 4 moderate, 4 hard — including the group's original
   seed), ids `gb-hy-001` through `gb-hy-012`, all pre-1929 public-domain
