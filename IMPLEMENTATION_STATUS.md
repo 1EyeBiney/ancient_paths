@@ -450,6 +450,20 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X7b done (2026-09-03, 1 new test, 2868 project-wide):**
+  status everywhere, `tests/audit/group-x7b-status.test.ts` — drives a
+  real game (with `startingResources` so recover/assist/amplify are
+  reachable without farming resources through real play first, a
+  test-only override the engine already exposed) until all 12 reachable
+  states are visited, exercising R/S/A/T (state and session unchanged,
+  a genuinely new announcement, S names the team and, in a task state,
+  "successes") and `?`/Escape (help opens with rows, closes) in every
+  one. Two bugs in the test itself along the way, not the app: cursor-
+  list navigation keys must be dispatched to the focused LIST element
+  (its own keydown listener), not `window`; and the presenter's log is
+  a capped ring buffer, so "did a new announcement fire" has to compare
+  the last entry by reference, not by log length (the same gotcha
+  U10's own test already documents).
   **Groups X7a/X7c/X7d/X7e/X7f done (2026-09-03, 4 new tests, 2867
   project-wide):** the automated accessibility audit's per-action checks
   (names/structure, focus, speech hygiene, no-flooding) plus the U10
