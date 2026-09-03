@@ -5,8 +5,9 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Completed
 
 - **Phase 9 — Version-One Content — DONE.** All 12 test groups (N1-N12)
-  are green: `general-bible` (2603 project-wide tests, `npx tsc --noEmit`
-  clean, `npm run build` clean, no new dependency). Built against
+  are green: `general-bible` (2602 project-wide tests at completion,
+  2734 after Fable's review; `npx tsc --noEmit` clean, `npm run build`
+  clean, no new dependency). Built against
   PHASE9_SPEC.md (written 2026-09-03 after Fable's review of Phase 8).
   Per the SECRECY PROTOCOL, nothing below is task text — counts and ids
   only.
@@ -51,6 +52,22 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   errors (OPEN_QUESTIONS item 34, which also flags one pre-existing,
   not-new, not-fixed button-label/content-convention mismatch on the
   assisted-form resource for a future phase to rule on).
+  **Review addendum (Fable, 2026-09-03; OPEN_QUESTIONS item 35; 2734
+  tests):** three fixes and one ruling. `SessionDeck` now honors a fork
+  route's `taskFocus` for the stages inside it (PHASE3_SPEC said
+  "stage/route"; the builder read the stage only, and the schema makes
+  stage-level focus optional, so every route stage in the real journey
+  had been drawing plain rotation). The reveal's "Also accepted" line
+  lists only genuine alternatives (content rules require the list to
+  contain the answer, so every reveal had repeated it). Item 34's
+  mismatch is resolved the design doc's way: the assisted form costs
+  Provision (§8.2, §20.5) — all 104 assisted forms in `general-bible`
+  and the 4 in `dev-sample` were rewritten mechanically and blind, a
+  blind rule pins the convention, CONTENT_AUTHORING.md §5 records it.
+  A content review for factual accuracy ran in an isolated agent (no
+  task text in Brian's transcript); its outcome is in item 35. Noted
+  for Phase 10: `route.difficulty` is descriptive only, so the shortest
+  route is strictly dominant — PHASE10_SPEC.md X4b makes it real.
 
 - **Phase 8 — Persistence and Recovery — DONE.** All 8 test groups
   (P1-P8) are green: 42 new tests (457 project-wide), `npx tsc --noEmit`
@@ -432,4 +449,15 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Remaining
 
-- Phase 10 — Accessibility and balance audit.
+- Phase 10 — Accessibility and balance audit: **specified**
+  (PHASE10_SPEC.md, 2026-09-03) — a headless simulation harness
+  (`src/sim/`) with a committed, test-checked `SIMULATION_REPORT.md`;
+  game-length, economy, fairness and content-repeat analyses as
+  findings-plus-proposals; automated accessibility, focus and
+  error-recovery audits against the real content; an NVDA checklist
+  for Brian's own pass; route difficulty made real in the deck (X4b);
+  recent-use memory across games (X6) pending Brian's ruling; and the
+  §35 Definition of Done walked item by item.
+- Phase 11 — Content growth and the deferred items (timed endgame,
+  melody tasks when Brian's note data arrives, audio-listening
+  recordings, a second journey).

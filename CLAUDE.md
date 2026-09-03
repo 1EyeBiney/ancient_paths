@@ -1,9 +1,9 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 8 COMPLETE + REVIEWED, PHASE 9 (VERSION-ONE CONTENT) SPECIFIED (2026-09-03) — implement PHASE9_SPEC.md next
+## Status: PHASE 9 COMPLETE + REVIEWED, PHASE 10 (ACCESSIBILITY AND BALANCE AUDIT) SPECIFIED (2026-09-03) — implement PHASE10_SPEC.md next
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (460/460
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (2734/2734
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
@@ -118,16 +118,36 @@ check ignores undefined-valued keys; and the undo nuance — an arming
 Ctrl+Z no longer re-renders over its message, a confirming one
 announces the confirmation and the new screen together.
 
-**Phase 9 (version-one content) is specified and ready to implement**:
-see **PHASE9_SPEC.md** and its SECRECY PROTOCOL. Group N1 first: the
-relay prompt (PHASE2_SPEC's "shared prompt comes from
-`nextCommunityTask`" was never implemented — a relay asks nothing
-today). Then the full journey (five milestones, 7 required successes,
-4 events, 20 offerings — public content), the `general-bible` pack (128
-tasks; **never quoted anywhere Brian reads — counts and ids only**),
-`dev-*` packs excluded from production builds, blind content tests, and
-the §34 deliverable as a test: two full sessions with ≤ 5% overlap.
-Rulings: OPEN_QUESTIONS item 32.
+**Phase 9 (version-one content) is done** (PHASE9_SPEC.md, groups
+N1-N12 by Sonnet, then Fable's review; 2734 tests). Group N1 closed the
+relay-prompt gap (a relay now draws and shows a shared community task
+and reveals its answer on resolve). The real Jerusalem-to-Rome journey
+is v1.0.0 (five milestones, 7 required successes, 4 events, 20
+offerings — public content). The `general-bible` production pack has
+128 tasks (40/20/20/12/12/12/12 across the seven categories; **never
+quoted anywhere Brian reads — counts and ids only; Brian, don't open
+the file or expand the Phase 9 session's tool calls**). `dev-*` packs
+load only in `npm run dev`; the blind content-test suite enforces the
+authoring rules by id and rule name; the two-session deliverable holds
+at 0% overlap (its "≥ 40 distinct tasks per session" figure was my
+arithmetic slip — item 33). Fable's review (item 35) fixed three
+things: the deck now honors a fork ROUTE's `taskFocus` (a Phase 3 gap
+the real journey exposed), the reveal no longer repeats the official
+answer under "Also accepted", and the assisted form costs Provision as
+§8.2/§20.5 say (all 104 authored assisted forms rewritten blind; a
+blind rule pins it; CONTENT_AUTHORING §5). A factual content review ran
+in an isolated subagent so no task text entered Brian's transcript.
+
+**Phase 10 (accessibility and balance audit) is specified**: see
+**PHASE10_SPEC.md**. A headless simulation harness (`src/sim/`) with a
+committed, test-checked `SIMULATION_REPORT.md`; length, economy,
+fairness and content-repeat analyses as findings plus proposals (no
+agent-side balance tuning); automated accessibility, focus and
+error-recovery audits against the real content; an NVDA checklist for
+Brian's own pass; route difficulty made real in the deck (X4b); recent
+-use memory across games (X6) pending Brian's ruling; and the §35
+Definition of Done walked item by item. Rulings: OPEN_QUESTIONS item 35
+and the spec's "Decisions" section.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

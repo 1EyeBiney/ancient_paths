@@ -745,6 +745,66 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       Provision-funds-assist as the intended convention and correct the
       content instead).
 
+35. **RESOLVED (2026-09-03) — Fable's review of Phase 9.** Sonnet's work
+    held up well: the relay prompt (N1) is exactly as specified, the
+    journey's numbers are right, the blind-test discipline was kept
+    throughout, and the N11 amendment (item 33) was correct — my spec's
+    "≥ 40 distinct tasks per session" was an arithmetic slip (I was
+    thinking of the two sessions' union, and even that fails for two
+    teams). Three code fixes, one ruling, and a content review:
+    - **Route `taskFocus` was ignored** (`src/session/builder.ts`).
+      PHASE3_SPEC's planner step 4 says "the team's current stage/route
+      taskFocus"; the Phase 3 builder read the stage's own `taskFocus`
+      only. The schema requires `taskFocus` on a route and makes it
+      optional on a stage, so every stage inside a fork route in the
+      real journey was drawing from plain rotation — a route's "testing
+      Scripture knowledge and listening skill" was untrue. Fixed with a
+      `focusForStage()` lookup (stage's own focus, else its route's);
+      `tests/session/group-review9-route-focus.test.ts` covers the
+      fixture, an override, and all five real route stages. Nothing in
+      Phase 9 caused this; the real content surfaced it.
+    - **"Also accepted" repeated the official answer.** The blind rules
+      (rightly) require `acceptedAnswers` to contain `answer`, so every
+      reveal read "Answer: X. Also accepted: X." on both screens and in
+      speech. New `acceptedAlternatives()` in `src/ui/speech.ts` filters
+      the answer and case-insensitive duplicates; host and audience views
+      use it; V6's test amended plus a positive case. Verified live.
+    - **The assisted form costs Provision — ruling.** Item 34's
+      observation traced back: design doc §8.2 lists "reduce an authored
+      challenge to its assisted form" under Provision and §20.5 says
+      "spend Provision for an eligible assisted form"; the Phase 5
+      dev-playtest generator already authors it that way; the host's
+      button says so. `dev-sample` (Phase 1) had authored Insight and
+      PHASE2_SPEC accommodated it ("some assisted variants cost
+      insight") — that accommodation was the mistake, and general-bible
+      inherited it from dev-sample (all 104 assisted forms). Fixed by a
+      mechanical, content-blind rewrite of `cost.resource` in both packs
+      (104 + 4 replacements, counts verified by the script, no text
+      printed); a blind rule now pins assisted → provision and amplified
+      → courage; CONTENT_AUTHORING.md §5 records the convention. The
+      engine still honors whatever a task declares (unchanged), so the
+      `tests/engine/fixtures.ts` tasks that cost Insight keep testing
+      that property. The button labels stay static.
+    - **Noted for Phase 10 (PHASE10_SPEC.md X4b)**: `route.difficulty`
+      is descriptive only — `SessionDeck` draws at the session weights
+      regardless of route, so "Mountain Route: one success, the hardest
+      road" is strictly dominant (fewer tasks, identical odds). Ruled: a
+      route's difficulty shifts its stages' draw weights one step
+      relative to the session setting. Brian may veto.
+    - **Noted, no action**: the two `dev-*` pack files are copied into
+      `dist/` by Vite (they live in `public/`) even though a production
+      build never fetches them — harmless, they are not secret.
+      `general-bible.json` is itself a publicly served static file, as
+      any static-site content must be; Brian's honor system was always
+      the model (CONTENT_AUTHORING §1), this just states it once.
+    - **Content review**: done by a separate, isolated agent so that no
+      task text entered this session's transcript (Brian, that is why
+      the review ran as a background subagent rather than inline). Its
+      findings, by id and kind of change only, are appended below.
+    2734 tests after the code fixes (2602 at Phase 9's completion; the
+    difference is the new blind cost rule per task, the route-focus
+    tests, and the reveal-alternatives case).
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,
