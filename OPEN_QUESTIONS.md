@@ -523,6 +523,56 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     (§26 says "where practical"): on resume the current task's clip plays
     again as a fresh presentation.
 
+30. **RESOLVED (2026-09-03) — Phase 8 Group P8 browser check (Sonnet,
+    Chrome via the dev server).** dev-sample + dev-playtest packs,
+    Jerusalem to Rome, 2 teams (Cross, Lion), `npm run dev`. Confirmed:
+    - `indexedDB.databases()` shows a real `the-way` (v1) database from
+      first boot; its `saves` object store's `current` key updates after
+      **every** action (checked after `startGame`, and again after a full
+      task cycle — `commands.length` and `snapshot.state` matched the
+      live engine both times, `lastCommand` matched the last thing
+      clicked).
+    - Reloading mid-task (`resourceWindow`, 7 commands in) showed the
+      Resume game button above New game with the exact card format:
+      "Jerusalem to Rome. 2 teams: Cross, Lion. Round 1, Cross's turn.
+      Saved 9/3/2026, 2:26:06 AM." Resuming reproduced the identical host
+      screen and audience table (same task, same "1 of 3 successes") —
+      confirmed by screenshot comparison before reload and after Resume.
+    - Ctrl+Z after Resume actually undid the resumed `presentTask`
+      (`commands.length` 7 → 8 with `undo` appended, `snapshot.state`
+      `resourceWindow` → `beginTurn`, and the screen visibly reverted to
+      "Present task"): undo history survived the reload, not just
+      `canUndo()` reporting true.
+    - Game log… listed the game's lines in order with a working Copy
+      button (Chrome's clipboard API is available here).
+    - New game while a save exists asked first ("Start a new game? The
+      saved game will be replaced."); Cancel returned to Welcome with
+      the save and its Resume card intact; confirming cleared
+      `saves/current` (verified empty afterward) and moved to setup.
+    - No console errors or dev-server errors at any point.
+
+    **One surprising, pre-existing (not new to Phase 8) accessibility
+    nuance found while checking Ctrl+Z**: `App.dispatchCommand`'s
+    `"undo"` case (from Phase 6) calls `undoController.press()` — which
+    calls `present()` with "Undo will reverse: X. Press again to
+    confirm." on the first press, or "Undo confirmed: X." on the second
+    — and then *unconditionally* calls `renderCurrentScreen(true)`
+    right after. `silent` only suppresses the audio-cue/auto-play side
+    effects; the renderer's own entry announcement for the current
+    screen still fires every time, immediately overwriting whichever
+    undo message `press()` just wrote to the live region and status
+    line, both on the arm press (state hasn't changed, so it's the same
+    text as before) and the confirm press (state has changed, so it's
+    the new screen's own text, not "Undo confirmed"). Functionally undo
+    still works correctly (confirmed above); a screen reader user likely
+    never actually hears "Undo will reverse…" or "Undo confirmed…"
+    before it's replaced. This predates Phase 8 (the code is unchanged
+    Phase 6 work) and wasn't something this browser check was scoped to
+    fix — flagging it here per Brian's ear-is-the-tiebreaker rule so a
+    future phase (or Brian's own testing) can judge whether it needs
+    fixing, e.g. by having the undo case build one combined announcement
+    instead of two sequential `present()` calls.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

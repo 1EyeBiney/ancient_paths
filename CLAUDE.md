@@ -1,9 +1,9 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 7 COMPLETE + REVIEWED, PHASE 8 (PERSISTENCE & RECOVERY) SPECIFIED (2026-09-03) — implement PHASE8_SPEC.md next
+## Status: PHASE 8 (PERSISTENCE & RECOVERY) COMPLETE (2026-09-03) — Phase 9 not yet planned
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (415/415
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (457/457
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
@@ -85,19 +85,33 @@ gap: nothing grants a resource from the real 0/0/0 start except
 surplus/events/offerings, which all need a resource first — Brian ruled
 a configurable stage-completion reward, folded into Phase 8.
 
-**Phase 8 (persistence and recovery) is specified and ready to
-implement**: see **PHASE8_SPEC.md**. Group P1 first: the
-stage-completion reward (`DEFAULTS.stageCompletionReward`, granted in
-`finalizeStageCompletion`; amending the existing tests it disturbs is
-expected and must be recorded). Then: a save = setup + the engine's
-command log (resume rebuilds the deck from the seed and replays —
-Phase 3's determinism makes this sound; undo comes back for free),
-IndexedDB behind a `SaveStore` seam with an in-memory store for tests
-(no new dependency), a `RecordingEngine` decorator so autosave after
-every command touches none of screens.ts's 28 dispatch sites, a Resume
-card on Welcome, a New-game guard, a Game log viewer, quarantine-never-
-delete for bad/foreign saves, two save-and-resume full-game round trips.
-Rulings: OPEN_QUESTIONS item 29.
+**Phase 8 (persistence and recovery) is done** (PHASE8_SPEC.md, groups
+P1-P8, 457 tests). Group P1 first: `DEFAULTS.stageCompletionReward`
+(choice, amount 1) is granted in `finalizeStageCompletion` before the
+milestone/community-event pause — the missing faucet from OPEN_QUESTIONS
+28; five existing tests amended and commented. Then persistence proper,
+new `src/persistence/`: `schema.ts` (a hand-mirrored zod
+`savedGameSchema` for `Command`/`PlaySession`/`SetupSnapshot`, since
+none of those are zod types; a specific message for a `saveSchemaVersion`
+mismatch, newer or older); `store.ts` (`SaveStore` seam,
+`MemorySaveStore` for tests — no new dependency — and
+`IndexedDbSaveStore`, database `the-way`); `recorder.ts`
+(`RecordingEngine`, a `GameEngine` decorator that only records a command
+that didn't throw, so screens.ts's 28 dispatch sites and undo.ts never
+changed); `replay.ts` (`rebuildFromSave()`: rebuilds the deck via
+`buildSessionDeck` on the saved seed, replays every command, refuses on
+any divergence or a mismatch against the saved session snapshot).
+`app.ts` gained a shared `enterPlaying()` (beginJourney and Resume both
+use it), autosave after every committed command (coalesced, one write in
+flight), a Resume game button and card on Welcome, a New-game guard, and
+a game menu with Game log… and Delete saved game. Manual browser check
+(Group P8) confirmed autosave, Resume (host/audience match verified by
+screenshot), a real post-resume Ctrl+Z (undo history survived reload),
+Game log, and the New-game guard — zero console errors; one pre-existing
+Phase 6 accessibility nuance flagged (not fixed): the undo arm/confirm
+message is immediately overwritten by the screen's own re-render
+announcement. Rulings and the browser-check writeup: OPEN_QUESTIONS
+items 29-30.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

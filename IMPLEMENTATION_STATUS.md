@@ -4,6 +4,59 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Completed
 
+- **Phase 8 — Persistence and Recovery — DONE.** All 8 test groups
+  (P1-P8) are green: 42 new tests (457 project-wide), `npx tsc --noEmit`
+  clean, `npm run build` clean. Built against PHASE8_SPEC.md (written
+  2026-09-03 after Fable's review of Phase 7). Group P1 first, in
+  `src/engine/engine.ts` (Phase 7's rules extended one explicit amendment
+  for this group): `DEFAULTS.stageCompletionReward` (choice, amount 1) is
+  granted in `finalizeStageCompletion` before the milestone/community-event
+  pause — the missing faucet from OPEN_QUESTIONS item 28; five existing
+  tests amended (each commented, tracing to this group) for the extra
+  pending choice it now produces.
+  New `src/persistence/`: `schema.ts` (`savedGameSchema`, a hand-mirrored
+  zod schema for `Command`/`PlaySession`/`SetupSnapshot` since none of
+  those are zod types themselves; `parseSavedGame()` gives a specific
+  message for a `saveSchemaVersion` mismatch, newer or older, both
+  quarantined); `store.ts` (`SaveStore` interface, `MemorySaveStore` for
+  tests, `IndexedDbSaveStore` — database `the-way`, object store `saves`,
+  key `current` + `quarantined-<ISO>`, opens lazily, never throws
+  synchronously); `recorder.ts` (`RecordingEngine`, a `GameEngine`
+  decorator that only records a command if the wrapped engine didn't
+  throw — screens.ts's 28 dispatch sites and undo.ts never changed);
+  `replay.ts` (`rebuildFromSave()`: resolves journey/packs by id and exact
+  version, rebuilds the deck via `buildSessionDeck` on the saved seed,
+  replays every command, and refuses on any divergence or a mismatch
+  against the saved session snapshot — timestamps ignored).
+  `src/ui/setup.ts` gained `SetupWizard.toSnapshot()`/`applySnapshot()`.
+  `src/ui/app.ts`: a new shared `enterPlaying()` (used by both
+  `beginJourney` and Resume) wraps the engine in a `RecordingEngine` and
+  autosaves after every committed command, coalescing so at most one
+  write is in flight; a failing store announces once, politely, and stops
+  trying for that game. Welcome checks the store on boot (async;
+  re-renders if still on Welcome once it resolves) and offers a **Resume
+  game** button above New game with a spoken/visible summary card, or
+  quarantines and announces an unreadable save. Resume rebuilds, applies
+  the setup snapshot, restores audio settings/speech mode, and enters
+  playing — announcing "Resumed." (assertive) ahead of the screen's
+  normal entry announcement; pre-seeding the event-log-length and
+  clues-revealed tracking stops a resumed game's whole prior history from
+  being voiced as new, while the audio presentation key stays null on
+  purpose so the resumed task's clip plays once more from the top (audio
+  state itself is never persisted). New game over an existing save asks
+  first and clears the store on confirm. The game menu gained **Game
+  log…** (last 50 lines, Copy via the clipboard API where available) and
+  **Delete saved game** (press-twice like End session; also stops
+  autosaving for the rest of that game). `main.ts` passes a real
+  `IndexedDbSaveStore`. KEYBOARD_COMMANDS.md's notes updated (no new
+  keys). Manual browser check (Group P8, OPEN_QUESTIONS item 30):
+  autosave, Resume (host/audience match confirmed by screenshot), a real
+  post-resume Ctrl+Z (undo history survived reload), Game log, and the
+  New-game guard all confirmed working with zero console errors; one
+  pre-existing (Phase 6, not new) accessibility nuance flagged, not
+  fixed — the undo arm/confirm message is immediately overwritten by the
+  screen's own re-render announcement.
+
 - **Phase 7 — Community and Offering Systems — DONE.** All 8 test groups
   (C1-C8) are green: 41 new tests (415 project-wide), `npx tsc --noEmit`
   clean, `npm run build` clean. Built against PHASE7_SPEC.md (written
@@ -323,17 +376,7 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Active
 
-- Phase 8 — Persistence and recovery: PHASE8_SPEC.md written
-  (2026-09-03) after Fable's review of Phase 7. A save is the setup plus
-  the engine's command log; resume rebuilds the deck from the seed and
-  replays (Phase 3's determinism makes this sound). IndexedDB behind a
-  `SaveStore` seam (in-memory store for tests, no new dependency), a
-  `RecordingEngine` decorator for autosave after every command, a
-  Resume card on Welcome, a New-game guard, a Game log viewer,
-  quarantine-never-delete for bad saves. Group P1 first: the
-  stage-completion reward Brian ruled on (OPEN_QUESTIONS 28), which fixes
-  the resource economy's missing faucet. Test groups P1-P8.
-  Implementation not yet started. Rulings in OPEN_QUESTIONS.md item 29.
+(none — Phase 8 complete; Phase 9 not yet planned)
 
 ## Remaining
 
