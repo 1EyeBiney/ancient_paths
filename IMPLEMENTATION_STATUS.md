@@ -450,6 +450,17 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X3 done (2026-09-03, 15 new tests, 2826 project-wide):**
+  resource economy, `tests/sim/group-x3-economy.test.ts` — the assisted/
+  amplified faucet is reachable in practice (BOLD reaches the amplified
+  form in every one of 10 sampled games; CAUTIOUS reaches the assisted
+  form well above the spec's 60% floor); no preset floods every team to
+  the resource cap in more than 10% of games or discards at the cap in
+  more than 25%; the Journey Token rate for BOLD cleared the spec's 30%
+  informational floor with no note needed. New `src/sim/aggregate.ts`
+  turns a batch of `SimResult`s into the summary statistics X3 (and
+  later X4/X10) need, so the report and the tests always read the same
+  numbers from the same computation.
   **Group X2 done (2026-09-03, 56 new tests, 2811 project-wide):** game
   length and sufficiency under realistic play, `tests/sim/group-x2-
   length.test.ts` — a 7-team-count × 3-difficulty × 3-preset matrix (3
