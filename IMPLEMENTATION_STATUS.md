@@ -450,6 +450,25 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X4 + X4b done (2026-09-03, 20 new tests, 2846 project-wide):**
+  `src/session/builder.ts` — a fork route's own `difficulty` now shifts
+  its stages' draw weights one step relative to the session setting
+  (easy gentler, hard harder, moderate unchanged, clamped at the ends);
+  before this, `route.difficulty` was decorative and the route with the
+  fewest required successes was always strictly dominant.
+  `tests/session/group-x4b-route-difficulty.test.ts` confirms the shift,
+  the clamping at both ends, and that determinism and category rotation
+  are unaffected. `tests/sim/group-x4-fairness.test.ts`: routes, catch-
+  up frequency, community-event stats, and Service-by-preset (HOARDER
+  earns near-zero, GENEROUS earns the most) all check out; seat order
+  surfaced a genuine, unfixed finding — every seat's win share sits
+  above the spec's own [0.15, 0.40] bound (this journey commonly ends
+  with more than one team finishing, which §21 rules acceptable, so a
+  single-winner-shaped bound doesn't fit), but *first*-to-finish share
+  by seat shows a real ~3x skew toward seat 0 from how the "finish the
+  round" ending rule grants its grace period. Recorded with numbers and
+  two unimplemented proposals in OPEN_QUESTIONS item 37, per the spec's
+  own instruction for this case: report, don't redesign.
   **Group X3 done (2026-09-03, 15 new tests, 2826 project-wide):**
   resource economy, `tests/sim/group-x3-economy.test.ts` — the assisted/
   amplified faucet is reachable in practice (BOLD reaches the amplified

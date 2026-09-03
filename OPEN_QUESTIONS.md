@@ -885,6 +885,65 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     once, that either does or doesn't clear a bound. The realized total
     for `tests/sim` is recorded in `SIMULATION_REPORT.md`'s header.
 
+37. **Finding (2026-09-03) — PHASE10_SPEC Group X4's seat-order fairness
+    check: the [0.15, 0.40] per-seat win-share bound doesn't fit this
+    game's own rules, but a real, smaller turn-order skew sits underneath
+    it. Not fixed here — the spec is explicit that a breach here is
+    something to propose, not redesign.** Measured across 120 four-team
+    standard games (`tests/sim/group-x4-fairness.test.ts`, policy rotated
+    by seed so seat and preset are decoupled):
+    - **Win share by seat: [0.533, 0.517, 0.425, 0.450]** — every seat is
+      ABOVE the spec's 0.40 upper bound, not just seat 0. The reason: this
+      journey commonly ends with more than one team finishing at once
+      (`sharedVictory` in 68% of these games; mean 1.93 of 4 teams finish
+      per game — winners-per-game distribution was 1 winner in 38 games,
+      2 in 57, 3 in 21, 4 in 4). The [0.15, 0.40] bound reads like a
+      single-winner assumption (roughly "1/4 ± tolerance"); design doc
+      §21 explicitly rules "a shared journey victory is acceptable," so a
+      per-seat *win* share well above 1/4 is the intended shape of the
+      game, not a fairness defect. The test now reports this share
+      without a pass/fail bound.
+    - **The real skew is in *first*-to-Rome share by seat: [0.408, 0.275,
+      0.192, 0.125]** — seat 0 is first to finish more than 3x as often
+      as seat 3. Mechanism: the "finish the round" ending rule (§21; a
+      team finishing sets `finishRoundNumber`, the game ends once that
+      round completes) only grants a bonus chance to teams seated AFTER
+      the finisher within that same round — a team seated before the
+      finisher has already taken its turn for that round and gets
+      nothing extra. Seat 0 always acts first each round, so it is never
+      "too late" to benefit from someone else's finish that round, while
+      a later seat's own finish grants nothing to anyone seated earlier.
+      Over many close games this compounds into the observed skew.
+    - **Proposal (not implemented — Fable/Brian's call, matching the
+      spec's "propose, do not redesign" instruction for this audit
+      phase)**: two candidate fixes, either small: (a) rotate which team
+      occupies "seat 0" each game (e.g. by seed) so no single team's
+      identity benefits session over session — cosmetic, doesn't change
+      the underlying mechanic, but a host reading team order off a fixed
+      setup list would no longer always see the same team favored; (b)
+      change the ending rule so the round in which the LAST-acting team
+      of that round finishes is followed by one MORE full round for
+      everyone (guaranteeing every seat gets at least one "grace" turn
+      after any finish, not just seats after the finisher) — a real rule
+      change to `Engine.endTurnAndAdvance`, weighed against making games
+      run longer. Neither is implemented; `src/engine/` stays frozen to
+      defects only this phase per PHASE10_SPEC.md's Files section, and
+      this is a design tradeoff, not a defect.
+    - **Routes, briefly**: the static expected-cost formula (Σ required /
+      base rate at the route's own difficulty, ignoring X4b's weight
+      shift) puts Mountain Route ~59% cheaper than Coastal and ~38%
+      cheaper than Inland on the north fork — over the 25% threshold the
+      spec flags. But X4b's whole point is that a "hard" route now draws
+      MORE of its tasks from the hard/challenging tier in practice (not
+      fewer), which this static formula doesn't capture — it's the
+      floor a route-choosing team would compute WITHOUT knowing the
+      shifted odds, not the real in-play cost. Measuring the TRUE
+      post-X4b per-route success rate needs enough simulated games per
+      route to be statistically meaningful, which this audit's time
+      budget (item 36) didn't extend to. Recommended for Phase 11: a
+      dedicated per-route outcome comparison once more seed budget (or a
+      faster harness) is available.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,

@@ -66,6 +66,23 @@ const DIFFICULTY_WEIGHTS: Record<DeckDifficultySetting, Record<Difficulty, numbe
   challenging: { easy: 15, moderate: 45, hard: 40 },
 };
 
+// PHASE10_SPEC Group X4b: a fork route's own `difficulty` shifts the DRAW
+// weights for its stages one step relative to the session setting — easy
+// one step gentler, hard one step harder, moderate unchanged, clamped at
+// the ends (gentle can't get gentler, challenging can't get harder).
+// Before this, route.difficulty was descriptive only: every stage drew at
+// the plain session weights regardless of its route, making the route with
+// the FEWEST required successes always strictly dominant (same odds per
+// task, fewer tasks needed) — contradicting §5.3's "forks trade off
+// length, difficulty, and task type."
+const SESSION_DIFFICULTY_ORDER: DeckDifficultySetting[] = ["gentle", "standard", "challenging"];
+
+function stepSessionDifficulty(setting: DeckDifficultySetting, delta: -1 | 1): DeckDifficultySetting {
+  const idx = SESSION_DIFFICULTY_ORDER.indexOf(setting);
+  const next = Math.min(SESSION_DIFFICULTY_ORDER.length - 1, Math.max(0, idx + delta));
+  return SESSION_DIFFICULTY_ORDER[next]!;
+}
+
 function drawDifficulty(rng: Rng, weights: Record<Difficulty, number>): Difficulty {
   const total = weights.easy + weights.moderate + weights.hard;
   let roll = rng.next() * total;
@@ -126,6 +143,20 @@ function focusForStage(journey: Journey, stageId: string): TaskCategory[] | unde
   return undefined;
 }
 
+type RouteEntry = Extract<JourneyEntry, { kind: "fork" }>["routes"][number];
+
+/** The fork route containing `stageId`, or undefined for a top-level stage
+ * (PHASE10_SPEC Group X4b). */
+function routeForStage(journey: Journey, stageId: string): RouteEntry | undefined {
+  for (const entry of journey.entries) {
+    if (entry.kind !== "fork") continue;
+    for (const route of entry.routes) {
+      if (route.stages.some((s) => s.id === stageId)) return route;
+    }
+  }
+  return undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Seeded Fisher-Yates
 // ---------------------------------------------------------------------------
@@ -169,10 +200,21 @@ export class SessionDeck implements TaskSource {
     enabledCategories: TaskCategory[],
     private readonly rng: Rng,
     private readonly weights: Record<Difficulty, number>,
+    private readonly difficultySetting: DeckDifficultySetting,
   ) {
     this.pools = pools;
     this.communityReserve = communityReserve;
     this.rotationCategories = enabledCategories.filter((c) => c !== "community");
+  }
+
+  /** The draw-weight row for a stage (Group X4b): the route's difficulty
+   * shifts the session row one step; a top-level stage or a `moderate`
+   * route uses the plain session row. */
+  private weightsForStage(stageId: string): Record<Difficulty, number> {
+    const route = routeForStage(this.journey, stageId);
+    if (!route || route.difficulty === "moderate") return this.weights;
+    const delta = route.difficulty === "easy" ? -1 : 1;
+    return DIFFICULTY_WEIGHTS[stepSessionDifficulty(this.difficultySetting, delta)];
   }
 
   // -- TaskSource ------------------------------------------------------
@@ -198,7 +240,10 @@ export class SessionDeck implements TaskSource {
       category = this.pickFromCycle(team);
     }
 
-    const task = this.popFromCategory(category);
+    // nextReplacement() (recover) is unaffected: it draws by the ORIGINAL
+    // attempt's already-fixed category+difficulty via fallbackOrder, not
+    // a fresh weighted roll, so route-shifted weights only matter here.
+    const task = this.popFromCategory(category, this.weightsForStage(stageId));
     if (!task) {
       throw new SessionBuildError(
         `SessionDeck.nextTask: category "${category}" is exhausted and no fallback category had supply.`,
@@ -290,9 +335,9 @@ export class SessionDeck implements TaskSource {
     return snapshot;
   }
 
-  private popFromCategory(category: TaskCategory): Task | null {
+  private popFromCategory(category: TaskCategory, weights: Record<Difficulty, number> = this.weights): Task | null {
     if (!this.poolHasAny(category)) return null;
-    const drawn = drawDifficulty(this.rng, this.weights);
+    const drawn = drawDifficulty(this.rng, weights);
     for (const d of fallbackOrder(drawn)) {
       const bucket = this.pools[category][d];
       const task = bucket.pop();
@@ -494,6 +539,7 @@ export function buildSessionDeck(options: BuildOptions): BuildResult {
     enabledCategories,
     rng,
     DIFFICULTY_WEIGHTS[difficultySetting],
+    difficultySetting,
   );
 
   const report: DeckReport = {
