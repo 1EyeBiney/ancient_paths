@@ -960,6 +960,35 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     full round trip against `MemorySaveStore` and every piece of new
     `SetupWizard`/App logic instead.
 
+39. **Finding (2026-09-03) — PHASE10_SPEC Group X7g: Cancel-closing the
+    "End session?" confirm from the game menu doesn't restore focus
+    anywhere meaningful.** Every dialog launched from the game menu
+    (Audio, Game log, Delete saved game, Forget recent tasks, End
+    session) shares `ModalManager`'s single overlay with the menu
+    itself, so opening one clears the menu's content — detaching the
+    very button that invoked it. Four of the five now pass
+    `onClose: () => this.openGameMenu()` (`src/ui/app.ts`), so closing
+    them genuinely returns you to the menu. End session was left out on
+    purpose: its confirm path tears the whole game down and switches to
+    the setup screen, and reopening a menu with nothing left to act on
+    right before that transition would leave a stray dialog on top of
+    the new screen. The result is that Cancel-closing "End session?"
+    specifically still loses focus (lands wherever it happened to be
+    inside the now-hidden dialog, which a screen reader would announce
+    as nothing useful). Low-frequency path — a host who opens End
+    session and changes their mind — but real. **Proposal (not
+    implemented, `src/ui/` open to defect fixes only from PHASE10_SPEC's
+    own instruction; this is closer to a design choice about End
+    session's confirm-vs-cancel branches than a plain defect):** give
+    `openEndSessionConfirm` an `onClose` that reopens the menu ONLY when
+    closing via Cancel/Escape (not after a successful confirm) — e.g. by
+    tracking whether the confirm branch already ran before `onClose`
+    fires, or by having the confirm button call `this.modal.close()`
+    with `onCloseCallback` cleared first so its own teardown doesn't
+    trigger a reopen. Either is a small, well-scoped Phase 11 fix, not
+    attempted here to avoid rushing a change to a path that changes
+    game state.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,

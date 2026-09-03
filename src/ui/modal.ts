@@ -60,6 +60,7 @@ export class ModalManager {
     this.open_ = true;
     this.onCloseCallback = options.onClose;
     this.overlay.addEventListener("keydown", this.trapFocus);
+    this.overlay.addEventListener("keydown", this.handleEscape);
 
     options.present({ visual: `${options.title} dialog opened.` });
     heading.focus();
@@ -70,12 +71,41 @@ export class ModalManager {
     this.overlay.hidden = true;
     this.open_ = false;
     this.overlay.removeEventListener("keydown", this.trapFocus);
+    this.overlay.removeEventListener("keydown", this.handleEscape);
     const onClose = this.onCloseCallback;
+    const invoker = this.invoker;
     this.onCloseCallback = undefined;
-    onClose?.();
-    this.invoker?.focus();
     this.invoker = null;
+    onClose?.();
+    // PHASE10_SPEC Group X7g: a sub-dialog opened from within the game menu
+    // (e.g. Audio…) shares this single overlay with the menu itself, so
+    // opening it detaches the menu's own button — including the "invoker"
+    // captured for THIS dialog. If onClose() reentrantly reopens a parent
+    // modal (see app.ts's openAudioDialog etc.), that nested open() already
+    // focused its own heading and captured its own fresh invoker; calling
+    // this call's (now-detached, and stale) invoker.focus() afterward would
+    // do nothing useful at best, or steal focus from the reopened dialog at
+    // worst. Only restore focus here if nothing reopened in the meantime.
+    if (!this.open_) {
+      invoker?.focus();
+    }
   }
+
+  // PHASE10_SPEC Group X7g: Escape-closes-modal previously relied entirely
+  // on the app's global KeyboardController ladder, which is only attached
+  // while mode === "playing" (see app.ts's own comment on attachKeyboard).
+  // A modal opened from Welcome/Setup (the New-game guard) therefore had no
+  // Escape handling at all — closable only by clicking Cancel. The modal
+  // now owns its own Escape-to-close, independent of app mode; stopping
+  // propagation keeps it from also reaching the app-level "cancel" binding
+  // while playing, which would otherwise immediately reopen the game menu
+  // (dispatchCommand("cancel") falls back to openGameMenu() once the modal
+  // it just saw close makes isOpen() false).
+  private handleEscape = (event: KeyboardEvent): void => {
+    if (event.key !== "Escape") return;
+    event.stopPropagation();
+    this.close();
+  };
 
   private trapFocus = (event: KeyboardEvent): void => {
     if (event.key !== "Tab") return;

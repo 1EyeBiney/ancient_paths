@@ -1527,6 +1527,7 @@ export class App {
       title: "Audio",
       present: (i) => this.presenter.present(i),
       build: (container) => this.buildAudioSettings(container),
+      onClose: () => this.openGameMenu(),
     });
   }
 
@@ -1552,6 +1553,7 @@ export class App {
           container.appendChild(copyBtn);
         }
       },
+      onClose: () => this.openGameMenu(),
     });
   }
 
@@ -1578,6 +1580,7 @@ export class App {
         cancelBtn.addEventListener("click", () => this.modal.close());
         container.append(confirmBtn, cancelBtn);
       },
+      onClose: () => this.openGameMenu(),
     });
   }
 
@@ -1603,6 +1606,7 @@ export class App {
         cancelBtn.addEventListener("click", () => this.modal.close());
         container.append(confirmBtn, cancelBtn);
       },
+      onClose: () => this.openGameMenu(),
     });
   }
 

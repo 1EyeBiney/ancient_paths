@@ -450,6 +450,49 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 ## Active
 
 - Phase 10 — Accessibility and balance audit: implementing PHASE10_SPEC.md.
+  **Group X7g done (2026-09-03, 2 new tests, 2870 project-wide):** modals —
+  `tests/audit/group-x7g-modals.test.ts` checks every `ModalManager`
+  dialog (game menu, Audio, Game log, Delete saved game, Forget recent
+  tasks, End session, and the New-game guard from Welcome) for a stable
+  accessible title, Tab/Shift+Tab wrap, Escape-closes, and a sane
+  post-close focus target. Two real defects fixed in `src/ui/modal.ts`
+  and `src/ui/app.ts`:
+  - Escape only ever closed a modal via the app's global keyboard
+    ladder (`dispatchCommand("cancel")`), which is attached only while
+    `mode === "playing"` — a modal opened from Welcome or Setup (the
+    New-game guard) had no Escape handling at all, only its Cancel
+    button. `ModalManager` now owns its own Escape-to-close, attached
+    on the overlay for the lifetime of every open dialog regardless of
+    app mode, with `stopPropagation` so it doesn't also reach the
+    app-level ladder while playing (which would otherwise see the
+    modal already closed and reopen the game menu from its own "cancel
+    with nothing to cancel" fallback).
+  - Audio, Game log, Delete saved game, and Forget recent tasks are all
+    launched from buttons that are themselves children of the game
+    menu's own `ModalManager` content. Since every dialog shares one
+    overlay, opening any of them clears that content — detaching the
+    very button `close()` was going to refocus. Focus was silently
+    lost (`.focus()` on a detached element is a no-op) rather than
+    landing anywhere sensible. Fixed two ways: `ModalManager.close()`
+    now supports a dialog reopening itself from `onClose` without the
+    outer call clobbering the new one's state (captures `invoker`/
+    `onClose` in locals, and only restores focus to the old invoker if
+    nothing reopened in the meantime); those four dialogs now pass
+    `onClose: () => this.openGameMenu()`, so closing any of them —
+    Escape or Cancel — genuinely returns you to the menu you came
+    from. End session is deliberately excluded: its confirm path tears
+    the whole game down and switches to the setup screen, and
+    reopening a menu with nothing left to act on right before that
+    transition would leave a stray dialog on top of the new screen —
+    Cancel-closing it remains a known, undocumented-until-now focus
+    gap (recorded, not fixed, in OPEN_QUESTIONS).
+  One bug in the test itself, not the app: the original draft dispatched
+  Escape to `window`, which never reaches a listener on the overlay
+  (dispatching an event AT a target only fires that target's own
+  listeners — nothing bubbles back down into descendants). Real Escape
+  presses always originate from whatever has focus *inside* the trapped
+  modal and bubble up through the overlay to `window`; fixed by
+  dispatching to the dialog element itself, matching that.
   **Group X7b done (2026-09-03, 1 new test, 2868 project-wide):**
   status everywhere, `tests/audit/group-x7b-status.test.ts` — drives a
   real game (with `startingResources` so recover/assist/amplify are
