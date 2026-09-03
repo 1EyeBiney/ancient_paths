@@ -32,6 +32,18 @@ export const DEFAULTS = {
   // Centralized here rather than hard-coded in the engine (§27.6 spirit).
   insightEffectCost: 1, // extra-clue / eliminate-option / replay, per use
   recoverCostProvision: 1, // Provision "recover" after an incorrect ruling
+
+  // Phase 7 (§7.6, §10-12, §36; PHASE7_SPEC.md).
+  catchUp: {
+    enabled: true, // setup's "Community catch-up" toggle overrides this per session
+    stagesBehind: 2, // eligible when strictly MORE than this many entries behind the leader
+    bonus: { resource: "choice" as const, amount: 1 },
+  },
+  community: {
+    exceptionalShare: 0.5, // a single team's pledge share of the threshold …
+    exceptionalMinimum: 2, // … and at least this many units, counts as "exceptional"
+    maxPledgePerTeam: 3, // the UI offers 1..min(owned, this) per accepted resource
+  },
 } as const;
 
 export type GameDefaults = typeof DEFAULTS;

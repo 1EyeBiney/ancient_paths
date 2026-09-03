@@ -103,6 +103,10 @@ export interface GameSummary {
   journeyWinners: string[];
   barnabasAwardRecipients: string[];
   finalPositions: string[];
+  /** Configured public name of the Service recognition (§6.3, §36). */
+  serviceAwardName: string;
+  /** Human-readable lines about what the room did together (§34 Phase 7). */
+  communityAccomplishments: string[];
 }
 
 export interface RouteInfo {
@@ -139,6 +143,7 @@ export type Command =
   | { type: "contribute"; teamId: string; resource: ResourceType; amount: number }
   | { type: "declineContribution"; teamId: string }
   | { type: "resolveCommunityEvent" }
+  | { type: "shareGrantedResource"; teamId: string; toTeamId: string }
   | { type: "undo" };
 
 // ---------------------------------------------------------------------------
@@ -163,12 +168,18 @@ interface PendingChoice {
   teamId: string;
   amount: number;
   reason: string;
+  // A gift (from shareGrantedResource) cannot itself be re-shared — no
+  // infinite Service loops. Every other grant is shareable.
+  shareable: boolean;
 }
 
 interface CommunityEventRuntime {
   eventId: string;
   roomProgress: number;
   pledgedTotal: number;
+  // Contribution events only: per-team running pledge total, for the
+  // exceptional-contribution Service award at resolve time.
+  pledgedByTeam: Record<string, number>;
 }
 
 interface EngineState {
@@ -184,6 +195,10 @@ interface EngineState {
   pendingClueFlags: Record<string, number>;
   tasksThisTurn: number;
   turnHadFailureOrSkip: boolean;
+  // Repeatable community events (journey.communityEvents[].repeatable):
+  // which teams have already triggered each event id, so it fires once
+  // per team's first arrival instead of once per game.
+  repeatableArrivals: Record<string, string[]>;
 }
 
 // ---------------------------------------------------------------------------
@@ -203,6 +218,9 @@ export interface GameEngine {
   getEffectiveStageRequirement(teamId: string): number | null;
   getPendingSurplus(): number;
   getPendingChoicesForTeam(teamId: string): number;
+  getPendingChoiceDetailsForTeam(teamId: string): { amount: number; reason: string; shareable: boolean }[];
+  getStagesBehindLeader(teamId: string): number;
+  getConfig(): Readonly<GameDefaults>;
   getSummary(): GameSummary | null;
   statusText(): string;
   allPositionsText(): string;
@@ -298,6 +316,7 @@ class Engine implements GameEngine {
       pendingClueFlags: {},
       tasksThisTurn: 0,
       turnHadFailureOrSkip: false,
+      repeatableArrivals: {},
     };
   }
 
@@ -364,6 +383,8 @@ class Engine implements GameEngine {
         return this.cmdDeclineContribution(command.teamId);
       case "resolveCommunityEvent":
         return this.cmdResolveCommunityEvent();
+      case "shareGrantedResource":
+        return this.cmdShareGrantedResource(command.teamId, command.toTeamId);
       case "undo":
         return this.cmdUndo();
     }
@@ -435,8 +456,8 @@ class Engine implements GameEngine {
     this.log(`Team ${team.name} earns ${amount} Service.`);
   }
 
-  private queuePendingChoice(teamId: string, amount: number, reason: string): void {
-    this.state.pendingChoices.push({ teamId, amount, reason });
+  private queuePendingChoice(teamId: string, amount: number, reason: string, shareable = true): void {
+    this.state.pendingChoices.push({ teamId, amount, reason, shareable });
   }
 
   private grantOrQueueChoice(
@@ -494,6 +515,49 @@ class Engine implements GameEngine {
     const stage = this.findStage(team.currentStageId);
     const reduction = this.state.stageReductions[teamId] ?? 0;
     return Math.max(1, stage.requiredSuccesses - reduction);
+  }
+
+  // -- catch-up (§10-12, PHASE7_SPEC "Stage ordinal and 'stages behind'") ----
+
+  /** The index of the top-level journey.entries item containing a team's
+   * current stage — a fork's own index for any of its route stages (so
+   * choosing the longer route never counts as "further along"), or
+   * entries.length for a team that has finished the journey. */
+  private stageOrdinal(team: TeamState): number {
+    if (this.state.session.finishedTeamIds.includes(team.id)) {
+      return this.journey.entries.length;
+    }
+    const stageId = team.currentStageId;
+    const topIdx = this.journey.entries.findIndex((e) => e.kind === "stage" && e.id === stageId);
+    if (topIdx >= 0) return topIdx;
+    const forkIdx = this.journey.entries.findIndex(
+      (e) => e.kind === "fork" && e.routes.some((r) => r.stages.some((s) => s.id === stageId)),
+    );
+    return forkIdx >= 0 ? forkIdx : 0;
+  }
+
+  getStagesBehindLeader(teamId: string): number {
+    const team = this.state.session.teams.find((t) => t.id === teamId);
+    if (!team) return 0;
+    const maxOrdinal = Math.max(...this.state.session.teams.map((t) => this.stageOrdinal(t)));
+    return Math.max(0, maxOrdinal - this.stageOrdinal(team));
+  }
+
+  /** Called on a community event's SUCCESS only (a failed event grants
+   * nothing); the leader (0 stages behind) never qualifies. */
+  private applyCatchUp(): void {
+    if (!this.config.catchUp.enabled) return;
+    const { stagesBehind, bonus } = this.config.catchUp;
+    for (const team of this.state.session.teams) {
+      const behind = this.getStagesBehindLeader(team.id);
+      if (behind <= stagesBehind) continue;
+      this.grantOrQueueChoice(team, bonus.resource, bonus.amount, "catch-up");
+      if (bonus.resource === "choice") {
+        this.log(`Catch-up: Team ${team.name} is ${behind} stages behind and may choose ${bonus.amount} resource.`);
+      } else {
+        this.log(`Catch-up: Team ${team.name} is ${behind} stages behind and receives ${bonus.amount} ${bonus.resource}.`);
+      }
+    }
   }
 
   // -- turn lifecycle --------------------------------------------------------
@@ -903,13 +967,22 @@ class Engine implements GameEngine {
     team.currentMilestoneId = milestoneId;
     team.stagesBeyondMilestone = 0;
     const event = this.journey.communityEvents.find((e) => e.milestoneId === milestoneId);
-    if (event && !this.state.session.triggeredMilestones.includes(milestoneId)) {
-      this.state.session.triggeredMilestones.push(milestoneId);
-      this.state.pendingCommunityEventId = event.id;
-      this.state.session.state = "landmarkIntroduction";
-      return true;
+    if (!event) return false;
+
+    if (event.repeatable) {
+      const arrivals = this.state.repeatableArrivals[event.id] ?? [];
+      if (arrivals.includes(team.id)) return false;
+      this.state.repeatableArrivals[event.id] = [...arrivals, team.id];
+    } else if (this.state.session.triggeredMilestones.includes(milestoneId)) {
+      return false;
     }
-    return false;
+    // triggeredMilestones records every trigger, including repeats — its
+    // consumer (communityProgress.ts) reads only the LAST entry to find
+    // the currently-active event, so duplicates are harmless.
+    this.state.session.triggeredMilestones.push(milestoneId);
+    this.state.pendingCommunityEventId = event.id;
+    this.state.session.state = "landmarkIntroduction";
+    return true;
   }
 
   private advanceTeamToNextEntry(team: TeamState, justCompleted: StageEntry): void {
@@ -954,35 +1027,47 @@ class Engine implements GameEngine {
     }
     const team = this.currentTeam();
     const outcome = drawOfferingOutcome(this.rng, this.config.offeringWeights, this.journey.offeringOutcomes);
-    this.applyOfferingEffect(team, outcome);
+    const summary = this.applyOfferingEffect(team, outcome);
     this.awardService(team, this.config.serviceAwards.offerSurplus);
     this.log(`Team ${team.name} offers a surplus success: ${outcome.announcement}`);
+    this.log(`Offering effect: ${summary}`);
     this.state.pendingSurplus--;
     if (this.state.pendingSurplus === 0) this.finalizeStageCompletion(team);
   }
 
-  private applyOfferingEffect(team: TeamState, outcome: OfferingOutcomeDef): void {
+  /** Applies the outcome's mechanical effect (unchanged from before Phase
+   * 7 — every existing log line here stands verbatim) and returns a
+   * human summary of what actually happened, for the new "Offering
+   * effect: …" log line. */
+  private applyOfferingEffect(team: TeamState, outcome: OfferingOutcomeDef): string {
     const effect: OfferingEffect = outcome.effect;
+    const grantSummary = (targetLabel: string, resource: ResourceType | "choice", amount: number): string =>
+      resource === "choice"
+        ? `${targetLabel} may choose ${amount} resource.`
+        : `${targetLabel} receives ${amount} ${resource}.`;
     switch (effect.type) {
       case "grant-resource": {
         if (effect.target === "offering-team") {
           this.grantOrQueueChoice(team, effect.resource, effect.amount, "an offering");
+          return grantSummary(`Team ${team.name}`, effect.resource, effect.amount);
         } else if (effect.target === "every-team") {
           for (const t of this.state.session.teams) {
             this.grantOrQueueChoice(t, effect.resource, effect.amount, "an offering");
           }
+          return grantSummary("Every team", effect.resource, effect.amount);
         } else {
           const others = this.state.session.teams.filter((t) => t.id !== team.id);
           if (others.length > 0) {
             const target = pickOne(this.rng, others);
             this.grantOrQueueChoice(target, effect.resource, effect.amount, "an offering");
+            return grantSummary(`Team ${target.name}`, effect.resource, effect.amount);
           }
+          return "No further effect.";
         }
-        return;
       }
       case "reveal-next-stage-info":
         this.log(`Team ${team.name} learns about its next stage.`);
-        return;
+        return this.describeNextStageFor(team);
       case "grant-clue-next-task": {
         const target =
           effect.target === "offering-team"
@@ -992,14 +1077,25 @@ class Engine implements GameEngine {
                 return others.length > 0 ? pickOne(this.rng, others) : team;
               })();
         this.state.pendingClueFlags[target.id] = (this.state.pendingClueFlags[target.id] ?? 0) + 1;
-        return;
+        return `Team ${target.name} will receive a free clue on its next task.`;
       }
       case "boost-next-community-event":
         this.state.nextCommunityEventBoosted = true;
-        return;
+        return "The next community event's reward is strengthened.";
       case "none":
-        return;
+        return "No further effect.";
     }
+  }
+
+  /** What actually comes next for a team's position — the real content
+   * behind "reveal-next-stage-info" (previously only logged that the
+   * team "learns about" it, without saying what). */
+  private describeNextStageFor(team: TeamState): string {
+    const stage = this.findStage(team.currentStageId);
+    const next = this.nextEntryAfter(stage.id);
+    if (next === null) return `Team ${team.name} is on the final stretch.`;
+    if (next.kind === "fork") return `Team ${team.name}'s road divides next at ${next.name}.`;
+    return `Team ${team.name}'s next stage is ${next.name}, needing ${next.requiredSuccesses} successes.`;
   }
 
   private cmdChooseGrantedResource(teamId: string, resource: ResourceType): void {
@@ -1019,7 +1115,7 @@ class Engine implements GameEngine {
     this.requireState("beginCommunityEvent", "landmarkIntroduction");
     const eventId = this.state.pendingCommunityEventId;
     if (!eventId) throw new IllegalCommandError("beginCommunityEvent", "no community event is pending");
-    this.state.community = { eventId, roomProgress: 0, pledgedTotal: 0 };
+    this.state.community = { eventId, roomProgress: 0, pledgedTotal: 0, pledgedByTeam: {} };
     this.state.pendingCommunityEventId = null;
     this.state.session.state = "communityEvent";
     const event = this.journey.communityEvents.find((e) => e.id === eventId);
@@ -1057,6 +1153,7 @@ class Engine implements GameEngine {
     const team = this.getTeamByIdOrThrow("contribute", teamId);
     this.deductResource("contribute", team, resource, amount);
     this.state.community!.pledgedTotal += amount;
+    this.state.community!.pledgedByTeam[teamId] = (this.state.community!.pledgedByTeam[teamId] ?? 0) + amount;
     this.awardService(team, this.config.serviceAwards.donateResource);
     this.log(`Team ${team.name} contributes ${amount} ${resource}.`);
   }
@@ -1079,12 +1176,48 @@ class Engine implements GameEngine {
     if (success) {
       this.applyRoomReward(event.reward);
       this.log(`The room succeeds at ${event.title}.`);
+      this.applyCatchUp();
     } else {
       this.log(`The room does not meet the goal for ${event.title}.`);
     }
+
+    // Exceptional contributions (success OR failure — the generosity
+    // happened regardless of whether the room met its goal).
+    if (event.kind === "contribution") {
+      const exceptionalThreshold = Math.max(
+        this.config.community.exceptionalMinimum,
+        Math.ceil(this.config.community.exceptionalShare * event.contributionThreshold),
+      );
+      for (const [teamId, pledged] of Object.entries(community.pledgedByTeam)) {
+        if (pledged < exceptionalThreshold) continue;
+        const team = this.getTeamByIdOrThrow("resolveCommunityEvent", teamId);
+        this.awardService(team, this.config.serviceAwards.exceptionalCommunityContribution);
+        this.log(`Team ${team.name} made an exceptional contribution.`);
+      }
+    }
+
     this.state.nextCommunityEventBoosted = false;
     this.state.community = null;
     this.endTurnAndAdvance();
+  }
+
+  // -- sharing a granted resource (§11 "voluntarily sharing an eligible reward") --
+
+  private cmdShareGrantedResource(teamId: string, toTeamId: string): void {
+    if (teamId === toTeamId) {
+      throw new IllegalCommandError("shareGrantedResource", "cannot share a gift with yourself");
+    }
+    const team = this.getTeamByIdOrThrow("shareGrantedResource", teamId);
+    const toTeam = this.getTeamByIdOrThrow("shareGrantedResource", toTeamId);
+    const idx = this.state.pendingChoices.findIndex((c) => c.teamId === teamId && c.shareable);
+    if (idx < 0) {
+      throw new IllegalCommandError("shareGrantedResource", `no shareable pending choice for team "${teamId}"`);
+    }
+    const choice = this.state.pendingChoices[idx]!;
+    this.state.pendingChoices.splice(idx, 1);
+    this.queuePendingChoice(toTeamId, choice.amount, `a gift from Team ${team.name}`, false);
+    this.awardService(team, this.config.serviceAwards.chooseCommunityBenefit);
+    this.log(`Team ${team.name} shares its gift with Team ${toTeam.name}.`);
   }
 
   private applyRoomReward(reward: RoomReward): void {
@@ -1142,6 +1275,51 @@ class Engine implements GameEngine {
     return this.state.pendingChoices.filter((c) => c.teamId === teamId).length;
   }
 
+  getPendingChoiceDetailsForTeam(teamId: string): { amount: number; reason: string; shareable: boolean }[] {
+    return this.state.pendingChoices
+      .filter((c) => c.teamId === teamId)
+      .map((c) => ({ amount: c.amount, reason: c.reason, shareable: c.shareable }));
+  }
+
+  getConfig(): Readonly<GameDefaults> {
+    return this.config;
+  }
+
+  /** Human lines about what the room did together (§34 Phase 7), derived
+   * from the event log so undo naturally keeps them accurate. Omits any
+   * category that never happened. */
+  private buildCommunityAccomplishments(): string[] {
+    const log = this.state.session.eventLog;
+    const lines: string[] = [];
+
+    for (const entry of log) {
+      const m = /^The room succeeds at (.+)\.$/.exec(entry.text);
+      if (m) lines.push(`The room succeeded at ${m[1]}.`);
+    }
+    for (const entry of log) {
+      const m = /^The room does not meet the goal for (.+)\.$/.exec(entry.text);
+      if (m) lines.push(`The room fell short at ${m[1]}.`);
+    }
+
+    const offerCount = log.filter((e) => /^Team .+ offers a surplus success: /.test(e.text)).length;
+    if (offerCount > 0) lines.push(`${offerCount} surplus successes were offered.`);
+
+    const pledgedTotal = log.reduce((sum, e) => {
+      const m = /^Team .+ contributes (\d+) (?:insight|provision|courage)\.$/.exec(e.text);
+      return m ? sum + Number(m[1]) : sum;
+    }, 0);
+    if (pledgedTotal > 0) lines.push(`${pledgedTotal} resources were pledged to community events.`);
+
+    for (const entry of log) {
+      if (/^Team .+ made an exceptional contribution\.$/.test(entry.text)) lines.push(entry.text);
+    }
+
+    const shareCount = log.filter((e) => /^Team .+ shares its gift with Team /.test(e.text)).length;
+    if (shareCount > 0) lines.push(`${shareCount} gifts were shared between teams.`);
+
+    return lines;
+  }
+
   getSummary(): GameSummary | null {
     if (this.state.session.state !== "gameSummary") return null;
     const teams = this.state.session.teams;
@@ -1154,6 +1332,8 @@ class Engine implements GameEngine {
       journeyWinners: [...this.state.session.finishedTeamIds],
       barnabasAwardRecipients,
       finalPositions,
+      serviceAwardName: this.config.serviceAwardPublicName,
+      communityAccomplishments: this.buildCommunityAccomplishments(),
     };
   }
 
@@ -1246,6 +1426,7 @@ class Engine implements GameEngine {
       `Provision ${team.resources.provision}.`,
       `Courage ${team.resources.courage}.`,
       team.hasJourneyToken ? "Holding a Journey Token." : "No Journey Token.",
+      `Service ${team.serviceScore}.`,
     ];
     return parts.join(" ");
   }
