@@ -52,5 +52,13 @@ Notes:
 - The audio keys (Space/L/X/N) work only while playing. The Sound check
   screen (Welcome → Sound check) uses ordinary Tab + Enter on its buttons,
   including the same Pause/Stop/Skip transport buttons.
+- Phase 7 added no new keys, only new on-screen controls reachable by Tab
+  (no dedicated shortcut, matching C/I's precedent that only the most
+  common actions get a letter): a contribution pledge now offers one
+  "contribute N {resource}" row per unit from 1 up to the lesser of what
+  the team owns and the configured cap, plus decline; a team holding a
+  pending "choose a resource" grant gets a "share with Team X" row per
+  other team alongside its own take-the-resource rows (absent once that
+  grant is itself a received gift — gifts can't be re-shared).
 - This file is the living record; update it whenever `KEY_BINDINGS`
   changes in `src/ui/keys.ts`.

@@ -401,6 +401,57 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       rules (existing tests untouched, state inside `EngineState`, log
       texts frozen). Schema and sample content stay untouched.
 
+27. **Phase 7 Group C8 browser check (Sonnet, Chrome via the dev server,
+    real content: dev-playtest + jerusalem-rome.json) — mixed results; one
+    genuine content-balance finding, no code bugs.** `npm run dev`, two
+    sessions (3 teams, then 2 teams), driven by real clicks/keydowns with
+    one team always ruled correct and the others always incorrect to open
+    a stages-behind gap, ~750 combined steps, zero console or dev-server
+    errors either time.
+    - **Confirmed working live**: a failed community event correctly
+      grants NO catch-up (checked twice, once per session) — the
+      success-only gate holds under real play, not just fakes. The pledge
+      list correctly collapses to "decline" only, with zero amount
+      buttons, when a team truly owns 0 of every resource (the
+      `Math.min(owned, maxPledgePerTeam)` cap at owned=0). Both the host
+      summary screen and the audience panel show `Barnabas Award:` (the
+      configured name) and a "Community" accomplishments list; a real
+      game where two events both failed rendered `The room fell short at
+      The Harbor Gathering.` / `...The Sending Church.` on both screens
+      correctly. Ties for the Barnabas Award work (three teams tied at 0
+      Service, all three listed). The `journeyTokenAmplify` button
+      correctly appears/disappears per task depending on that specific
+      task's `resourceInteractions.courage` — real dev-playtest content
+      doesn't give every task every interaction, unlike the synthetic
+      packs the automated tests use. Zero errors of any kind.
+    - **NOT independently confirmed live, in the time available** (all
+      already covered by the 40+ deterministic C1-C7 tests against a
+      fake backend): the `Catch-up:` announcement + `serviceEarned` cue
+      firing on an actual SUCCESSFUL catch-up-eligible event; the
+      exceptional-contribution line; the `offering` cue + `Offering
+      effect:` line; sharing a gift. Real starting resources are 0/0/0,
+      and Insight/Provision/Courage are earned slowly through ordinary
+      play — arranging a genuine surplus (needs a courage-interactive
+      task at the exact banked-successes count to overshoot via a free
+      Journey-Token amplify) or a met community-event threshold (Caesarea
+      needs 7 relay answers but each team gets only ONE turn per event —
+      unreachable below 7 teams; Antioch needs 4 pledged units teams
+      don't yet have) within a reasonable step budget proved impractical
+      by hand. Not a Phase 7 bug — the mechanics fired exactly as
+      designed everywhere they WERE reached, and are exhaustively covered
+      by fake-backend tests; this is a live-arrangement-time gap only.
+    - **Content-balance finding for Phase 9** (not a code issue,
+      mechanics work as specified): Caesarea's relay `successThreshold`
+      is 7, but the relay's own design (each team gets exactly one turn
+      per event, `communityProgress.ts`'s `answeredTeamIds` never resets
+      mid-event) caps the achievable room progress at the team count.
+      With the common 2-8 team range, a threshold of 7 is unreachable
+      below 7 teams and barely reachable at 7-8 — worth Fable/Brian
+      revisiting when jerusalem-rome.json's content is finalized (either
+      lower the threshold, or intentionally scope it to larger rooms).
+    - Brian's ear/eyes are still the final check on the cue character and
+      screen layout for the parts that WERE reached live.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey

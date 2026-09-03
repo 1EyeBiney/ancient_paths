@@ -1,9 +1,9 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 6 (AUDIO) COMPLETE, PHASE 7 (COMMUNITY & OFFERINGS) SPECIFIED (2026-09-03) — implement PHASE7_SPEC.md next
+## Status: PHASE 7 (COMMUNITY & OFFERINGS) COMPLETE (2026-09-03) — Phase 8 (persistence) not yet planned
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (374/374
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (415/415
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
@@ -60,20 +60,26 @@ audio entirely broken the whole game still completes on fallback text.
 Brian's verdict: audio works (OPEN_QUESTIONS 24-25); ambient stays
 one-screen until Phase 9 authors real ambience.
 
-**Phase 7 (community and offerings) is specified and ready to
-implement**: see **PHASE7_SPEC.md**. The Phase 2 engine already has
-events, contributions, room rewards, the weighted offering pool, and
-Service; Phase 7 finishes catch-up (setup toggle → engine config,
-success-only, announced), pledge amounts + the exceptional-contribution
-award, sharing a granted resource (Service for choosing the community),
-audible offering outcomes via new `Offering effect:` log lines and a
-general voiced-log-lines table in app.ts, visible Service (audience
-column, status, summary accomplishments, configurable award name), and
-repeatable events. **This phase opens `src/engine/` to the implementer**
-under the spec's rules: existing engine tests untouched, new state
-inside `EngineState`, existing log-line texts frozen (the UI regexes
-them). Schema and sample content stay untouched. Rulings:
-OPEN_QUESTIONS item 26.
+**Phase 7 (community and offerings) is done** (PHASE7_SPEC.md, groups
+C1-C8, 415 tests): the first phase to open `src/engine/` to an
+implementing agent, under explicit rules — every pre-existing engine
+test stayed green unchanged, all new state lives inside `EngineState`
+(undo covers it for free), no existing log-line text was reworded (the
+UI regexes several). New: catch-up (`stageOrdinal`/
+`getStagesBehindLeader`, success-only, a fork counts as one entry so
+route choice never changes rank), per-team pledge tracking and the
+exceptional-contribution Service award, `shareGrantedResource` (a
+received gift can't be re-shared), offering effects now return a real
+summary logged as `Offering effect: …` (`reveal-next-stage-info`
+actually names what's next), repeatable community events, `GameSummary`
+gained `serviceAwardName`/`communityAccomplishments`. UI: one
+`EVENT_LOG_VOICE` table replaces the old ad-hoc cue matching, two new
+cues, live pledge-amount and gift-sharing buttons, a Service column and
+accomplishments list on both the host and audience summary. Manual
+browser check (real content) found no code bugs; one content-balance
+note for Phase 9 (Caesarea's relay threshold needs 7+ teams to be
+reachable under the current one-turn-per-team design). Rulings and the
+browser-check writeup: OPEN_QUESTIONS items 26-27.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

@@ -1,8 +1,44 @@
 # Implementation Status
 
-Tracks the design doc §34 phases. Updated 2026-09-02.
+Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Completed
+
+- **Phase 7 — Community and Offering Systems — DONE.** All 8 test groups
+  (C1-C8) are green: 41 new tests (415 project-wide), `npx tsc --noEmit`
+  clean, `npm run build` clean. Built against PHASE7_SPEC.md (written
+  2026-09-03 after Brian closed Phase 6 — "audio works"). The Phase 2
+  engine already had events, contributions, room rewards, the weighted
+  offering pool, and Service (F4-F8, G1-G7, H4-H6); Phase 7 opened
+  `src/engine/` for the first time to finish the rest, keeping every
+  pre-existing engine test green unchanged. New in `src/engine/engine.ts`:
+  `stageOrdinal()`/`getStagesBehindLeader()` (a fork counts as its own
+  single entry, so route choice never changes rank) and `applyCatchUp()`
+  (fires on a community event's SUCCESS only, granting every team
+  strictly more than `catchUp.stagesBehind` entries back a resource of
+  choice); per-team pledge tracking and the exceptional-contribution
+  Service award; `shareGrantedResource` (moves a shareable pending choice
+  to another team — a received gift can't be re-shared); offering
+  effects now return a human summary logged as `Offering effect: …`
+  (`reveal-next-stage-info` actually names the next stage, fork, or
+  "final stretch"); repeatable community events fire per team's first
+  arrival instead of once per game; `GameSummary` gained
+  `serviceAwardName` and `communityAccomplishments`; `statusText()`
+  appends `Service n.`; new `getConfig()`/`getPendingChoiceDetailsForTeam()`
+  read API. `src/config/defaults.ts` gained `catchUp` and `community`
+  config blocks. In `src/ui/`: app.ts's ad-hoc cue matching became one
+  `EVENT_LOG_VOICE` table (pattern → cue + whether to speak it), with
+  multiple voiced lines in one render joined into a single `present()`
+  call; two new cues (`offering`, `serviceEarned`); the setup catch-up
+  checkbox now actually reaches engine config; screens.ts's pledge list
+  offers 1..min(owned, cap) per resource and a granted-choice picker
+  gained "share with Team X" buttons; the audience view gained a Service
+  column and a communityAccomplishments list, both on the summary too.
+  Manual browser check (Group C8, real content, OPEN_QUESTIONS item 27):
+  no bugs found in anything reached live; a content-balance finding
+  (Caesarea's relay threshold needs 7+ teams to be reachable under the
+  current one-turn-per-team relay design) flagged for Phase 9, not a
+  code issue. KEYBOARD_COMMANDS.md's notes updated (no new keys).
 
 - **Phase 6 — Audio System — DONE.** All 8 test groups (A1-A8) are green:
   61 new tests (364 project-wide), `npx tsc --noEmit` clean, `npm run
@@ -277,17 +313,7 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- Phase 7 — Community and offering systems: PHASE7_SPEC.md written
-  (2026-09-03) after Brian closed Phase 6 ("audio works"). The Phase 2
-  engine already covers events, contributions, room rewards, offerings,
-  weighted pools, and Service; the spec finishes catch-up (setup toggle
-  → engine, success-only, announced), pledge amounts + the exceptional-
-  contribution award, sharing a granted resource (the "choose the
-  community" Service action), audible offering outcomes, visible Service
-  (audience column, status, summary accomplishments, configurable award
-  name), repeatable events. Test groups C1-C8. Opens `src/engine/` to
-  the implementer under rules in the spec. Implementation not yet
-  started. Rulings in OPEN_QUESTIONS.md item 26.
+(none — Phase 7 complete; Phase 8 not yet planned)
 
 ## Remaining
 
