@@ -10,6 +10,7 @@ import { planSession, type SessionDuration, type SessionPace, type SessionPlan }
 import { buildSessionDeck, SessionBuildError, type BuildOptions, type BuildResult, type DeckDifficultySetting } from "../session/builder";
 import type { TeamSetup } from "../engine/engine";
 import type { MapStyleId } from "./mapProjection";
+import type { SetupSnapshot } from "../persistence/schema";
 
 export type NonCommunityCategory = Exclude<Task["category"], "community">;
 
@@ -195,6 +196,54 @@ export class SetupWizard {
 
   setTasksPerTurnOverride(n: number | null): void {
     this.tasksPerTurnOverride = n === null ? null : clamp(Math.round(n), MIN_TASKS_PER_TURN, MAX_TASKS_PER_TURN);
+  }
+
+  // -- persistence (Phase 8) -------------------------------------------------
+
+  /** Every public field, keyed by journey id (not the Journey object itself)
+   * — PHASE8_SPEC.md Group P2's SetupSnapshot, one field per wizard field. */
+  toSnapshot(): SetupSnapshot {
+    if (!this.journey) throw new Error("SetupWizard.toSnapshot: no journey selected");
+    return {
+      journeyId: this.journey.journeyId,
+      teamCount: this.teamCount,
+      teamNames: [...this.teamNames],
+      duration: this.duration,
+      pace: this.pace,
+      difficulty: this.difficulty,
+      enabledPackIds: [...this.enabledPackIds],
+      enabledCategories: [...this.enabledCategories],
+      audio: { ...this.audio },
+      communityCatchup: this.communityCatchup,
+      seed: this.seed,
+      tasksPerTurnOverride: this.tasksPerTurnOverride,
+      reducedMotion: this.reducedMotion,
+      mapStyle: this.mapStyle,
+    };
+  }
+
+  /** Resolves the journey by id from this wizard's own journeys list;
+   * throws if it no longer exists (PHASE8_SPEC.md Group P2: "the snapshot
+   * is invalid" — callers should have already checked via rebuildFromSave). */
+  applySnapshot(snapshot: SetupSnapshot): void {
+    const journey = this.journeys.find((j) => j.journeyId === snapshot.journeyId);
+    if (!journey) {
+      throw new Error(`SetupWizard.applySnapshot: unknown journey "${snapshot.journeyId}"`);
+    }
+    this.journey = journey;
+    this.teamCount = snapshot.teamCount;
+    this.teamNames = [...snapshot.teamNames];
+    this.duration = snapshot.duration;
+    this.pace = snapshot.pace;
+    this.difficulty = snapshot.difficulty;
+    this.enabledPackIds = [...snapshot.enabledPackIds];
+    this.enabledCategories = [...snapshot.enabledCategories];
+    this.audio = { ...snapshot.audio };
+    this.communityCatchup = snapshot.communityCatchup;
+    this.seed = snapshot.seed;
+    this.tasksPerTurnOverride = snapshot.tasksPerTurnOverride;
+    this.reducedMotion = snapshot.reducedMotion;
+    this.mapStyle = snapshot.mapStyle;
   }
 
   // -- derived --------------------------------------------------------------
