@@ -21,6 +21,7 @@ import { KeyboardController, type KeyBinding } from "./keys";
 import { ModalManager } from "./modal";
 import { UndoController } from "./undo";
 import { ScreenRenderer, type ScreenRender } from "./screens";
+import { AudienceView } from "./audience";
 import { SetupWizard, attemptSessionGeneration } from "./setup";
 import { CursorList } from "./cursorList";
 import { buildStatus, buildActionsSummary, buildPositions } from "./speech";
@@ -52,7 +53,9 @@ export class App {
   private readonly assertiveRegion: HTMLElement;
   private readonly statusLine: HTMLElement;
   private readonly contentContainer: HTMLElement;
+  private readonly audienceContainer: HTMLElement;
   private readonly modalRoot: HTMLElement;
+  private audience: AudienceView | null = null;
 
   private readonly presenter: Presenter;
   private readonly modal: ModalManager;
@@ -79,10 +82,26 @@ export class App {
     this.statusLine = el("p");
     this.statusLine.setAttribute("aria-hidden", "true");
     this.statusLine.className = "status-line";
-    this.contentContainer = el("main");
+    // Page structure (PHASE5_SPEC): one h1, then the audience view (a
+    // browse-mode document region) and the host controls (a SCOPED
+    // application region — never on body — so NVDA delivers single-letter
+    // hotkeys while focus is inside it; Decision 1, Brian's ear decides).
+    const title = el("h1", { text: "The Way: A Journey Through Bible Lands", className: "app-title" });
+    const main = el("main");
+    this.audienceContainer = el("section");
+    this.audienceContainer.id = "audience-view";
+    this.audienceContainer.className = "audience";
+    this.audienceContainer.setAttribute("aria-label", "Audience view");
+    this.audienceContainer.hidden = true;
+    this.contentContainer = el("section");
+    this.contentContainer.id = "host-controls";
+    this.contentContainer.className = "host";
+    this.contentContainer.setAttribute("aria-label", "Host controls");
+    this.contentContainer.setAttribute("role", "application");
+    main.append(this.audienceContainer, this.contentContainer);
     this.modalRoot = el("div");
 
-    this.root.append(this.politeRegion, this.assertiveRegion, this.statusLine, this.contentContainer, this.modalRoot);
+    this.root.append(this.politeRegion, this.assertiveRegion, this.statusLine, title, main, this.modalRoot);
 
     this.presenter = new Presenter({
       politeRegion: this.politeRegion,
@@ -185,6 +204,12 @@ export class App {
     return this.lastRender.heading;
   }
 
+  private hideAudience(): void {
+    this.audience = null;
+    this.audienceContainer.innerHTML = "";
+    this.audienceContainer.hidden = true;
+  }
+
   private disposeCursorLists(): void {
     for (const list of this.activeCursorLists) list.dispose();
     this.activeCursorLists = [];
@@ -195,8 +220,9 @@ export class App {
   private renderStartup(): void {
     this.mode = "startup";
     this.disposeCursorLists();
+    this.hideAudience();
     this.contentContainer.innerHTML = "";
-    this.contentContainer.appendChild(el("h1", { text: "The Way: A Journey Through Bible Lands" }));
+    this.contentContainer.appendChild(el("h2", { text: "Welcome" }));
 
     if (this.options.loadErrors && this.options.loadErrors.length > 0) {
       this.contentContainer.appendChild(el("h2", { text: "Content could not be loaded" }));
@@ -224,8 +250,9 @@ export class App {
     this.mode = "setup";
     this.detachKeyboard();
     this.disposeCursorLists();
+    this.hideAudience();
     this.contentContainer.innerHTML = "";
-    this.contentContainer.appendChild(el("h1", { text: "Set up your session" }));
+    this.contentContainer.appendChild(el("h2", { text: "Set up your session" }));
 
     // Journey
     this.contentContainer.appendChild(el("h2", { text: "Journey" }));
@@ -396,6 +423,8 @@ export class App {
       },
       onAfterAction: () => this.renderCurrentScreen(),
     });
+    this.audience = new AudienceView({ journey, tasksById });
+    this.audienceContainer.hidden = false;
 
     this.mode = "playing";
     this.disposeCursorLists();
@@ -412,6 +441,8 @@ export class App {
    * and without it, wiping the container drops focus to <body>. */
   private renderCurrentScreen(): void {
     if (!this.engine || !this.renderer) return;
+    // Same pass, same state: this is what keeps host and audience in sync.
+    this.audience?.render(this.engine, this.audienceContainer);
     this.lastRender = this.renderer.render(this.engine, this.contentContainer);
     const heading = this.contentContainer.querySelector<HTMLElement>("h2");
     if (heading) {

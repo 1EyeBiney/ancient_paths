@@ -83,7 +83,7 @@ describe("V1 — focus lands on the new screen heading after a host action", () 
     h = makeApp();
     beginByMouse(h);
     keydownOn(window, "Enter"); // Start game -> beginTurn
-    const heading = h.root.querySelector<HTMLElement>("main h2")!;
+    const heading = h.root.querySelector<HTMLElement>("#host-controls h2")!;
     expect(heading.textContent).toMatch(/^Round 1/);
     expect(document.activeElement).toBe(heading);
   });
@@ -92,7 +92,7 @@ describe("V1 — focus lands on the new screen heading after a host action", () 
     h = makeApp();
     beginByMouse(h);
     h.root.querySelector<HTMLButtonElement>('button[data-action-id="confirm"]')!.click();
-    const heading = h.root.querySelector<HTMLElement>("main h2")!;
+    const heading = h.root.querySelector<HTMLElement>("#host-controls h2")!;
     expect(heading.textContent).toMatch(/^Round 1/);
     expect(document.activeElement).toBe(heading);
   });

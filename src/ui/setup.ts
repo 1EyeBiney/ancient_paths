@@ -26,7 +26,7 @@ export interface TeamPreset {
 export const TEAM_PRESETS: TeamPreset[] = [
   { color: "#c0392b", symbol: "cross" },
   { color: "#27ae60", symbol: "lion" },
-  { color: "#2980b9", symbol: "dove" },
+  { color: "#1f6fa3", symbol: "dove" }, // darkened from #2980b9: that one only reached 4.39:1 vs white
   { color: "#f39c12", symbol: "anchor" },
   { color: "#8e44ad", symbol: "star" },
   { color: "#16a085", symbol: "shield" },
