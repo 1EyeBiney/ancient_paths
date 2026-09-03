@@ -140,7 +140,7 @@ export class AudienceView {
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const headRow = document.createElement("tr");
-    for (const label of ["Team", "Location", "Insight", "Provision", "Courage", "Journey Token", "Status"]) {
+    for (const label of ["Team", "Location", "Insight", "Provision", "Courage", "Journey Token", "Service", "Status"]) {
       const th = document.createElement("th");
       th.scope = "col";
       th.textContent = label;
@@ -161,6 +161,7 @@ export class AudienceView {
         String(team.resources.provision),
         String(team.resources.courage),
         team.hasJourneyToken ? "Token held" : "—",
+        String(team.serviceScore),
         isActive ? "now playing" : "",
       ];
       cells.forEach((c, i) => {
@@ -168,7 +169,7 @@ export class AudienceView {
         if (i === 0) (td as HTMLTableCellElement).scope = "row";
         if (typeof c === "string") td.textContent = c;
         else td.appendChild(c);
-        td.dataset.col = ["team", "location", "insight", "provision", "courage", "token", "status"][i]!;
+        td.dataset.col = ["team", "location", "insight", "provision", "courage", "token", "service", "status"][i]!;
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -252,8 +253,17 @@ export class AudienceView {
 
     const award = el("p", { data: "award" });
     const recipients = summary.barnabasAwardRecipients.map((id) => byId(id)?.name ?? id).join(", ");
-    award.textContent = `Barnabas Award: ${recipients || "not awarded"}.`;
+    award.textContent = `${summary.serviceAwardName}: ${recipients || "not awarded"}.`;
     section.appendChild(award);
+
+    if (summary.communityAccomplishments.length > 0) {
+      const community = el("div", { data: "community-accomplishments" });
+      community.appendChild(el("p", { text: "Community", className: "big" }));
+      const list = el("ul");
+      for (const line of summary.communityAccomplishments) list.appendChild(el("li", { text: line }));
+      community.appendChild(list);
+      section.appendChild(community);
+    }
 
     const positions = el("ol", { className: "leaderboard", data: "positions" });
     for (const id of summary.finalPositions) {

@@ -32,6 +32,7 @@ import { BrowserAudioBackend, type AudioBackend } from "./audio/backend";
 import { AudioManager, type SpeechMode } from "./audio/manager";
 import { CUES, type CueId } from "./audio/cues";
 import type { GameState, TaskVariantKind } from "../engine/types";
+import { DEFAULTS } from "../config/defaults";
 
 export type AppMode = "startup" | "setup" | "soundCheck" | "playing";
 
@@ -49,7 +50,44 @@ const CUE_LABELS: Record<CueId, string> = {
   arrival: "Arrival",
   celebration: "Celebration",
   menuOpen: "Menu opened",
+  offering: "Offering made",
+  serviceEarned: "Service earned",
 };
+
+/** Every event-log line the audio layer reacts to, in one place (PHASE7_SPEC
+ * "Voiced log lines"): a cue to play, and/or whether to speak the line
+ * itself. A line matches at most the first row here that fits it. Rows
+ * without `present` were already cue-only before Phase 7 and stay that
+ * way — only the new rows (offerings, catch-up, Service, sharing,
+ * exceptional contributions, free clues) are voiced aloud. */
+interface EventLogVoiceRow {
+  pattern: RegExp;
+  cue?: CueId;
+  present?: boolean;
+}
+
+const EVENT_LOG_VOICE: EventLogVoiceRow[] = [
+  { pattern: /'s answer is ruled correct:/, cue: "correct" },
+  { pattern: /answers for the room: correct\.$/, cue: "correct" },
+  { pattern: /'s answer is ruled incorrect:/, cue: "incorrect" },
+  { pattern: /answers for the room: incorrect\.$/, cue: "incorrect" },
+  { pattern: /'s answer is ruled skipped:/, cue: "skipped" },
+  { pattern: /earns a Journey Token for a perfect stage\.$/, cue: "journeyToken" },
+  // Deliberately narrower than "every stage completion": a fork-route
+  // stage that completes without arriving at a milestone logs nothing
+  // distinct (OPEN_QUESTIONS), so it gets no stageComplete cue either.
+  { pattern: / has reached .+\.$/, cue: "stageComplete" },
+  { pattern: /has completed the journey!$/, cue: "stageComplete" },
+  { pattern: /^The room succeeds at /, cue: "communitySuccess" },
+  { pattern: /^The room does not meet the goal for /, cue: "communityFail" },
+  { pattern: /^Team .+ offers a surplus success: /, cue: "offering", present: true },
+  { pattern: /^Offering effect: /, present: true },
+  { pattern: /^Catch-up: /, cue: "serviceEarned", present: true },
+  { pattern: /^Team .+ earns \d+ Service\.$/, cue: "serviceEarned", present: true },
+  { pattern: /^Team .+ shares its gift with Team /, present: true },
+  { pattern: /^Team .+ made an exceptional contribution\.$/, present: true },
+  { pattern: /^Team .+ receives a free clue from an earlier gift\.$/, present: true },
+];
 
 export interface AppOptions {
   root: HTMLElement;
@@ -599,8 +637,11 @@ export class App {
     // Community catch-up, reduced motion
     this.contentContainer.appendChild(el("h2", { text: "Options" }));
     this.contentContainer.appendChild(
-      this.checkbox("community-catchup", "Community catch-up (applies from Phase 7)", this.wizard.communityCatchup, (on) =>
-        this.wizard.setCommunityCatchup(on),
+      this.checkbox(
+        "community-catchup",
+        "Community catch-up (teams more than two stages behind get a bonus when the room succeeds)",
+        this.wizard.communityCatchup,
+        (on) => this.wizard.setCommunityCatchup(on),
       ),
     );
     this.contentContainer.appendChild(
@@ -736,6 +777,7 @@ export class App {
       turnTaskLimit: this.wizard.effectiveTasksPerTurn(),
       rng: createRng(this.wizard.seed),
       taskSource: outcome.result.deck,
+      config: { catchUp: { ...DEFAULTS.catchUp, enabled: this.wizard.communityCatchup } },
       ...(this.options.startingResources ? { startingResources: this.options.startingResources } : {}),
     });
     this.undoController = new UndoController({
@@ -822,9 +864,7 @@ export class App {
       this.lastCluesRevealedCount = this.engine.getCurrentTaskPublic()?.cluesRevealed.length ?? 0;
     } else {
       if (stateChanged) this.audioManager.killAll();
-      for (let i = previousLogLength; i < session.eventLog.length; i++) {
-        this.matchEventLogCue(session.eventLog[i]!.text);
-      }
+      this.voiceNewEventLogLines(previousLogLength, session.eventLog.length);
       if (stateChanged) this.handleAudioStateEntry(state);
       this.syncTaskAudioPresentation(state);
       this.syncClueAudio();
@@ -834,25 +874,21 @@ export class App {
     this.lastEventLogLength = session.eventLog.length;
   }
 
-  private matchEventLogCue(text: string): void {
-    if (/'s answer is ruled correct:/.test(text) || /answers for the room: correct\.$/.test(text)) {
-      this.audioManager.playCue("correct");
-    } else if (/'s answer is ruled incorrect:/.test(text) || /answers for the room: incorrect\.$/.test(text)) {
-      this.audioManager.playCue("incorrect");
-    } else if (/'s answer is ruled skipped:/.test(text)) {
-      this.audioManager.playCue("skipped");
-    } else if (/earns a Journey Token for a perfect stage\.$/.test(text)) {
-      this.audioManager.playCue("journeyToken");
-    } else if (/ has reached .+\.$/.test(text) || /has completed the journey!$/.test(text)) {
-      // Deliberately narrower than "every stage completion": a fork-route
-      // stage that completes without arriving at a milestone logs nothing
-      // distinct (OPEN_QUESTIONS), so it gets no stageComplete cue either.
-      this.audioManager.playCue("stageComplete");
-    } else if (/^The room succeeds at /.test(text)) {
-      this.audioManager.playCue("communitySuccess");
-    } else if (/^The room does not meet the goal for /.test(text)) {
-      this.audioManager.playCue("communityFail");
+  /** Every log line pushed since the last render: play its cue (if any),
+   * and collect its text (if voiced) into ONE joined announcement — the
+   * deferred-announce slot is latest-wins, so several separate present()
+   * calls in one render would silently drop all but the last. */
+  private voiceNewEventLogLines(fromIndex: number, toIndex: number): void {
+    const session = this.engine!.getSession();
+    const toSpeak: string[] = [];
+    for (let i = fromIndex; i < toIndex; i++) {
+      const text = session.eventLog[i]!.text;
+      const row = EVENT_LOG_VOICE.find((r) => r.pattern.test(text));
+      if (!row) continue;
+      if (row.cue) this.audioManager.playCue(row.cue);
+      if (row.present) toSpeak.push(text);
     }
+    if (toSpeak.length > 0) this.presenter.present({ visual: toSpeak.join(" ") });
   }
 
   private handleAudioStateEntry(state: GameState): void {

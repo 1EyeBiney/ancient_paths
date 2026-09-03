@@ -289,7 +289,7 @@ describe("U8 — contribution pledge and decline flow", () => {
     let render = renderer.render(engine, container);
     expect(container.textContent).toContain("Now pledging: Team Alpha");
     const insightBefore = engine.getTeam("team-1")!.resources.insight;
-    render.actions.find((a) => a.id === "contribute-insight")!.run();
+    render.actions.find((a) => a.id === "contribute-insight-1")!.run();
     expect(engine.getTeam("team-1")!.resources.insight).toBe(insightBefore - 1);
 
     render = renderer.render(engine, container);

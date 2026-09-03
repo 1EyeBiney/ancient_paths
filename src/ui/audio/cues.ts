@@ -22,7 +22,9 @@ export type CueId =
   | "communityFail"
   | "arrival"
   | "celebration"
-  | "menuOpen";
+  | "menuOpen"
+  | "offering"
+  | "serviceEarned";
 
 export const CUES: Record<CueId, CueTone[]> = {
   correct: [
@@ -58,6 +60,20 @@ export const CUES: Record<CueId, CueTone[]> = {
     { hz: 1047, ms: 220, gain: 0.9 },
   ],
   menuOpen: [{ hz: 550, ms: 60, gain: 0.5 }],
+  // Phase 7: three soft rising tones for a generosity outcome (an
+  // offering, never harsh — §10's "always earns Service, even if the
+  // material result is neutral or silly").
+  offering: [
+    { hz: 523, ms: 110, gain: 0.6 },
+    { hz: 659, ms: 110, gain: 0.6 },
+    { hz: 784, ms: 130, gain: 0.65 },
+  ],
+  // A quick two-note "ding" distinct from "correct" (660/880) — Service
+  // earned through generosity, not through a task ruling.
+  serviceEarned: [
+    { hz: 740, ms: 80, gain: 0.7 },
+    { hz: 932, ms: 110, gain: 0.75 },
+  ],
 };
 
 export function cueDurationMs(id: CueId): number {

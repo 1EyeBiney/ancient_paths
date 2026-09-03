@@ -35,7 +35,7 @@ export const DEFAULTS = {
 
   // Phase 7 (§7.6, §10-12, §36; PHASE7_SPEC.md).
   catchUp: {
-    enabled: true, // setup's "Community catch-up" toggle overrides this per session
+    enabled: true as boolean, // setup's "Community catch-up" toggle overrides this per session
     stagesBehind: 2, // eligible when strictly MORE than this many entries behind the leader
     bonus: { resource: "choice" as const, amount: 1 },
   },

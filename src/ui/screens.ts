@@ -133,11 +133,12 @@ export class ScreenRenderer {
   }
 
   private appendGrantedChoicePickers(engine: GameEngine, container: HTMLElement, actions: ScreenAction[]): void {
-    for (const team of engine.getSession().teams) {
-      const pending = engine.getPendingChoicesForTeam(team.id);
-      if (pending <= 0) continue;
+    const allTeams = engine.getSession().teams;
+    for (const team of allTeams) {
+      const details = engine.getPendingChoiceDetailsForTeam(team.id);
+      if (details.length === 0) continue;
       container.appendChild(
-        el("p", { text: `Team ${team.name} may choose a resource (${pending} pending).`, className: "pending-choice" }),
+        el("p", { text: `Team ${team.name} may choose a resource (${details.length} pending).`, className: "pending-choice" }),
       );
       const resources: ResourceType[] = ["insight", "provision", "courage"];
       for (const resource of resources) {
@@ -148,7 +149,24 @@ export class ScreenRenderer {
         };
         actions.push(action);
       }
-      this.renderButtons(container, actions.filter((a) => a.id.startsWith(`chooseGranted-${team.id}-`)));
+      // Sharing (§11 "voluntarily sharing an eligible reward"): offered
+      // only while the team holds at least one shareable choice — a
+      // received gift can't itself be re-shared (no Service loops).
+      if (details.some((d) => d.shareable)) {
+        for (const other of allTeams) {
+          if (other.id === team.id) continue;
+          const action: ScreenAction = {
+            id: `share-${team.id}-${other.id}`,
+            label: `Team ${team.name}: share with Team ${other.name}`,
+            run: () => engine.dispatch({ type: "shareGrantedResource", teamId: team.id, toTeamId: other.id }),
+          };
+          actions.push(action);
+        }
+      }
+      this.renderButtons(
+        container,
+        actions.filter((a) => a.id.startsWith(`chooseGranted-${team.id}-`) || a.id.startsWith(`share-${team.id}-`)),
+      );
     }
   }
 
@@ -555,12 +573,16 @@ export class ScreenRenderer {
         container.appendChild(
           el("p", { text: `Now pledging: Team ${current.name}. Accepted: ${event.acceptedResources.join(", ")}.` }),
         );
+        const maxPledge = engine.getConfig().community.maxPledgePerTeam;
         for (const resource of event.acceptedResources) {
-          pledgeActions.push({
-            id: `contribute-${resource}`,
-            label: `Team ${current.name}: contribute 1 ${resource}`,
-            run: () => engine.dispatch({ type: "contribute", teamId: current.id, resource, amount: 1 }),
-          });
+          const owned = current.resources[resource];
+          for (let amount = 1; amount <= Math.min(owned, maxPledge); amount++) {
+            pledgeActions.push({
+              id: `contribute-${resource}-${amount}`,
+              label: `Team ${current.name}: contribute ${amount} ${resource}`,
+              run: () => engine.dispatch({ type: "contribute", teamId: current.id, resource, amount }),
+            });
+          }
         }
         pledgeActions.push({
           id: "declineContribution",
@@ -614,19 +636,30 @@ export class ScreenRenderer {
     const barnabas = summary.barnabasAwardRecipients
       .map((id) => session.teams.find((t) => t.id === id)?.name ?? id)
       .join(", ");
-    container.appendChild(el("p", { text: `Barnabas Award: ${barnabas || "not awarded"}.` }));
+    container.appendChild(el("p", { text: `${summary.serviceAwardName}: ${barnabas || "not awarded"}.` }));
 
     const positions = summary.finalPositions
       .map((id) => session.teams.find((t) => t.id === id)?.name ?? id)
       .join(", ");
     container.appendChild(el("p", { text: `Final positions: ${positions}.` }));
 
+    if (summary.communityAccomplishments.length > 0) {
+      container.appendChild(el("h3", { text: "Community" }));
+      const list = document.createElement("ul");
+      for (const line of summary.communityAccomplishments) list.appendChild(el("li", { text: line }));
+      container.appendChild(list);
+    }
+
     const actions: ScreenAction[] = [
       { id: "newGame", label: "New game", run: () => this.options.onNewGame?.() },
     ];
     this.renderButtons(container, actions);
+    const accomplishmentsSpoken =
+      summary.communityAccomplishments.length > 0
+        ? ` ${summary.communityAccomplishments.length} community accomplishments.`
+        : "";
     this.present({
-      visual: `Game over. Journey winner${summary.journeyWinners.length === 1 ? "" : "s"}: ${winners}. Barnabas Award: ${barnabas || "not awarded"}.`,
+      visual: `Game over. Journey winner${summary.journeyWinners.length === 1 ? "" : "s"}: ${winners}. ${summary.serviceAwardName}: ${barnabas || "not awarded"}.${accomplishmentsSpoken}`,
     });
     return { heading, actions, primaryActionId: "newGame" };
   }

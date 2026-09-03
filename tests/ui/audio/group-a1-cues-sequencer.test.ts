@@ -7,7 +7,7 @@ import { hzForMidi, scheduleMelody, scheduleTotalDurationSec } from "../../../sr
 import type { Melody } from "../../../src/content/schemas";
 
 describe("A1 — every cue has at least one positive-duration tone", () => {
-  it("all 10 documented cue ids are present with real tones", () => {
+  it("all 12 documented cue ids are present with real tones", () => {
     const expectedIds: CueId[] = [
       "correct",
       "incorrect",
@@ -19,6 +19,8 @@ describe("A1 — every cue has at least one positive-duration tone", () => {
       "arrival",
       "celebration",
       "menuOpen",
+      "offering",
+      "serviceEarned",
     ];
     expect(Object.keys(CUES).sort()).toEqual([...expectedIds].sort());
     for (const id of expectedIds) {
