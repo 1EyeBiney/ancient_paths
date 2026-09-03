@@ -84,14 +84,21 @@ export class IndexedDbSaveStore implements SaveStore {
     return this.dbPromise;
   }
 
+  /** Resolves on the TRANSACTION completing, not on the request succeeding:
+   * a request's onsuccess fires before the write is durable, and a
+   * transaction can still abort after it (e.g. QuotaExceededError on
+   * commit) — which must surface as a failed save, not a silent one. */
   private async withStore<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBRequest<T>): Promise<T> {
     const db = await this.openDb();
     return new Promise<T>((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, mode);
       const store = tx.objectStore(STORE_NAME);
       const request = fn(store);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error ?? new Error("IndexedDbSaveStore: request failed"));
+      const fail = (error: unknown) => reject(error ?? new Error("IndexedDbSaveStore: request failed"));
+      request.onerror = () => fail(request.error);
+      tx.onerror = () => fail(tx.error);
+      tx.onabort = () => fail(tx.error ?? new Error("IndexedDbSaveStore: transaction aborted"));
+      tx.oncomplete = () => resolve(request.result);
     });
   }
 

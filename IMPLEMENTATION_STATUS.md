@@ -56,6 +56,14 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   pre-existing (Phase 6, not new) accessibility nuance flagged, not
   fixed — the undo arm/confirm message is immediately overwritten by the
   screen's own re-render announcement.
+  **Review addendum (Fable, 2026-09-03; OPEN_QUESTIONS item 31; 460
+  tests):** Resume now applies the saved reduced-motion choice to the DOM;
+  `IndexedDbSaveStore` resolves on transaction completion, not request
+  success; the replay integrity check ignores undefined-valued keys (a
+  JSON round trip of a post-fork save now resumes); and the undo nuance
+  above is fixed — an arming Ctrl+Z no longer re-renders over its own
+  message, and a confirming one announces the confirmation and the new
+  screen together.
 
 - **Phase 7 — Community and Offering Systems — DONE.** All 8 test groups
   (C1-C8) are green: 41 new tests (415 project-wide), `npx tsc --noEmit`

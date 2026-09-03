@@ -571,7 +571,43 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     fix — flagging it here per Brian's ear-is-the-tiebreaker rule so a
     future phase (or Brian's own testing) can judge whether it needs
     fixing, e.g. by having the undo case build one combined announcement
-    instead of two sequential `present()` calls.
+    instead of two sequential `present()` calls. **Fixed in Fable's Phase 8
+    review (item 31).**
+
+31. **RESOLVED (2026-09-03) — Fable's review of Phase 8.** The design held
+    up end to end (decorator, replay, coalesced autosave, quarantine, the
+    round-trip tests); four small things fixed, each pinned by
+    `tests/ui/group-p8-review-fixes.test.ts`:
+    - **Resume ignored the saved reduced-motion choice**: `applySnapshot`
+      set `wizard.reducedMotion` but nothing re-stamped the DOM, so a save
+      made with "Reduce motion" on resumed with animation. Now
+      `applyReducedMotion()` runs after the snapshot is applied.
+    - **`IndexedDbSaveStore` resolved on `request.onsuccess`**, which fires
+      before the transaction commits; a quota abort after that point would
+      have reported a successful save. It now resolves on
+      `transaction.oncomplete` and rejects on `onerror`/`onabort` (no jsdom
+      coverage — the browser check is its test, per rule 5).
+    - **The integrity check treated `{ k: undefined }` and `{}` as
+      different.** Both current paths keep such keys (verified: zod 4
+      preserves an optional key present with `undefined`; structured clone
+      does too; `getSession()` already returns a clone), so nothing was
+      broken today — but the engine writes `team.pendingForkId = undefined`
+      explicitly, and any JSON round trip (a future export/import) would
+      have refused every post-fork save as "does not match its record".
+      `deepEqual` now ignores undefined-valued keys; the test proves a
+      post-fork save survives `JSON.parse(JSON.stringify(save))`.
+    - **Item 30 fixed**: `UndoController.press()` now returns whether an
+      undo was dispatched. An arming press no longer re-renders (nothing
+      changed, so "Undo will reverse: …" stands); a confirming press
+      re-renders and then announces "Undo confirmed: … " plus the new
+      screen's entry text as ONE announcement, so neither is lost.
+    Noted, not changed: the engine config (`DEFAULTS`) is not recorded in
+    a save, so a change to any default (the Phase 10 balance audit will
+    make several) makes an in-flight save fail its integrity check and get
+    quarantined with "does not match its record". That is the safe failure
+    — a resumed game silently running under different rules would be
+    worse — and saves are short-lived, so it stands; if it ever bites,
+    record `config` in the save and pass it to `createEngine` on rebuild.
 
 ## Open
 

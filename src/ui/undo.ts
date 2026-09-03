@@ -30,23 +30,27 @@ export class UndoController {
     return this.armedAt !== null;
   }
 
-  /** Call whenever the host presses the undo key/button. */
-  press(): void {
+  /** Call whenever the host presses the undo key/button. Returns true only
+   * when an undo was actually dispatched (the confirming press) — the
+   * caller re-renders then and only then; an arming press changes nothing
+   * on screen, so re-rendering would just talk over the arm message. */
+  press(): boolean {
     if (!this.options.engine.canUndo()) {
       this.armedAt = null;
       this.options.present({ visual: "Nothing to undo." });
-      return;
+      return false;
     }
     if (this.armedAt !== null && this.now() - this.armedAt <= this.armWindowMs) {
       const description = this.lastEventDescription();
       this.armedAt = null;
       this.options.engine.dispatch({ type: "undo" });
       this.options.present({ visual: `Undo confirmed: ${description}` });
-      return;
+      return true;
     }
     this.armedAt = this.now();
     const description = this.lastEventDescription();
     this.options.present({ visual: `Undo will reverse: ${description}. Press again to confirm.` });
+    return false;
   }
 
   /** Call whenever any OTHER command dispatches, so a stray undo arm doesn't linger. */

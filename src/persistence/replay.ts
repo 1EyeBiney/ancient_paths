@@ -26,7 +26,15 @@ export type RebuildResult =
 /** Deep structural equality for plain JSON-shaped data (no Date/Map/Set),
  * independent of key insertion order — the two PlaySession objects being
  * compared come from different construction paths (schema parse vs. live
- * engine state) so a JSON.stringify string comparison isn't safe. */
+ * engine state) so a JSON.stringify string comparison isn't safe. A key
+ * holding `undefined` counts as absent: the engine writes
+ * `team.pendingForkId = undefined` explicitly, and while structured clone
+ * and zod both keep such a key today, any JSON round trip (a future
+ * export/import) would drop it — that must never read as "tampered". */
+function definedKeys(o: Record<string, unknown>): string[] {
+  return Object.keys(o).filter((k) => o[k] !== undefined);
+}
+
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (typeof a !== typeof b || a === null || b === null) return false;
@@ -35,13 +43,12 @@ function deepEqual(a: unknown, b: unknown): boolean {
     return a.every((v, i) => deepEqual(v, b[i]));
   }
   if (typeof a === "object" && typeof b === "object") {
-    const aKeys = Object.keys(a as Record<string, unknown>);
-    const bKeys = Object.keys(b as Record<string, unknown>);
+    const ao = a as Record<string, unknown>;
+    const bo = b as Record<string, unknown>;
+    const aKeys = definedKeys(ao);
+    const bKeys = definedKeys(bo);
     if (aKeys.length !== bKeys.length) return false;
-    return aKeys.every((k) =>
-      Object.prototype.hasOwnProperty.call(b, k) &&
-      deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]),
-    );
+    return aKeys.every((k) => bKeys.includes(k) && deepEqual(ao[k], bo[k]));
   }
   return false;
 }

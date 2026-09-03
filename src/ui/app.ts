@@ -487,6 +487,7 @@ export class App {
     }
 
     this.wizard.applySnapshot(save.setup);
+    this.applyReducedMotion(); // the snapshot's reducedMotion choice has to reach the DOM too
     this.audioManager.setSettings(save.audio.settings);
     this.audioManager.setSpeechMode(save.audio.speechMode);
 
@@ -1303,12 +1304,24 @@ export class App {
       case "positions":
         this.presenter.present(buildPositions(this.engine.allPositionsText()));
         return;
-      case "undo":
+      case "undo": {
         // PHASE6_SPEC: undo is killAll() and nothing else — no cue replays.
         this.audioManager.killAll();
-        this.undoController?.press();
+        const undone = this.undoController?.press() ?? false;
+        // An arming press changes nothing on screen: leave "Undo will
+        // reverse: …" standing. After a confirmed undo the screen changes,
+        // and its re-render announces the new screen — which would replace
+        // "Undo confirmed: …" before a screen reader got to it (OPEN_QUESTIONS
+        // item 30), so say both, in order, as one announcement.
+        if (!undone) return;
+        const confirmation = this.presenter.log().at(-1);
         this.renderCurrentScreen(true);
+        const entry = this.presenter.log().at(-1);
+        if (confirmation && entry && entry !== confirmation) {
+          this.presenter.present({ visual: `${confirmation.visual} ${entry.visual}` });
+        }
         return;
+      }
       case "audioPause":
       case "audioStop":
       case "audioSkip":

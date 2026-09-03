@@ -3,7 +3,7 @@
 ## Status: PHASE 8 (PERSISTENCE & RECOVERY) COMPLETE (2026-09-03) — Phase 9 not yet planned
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (457/457
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (460/460
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
