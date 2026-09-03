@@ -121,10 +121,107 @@ describe("pack validation rejects (§33.2)", () => {
     }
   });
 
-  it("accepts a well-formed clueAudio array", () => {
+  const clipAsset = {
+    assetId: "ruth-clue-1",
+    filePath: "audio/dev/ruth-clue-1.wav",
+    assetType: "narration",
+    transcript: "I was given an ephah.",
+    durationSeconds: 3,
+    replayAllowed: true,
+    fallbackText: "The speaker says she was given an ephah.",
+    attribution: null,
+  };
+
+  it("accepts a well-formed clueAudio array whose clip is defined in the pack", () => {
     const pack = clonePack();
+    pack.audioAssets = [clipAsset];
     pack.tasks[0].clueAudio = ["ruth-clue-1"];
     expect(validateContentPack(pack, "good-clue-audio").ok).toBe(true);
+  });
+
+  // Audio assets (§17.3, PHASE6_SPEC): every reference must resolve, and an
+  // asset has exactly one source — a served file or note data.
+  it("a clueAudio id that no asset defines", () => {
+    const pack = clonePack();
+    pack.tasks[0].clueAudio = ["ruth-clue-1"];
+    const result = validateContentPack(pack, "dangling-clip");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(" ")).toMatch(/not defined in pack/);
+  });
+
+  it("a task-level audioAsset id that no asset defines", () => {
+    const pack = clonePack();
+    pack.tasks[0].audioAsset = "no-such-clip";
+    expect(validateContentPack(pack, "dangling-task-audio").ok).toBe(false);
+  });
+
+  it("an asset with neither filePath nor melody, and one with both", () => {
+    const pack = clonePack();
+    const { filePath: _f, ...noSource } = clipAsset;
+    pack.audioAssets = [noSource];
+    expect(validateContentPack(pack, "no-source").ok).toBe(false);
+    pack.audioAssets = [
+      {
+        ...clipAsset,
+        melody: { melodyId: "m", title: "M", tempoBpm: 90, notes: [{ midi: 60, beats: 1 }, { midi: 62, beats: 1 }], attribution: "PD" },
+      },
+    ];
+    expect(validateContentPack(pack, "two-sources").ok).toBe(false);
+  });
+
+  it("accepts a melody-as-data asset referenced by a hymn task", () => {
+    const pack = clonePack();
+    pack.audioAssets = [
+      {
+        assetId: "tune-1",
+        melody: {
+          melodyId: "tune-1",
+          title: "Placeholder tune",
+          tempoBpm: 100,
+          notes: [
+            { midi: 60, beats: 1 },
+            { midi: 64, beats: 1 },
+            { midi: 67, beats: 2 },
+          ],
+          attribution: "Public domain (placeholder).",
+        },
+        assetType: "hymn",
+        transcript: "A rising three-note phrase.",
+        durationSeconds: 2.4,
+        replayAllowed: true,
+        fallbackText: "The tune rises through three notes.",
+        attribution: "Public domain (placeholder).",
+      },
+    ];
+    pack.tasks[0].audioAsset = "tune-1";
+    expect(validateContentPack(pack, "melody-asset").ok).toBe(true);
+  });
+
+  it("duplicate audio asset ids", () => {
+    const pack = clonePack();
+    pack.audioAssets = [clipAsset, clipAsset];
+    expect(validateContentPack(pack, "dup-assets").ok).toBe(false);
+  });
+});
+
+describe("journey audio assets", () => {
+  it("a milestone ambient asset the journey does not define is rejected; a defined one is accepted", () => {
+    const journey = cloneJourney();
+    journey.milestones[0].ambientAudioAsset = "harbor-wind";
+    expect(validateJourney(journey, "dangling-ambient").ok).toBe(false);
+    journey.audioAssets = [
+      {
+        assetId: "harbor-wind",
+        filePath: "audio/dev/harbor-wind.wav",
+        assetType: "ambient",
+        transcript: "Wind and water at a harbor.",
+        durationSeconds: 20,
+        replayAllowed: true,
+        fallbackText: "Ambient harbor sounds.",
+        attribution: null,
+      },
+    ];
+    expect(validateJourney(journey, "defined-ambient").ok).toBe(true);
   });
 });
 

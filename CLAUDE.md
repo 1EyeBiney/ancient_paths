@@ -1,6 +1,6 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 5B (THE MAP) COMPLETE (2026-09-02) — next up: Phase 6, audio (not yet specified)
+## Status: PHASE 5B COMPLETE, PHASE 6 (AUDIO) SPECIFIED (2026-09-02) — implement PHASE6_SPEC.md next
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
 Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (297/297
@@ -42,9 +42,19 @@ in both states, not just in tests). Manually browser-checked; findings
 and one small clarity fix (a class-name collision between the map's own
 landmark groups and the Phase 5 strip's) are in OPEN_QUESTIONS item 21.
 
-Phase 6 (audio system, design doc §34) is not yet specified. When ready,
-Fable reviews Phase 5B and writes PHASE6_SPEC.md next, the same
-review-then-spec handoff used for every phase so far.
+**Phase 6 (audio) is specified and ready to implement**: see
+**PHASE6_SPEC.md** — an AudioManager behind a fake-able backend seam
+(voice via HTML5 audio, cues/melodies via Web Audio, per
+ACCESSIBILITY_PATTERNS §5, which is BINDING), a one-clip-at-a-time queue
+with a presenter gate (polite announcements defer until a clip ends;
+assertive interrupts), completion-driven handoffs with failsafes,
+cancellation tokens + one kill switch, play caps (the engine does NOT
+enforce `maxPlays` — the manager does), Space/L/X/N controls and an
+Audio dialog, a melody sequencer for note-data hymns, placeholder tones
+in dev-playtest, and Group A7 as the deliverable: with audio entirely
+broken, the whole game still completes on fallback text. The schema
+already has audio-asset records, melody data, and reference validation
+(Fable added them with the spec) — implementers must not touch it.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

@@ -123,6 +123,64 @@ export const taskSchema = z.object({
 export type Task = z.infer<typeof taskSchema>;
 
 // ---------------------------------------------------------------------------
+// Melody as data (CONTENT_AUTHORING §3c; PHASE6_SPEC). Hymn tunes are
+// note sequences synthesized in the browser at play time; every variation
+// (first N notes, tempo, transposition, a wrong note) is a parameter over
+// this one record, never a second audio file.
+// ---------------------------------------------------------------------------
+
+export const melodySchema = z.object({
+  melodyId: idSchema,
+  title: z.string().min(1),
+  tempoBpm: z.number().int().min(30).max(240),
+  notes: z
+    .array(
+      z.object({
+        midi: z.number().int().min(0).max(127),
+        beats: z.number().positive().max(16),
+      }),
+    )
+    .min(2),
+  attribution: z.string().min(1),
+});
+
+export type Melody = z.infer<typeof melodySchema>;
+
+// ---------------------------------------------------------------------------
+// Audio asset record (§17.3). A served file (`filePath`) OR note data
+// (`melody`) — exactly one. Referenced by id from tasks, variants, clue
+// arrays, and milestones; the pack/journey superRefines below check that
+// every reference resolves, so a dangling id is a content error caught at
+// load, never a silent gap at play time.
+// ---------------------------------------------------------------------------
+
+export const audioAssetSchema = z
+  .object({
+    assetId: idSchema,
+    filePath: z.string().min(1).optional(),
+    melody: melodySchema.optional(),
+    assetType: z.enum([
+      "narration",
+      "music",
+      "effect",
+      "task-audio",
+      "hymn",
+      "ambient",
+    ]),
+    transcript: z.string().min(1),
+    durationSeconds: z.number().positive(),
+    volumeRecommendation: z.number().min(0).max(1).optional(),
+    replayAllowed: z.boolean(),
+    fallbackText: z.string().min(1),
+    attribution: z.string().nullable(),
+  })
+  .refine((a) => (a.filePath ? 1 : 0) + (a.melody ? 1 : 0) === 1, {
+    message: "An audio asset needs exactly one source: filePath or melody.",
+  });
+
+export type AudioAsset = z.infer<typeof audioAssetSchema>;
+
+// ---------------------------------------------------------------------------
 // Content pack
 // ---------------------------------------------------------------------------
 
@@ -134,8 +192,31 @@ export const contentPackSchema = z
     title: z.string().min(1),
     description: z.string().optional(),
     tasks: z.array(taskSchema).min(1),
+    audioAssets: z.array(audioAssetSchema).optional(),
   })
   .superRefine((pack, ctx) => {
+    // Every audio reference must resolve to an asset in THIS pack.
+    const assetIds = new Set((pack.audioAssets ?? []).map((a) => a.assetId));
+    const dupAssets = new Set<string>();
+    (pack.audioAssets ?? []).forEach((a, i) => {
+      if (dupAssets.has(a.assetId)) {
+        ctx.addIssue({ code: "custom", path: ["audioAssets", i, "assetId"], message: `Duplicate audio asset id "${a.assetId}".` });
+      }
+      dupAssets.add(a.assetId);
+    });
+    const requireAsset = (id: string | null | undefined, path: (string | number)[]) => {
+      if (id && !assetIds.has(id)) {
+        ctx.addIssue({ code: "custom", path, message: `Audio asset "${id}" is not defined in pack "${pack.packId}".` });
+      }
+    };
+    pack.tasks.forEach((task, index) => {
+      requireAsset(task.audioAsset, ["tasks", index, "audioAsset"]);
+      requireAsset(task.normalVariant.audioAsset, ["tasks", index, "normalVariant", "audioAsset"]);
+      requireAsset(task.assistedVariant?.audioAsset, ["tasks", index, "assistedVariant", "audioAsset"]);
+      requireAsset(task.amplifiedVariant?.audioAsset, ["tasks", index, "amplifiedVariant", "audioAsset"]);
+      (task.clueAudio ?? []).forEach((id, i) => requireAsset(id, ["tasks", index, "clueAudio", i]));
+    });
+
     const seen = new Set<string>();
     pack.tasks.forEach((task, index) => {
       if (seen.has(task.id)) {
@@ -195,30 +276,6 @@ export const contentPackSchema = z
 
 export type ContentPack = z.infer<typeof contentPackSchema>;
 
-// ---------------------------------------------------------------------------
-// Audio asset record (§17.3)
-// ---------------------------------------------------------------------------
-
-export const audioAssetSchema = z.object({
-  assetId: idSchema,
-  filePath: z.string().min(1),
-  assetType: z.enum([
-    "narration",
-    "music",
-    "effect",
-    "task-audio",
-    "hymn",
-    "ambient",
-  ]),
-  transcript: z.string().min(1),
-  durationSeconds: z.number().positive(),
-  volumeRecommendation: z.number().min(0).max(1).optional(),
-  replayAllowed: z.boolean(),
-  fallbackText: z.string().min(1),
-  attribution: z.string().nullable(),
-});
-
-export type AudioAsset = z.infer<typeof audioAssetSchema>;
 
 // ---------------------------------------------------------------------------
 // Journey record (§17.2) — v1 shape; expected to grow through Phases 2–3.
@@ -373,8 +430,20 @@ export const journeySchema = z
     communityEvents: z.array(communityEventSchema),
     offeringOutcomes: z.array(offeringOutcomeSchema).min(1),
     map: journeyMapSchema.optional(),
+    audioAssets: z.array(audioAssetSchema).optional(),
   })
   .superRefine((journey, ctx) => {
+    // Milestone ambient audio must resolve to an asset in THIS journey.
+    const journeyAssetIds = new Set((journey.audioAssets ?? []).map((a) => a.assetId));
+    journey.milestones.forEach((m, index) => {
+      if (m.ambientAudioAsset && !journeyAssetIds.has(m.ambientAudioAsset)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["milestones", index, "ambientAudioAsset"],
+          message: `Milestone "${m.id}" references audio asset "${m.ambientAudioAsset}", which the journey does not define.`,
+        });
+      }
+    });
     if (journey.map) {
       journey.milestones.forEach((m, index) => {
         if (!m.coordinates) {

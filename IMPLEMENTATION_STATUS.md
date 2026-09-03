@@ -239,8 +239,10 @@ Tracks the design doc §34 phases. Updated 2026-09-02.
 
 ## Active
 
-- (nothing in flight — Phase 5B complete; Phase 6 audio not yet
-  specified)
+- Phase 6 — Audio system: PHASE6_SPEC.md written (2026-09-02) after
+  Fable's review of Phase 5B; schema gained audio-asset records on packs
+  and journeys, melody-as-data, and reference validation (6 new content
+  tests, 303 total). Test groups A1-A8. Implementation not yet started.
   - Known spec discrepancy found and NOT silently fixed: PHASE2_SPEC's
     estimator worked example (4 teams, 3 tasks, 9 successes, 2 events)
     computes ~72.7 min under the formula as literally specified, not the

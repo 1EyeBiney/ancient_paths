@@ -242,6 +242,26 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     `.map-overlay .map-landmark` are now unambiguous. No other issues
     found.
 
+22. **PHASE6_SPEC (2026-09-02) — decisions by the spec author, Brian
+    may veto.** Phase 5B reviewed: clean (M1-M6, 297 tests, browser-
+    checked; nothing to carry forward). Audio groundwork Fable made with
+    the spec: `audioAssetSchema` now takes exactly one source (`filePath`
+    OR `melody` note data — CONTENT_AUTHORING §3c's shape, finalized);
+    packs and journeys gain `audioAssets` arrays; every audio reference
+    (task/variant `audioAsset`, `clueAudio[i]`, milestone
+    `ambientAudioAsset`) must resolve within its own pack/journey (6 new
+    content tests). Found: the engine does NOT enforce `maxPlays`
+    (CONTENT_AUTHORING says it does) — it only logs the Insight replay
+    spend; play caps are therefore the audio manager's job (UI-side),
+    not an engine change. Decisions: new keys **L** replay task audio,
+    **X** stop clip, **N** skip optional narration (Space stays pause/
+    resume); interface-speech behavior defaults to **wait** (polite
+    announcements defer until the clip ends, assertive interrupts), with
+    "interrupt" selectable in a new game-menu Audio dialog; placeholder
+    audio is synthetic WAV tones plus synthetic scale/arpeggio "tunes" in
+    dev-playtest — no real voices, no ElevenLabs (item 12's licensing
+    question still stands), no real hymn melodies (Brian authors those).
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
