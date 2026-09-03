@@ -133,6 +133,29 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     added so the browser build is actually playable — `dev-sample`'s 8
     tasks cannot pass the sufficiency check for the real journey.
 
+17. **Brian's visual vision (2026-09-02) — direction recorded, build
+    order agreed: game first, map after Phase 5.** Brian wants the
+    audience screen to feel like a game, not decorated text: ideally a
+    photorealistic satellite-style map of the region with each team's
+    route animating as it progresses; failing that, a period/"ancient"
+    or 1980s-classroom style map illustrated with progress. Fable's
+    assessment: (Tier 1) a live 3D globe (CesiumJS-class) is real but
+    depends on streamed imagery tiles, API keys, licensing, and heavy
+    WebGL — not something to trust on a church laptop mid-game; stretch
+    goal only. (Tier 2, RECOMMENDED) NASA Blue Marble imagery (public
+    domain) cropped once by a script into a shipped web image, with an
+    SVG overlay drawing the route and gliding team badges between
+    landmarks (reduced motion → jump). No servers, no keys, runs on any
+    laptop. (Tier 3) the same overlay over a parchment/Natural Earth
+    (public domain) rendering — swappable background, could be a setup
+    choice. Needs: latitude/longitude per milestone in the journey schema
+    (Fable to spec — schema change), an imagery-prep script, and a map
+    component. Plan: its own phase spec ("the map") immediately after
+    Phase 5, before audio; the Phase 5 landmark strip remains the
+    information/text equivalent, the map is the sighted layer per the
+    parity principle. Confirm the actual Sunday hardware (laptop age,
+    TV vs projector) before committing to animation ambition.
+
 ## Open
 
 1. Final milestone list and exact stage layout for the composite journey
