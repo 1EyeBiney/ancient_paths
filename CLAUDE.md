@@ -107,6 +107,13 @@ These are Brian's rulings; where they conflict with the design doc, THESE win:
    journey declares its viewport and per-milestone lat/long (schema
    change, Fable-spec'd). Must run on a ~6-year-old laptop. Live 3D
    globe = stretch only. Details: OPEN_QUESTIONS item 17.
+10. **Deployment (2026-09-02)**: `.github/workflows/deploy.yml` builds,
+    type-checks, tests, and publishes `dist/` to GitHub Pages on every
+    push to `main` — the implementing agent's normal push-per-green-group
+    is the deploy. Live address: https://1eyebiney.github.io/ancient_paths/
+    once Settings → Pages → Source is set to "GitHub Actions" (and the
+    repo is public, or the account is on a paid plan — Pages does not
+    serve private repos for free).
 - Naming: "The Way" = game title; Ancient Paths = project/workspace name.
 
 ## Related context
