@@ -837,7 +837,17 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       than quote it — left; the transcript IS the text the host reads,
       and PHASE9's rule allows paraphrase. (d) `gb-cm-006`'s citation
       runs one verse past the enumerated set — tightened in the
-      follow-up.
+      follow-up. **Follow-up pass (same reviewer, ~3 minutes)**: all
+      15 overlaps fixed by rewriting the CLUE (both clues in
+      `gb-sk-020`; a single, different verifiable detail in
+      `gb-br-012`); no amplified prompt, answer or accepted-answer list
+      needed to change; `gb-cm-006`'s reference and host guidance now
+      agree; 17 lines changed, counts unchanged. Reviewer's note, kept
+      for the record: a few replacement clues draw on the figure's
+      wider narrative rather than the single cited verse — consistent
+      with how the pack's clues already work; a "clues only from the
+      cited passage" rule was NOT adopted (it would make many hard
+      tasks clue-less).
     - **X6 ruled — yes (Brian, 2026-09-03)**: recent-use memory across
       games goes into Phase 10 as specified (PHASE10_SPEC.md Group X6);
       Open item 5 updated.

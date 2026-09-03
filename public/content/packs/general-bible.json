@@ -387,7 +387,7 @@
         "acceptedAnswers": ["Joseph and carpenter", "Joseph, carpenter"],
         "successValue": 2
       },
-      "clues": ["An angel appeared to him in a dream, telling him not to be afraid to take Mary as his wife.", "He worked as a carpenter."],
+      "clues": ["An angel appeared to him in a dream, telling him not to be afraid to take Mary as his wife.", "He was of the house of David, which is why the family traveled to Bethlehem for the census."],
       "teachingReveal": "Joseph, a carpenter engaged to Mary, was told by an angel in a dream not to be afraid to take her as his wife, since the child was conceived by the Holy Spirit.",
       "historicalNote": null,
       "audioAsset": null,
@@ -518,7 +518,7 @@
         "acceptedAnswers": ["Peter and a rooster crowing", "Peter, rooster crowing"],
         "successValue": 2
       },
-      "clues": ["Jesus had predicted this would happen before a rooster crowed.", "He wept bitterly afterward."],
+      "clues": ["Earlier that same night he had drawn a sword in the garden to defend Jesus.", "He wept bitterly afterward."],
       "teachingReveal": "Peter denied knowing Jesus three times in a courtyard, just as Jesus had predicted; when the rooster crowed, Peter remembered and wept bitterly.",
       "historicalNote": null,
       "audioAsset": null,
@@ -587,7 +587,7 @@
         "acceptedAnswers": ["Samson and Delilah"],
         "successValue": 2
       },
-      "clues": ["He was a Nazirite from birth, under a vow to God.", "A woman named Delilah discovered the secret of his strength."],
+      "clues": ["He was a Nazirite from birth, under a vow to God.", "He once killed a lion with his bare hands, and at the end of his life pulled down the pillars of a temple."],
       "teachingReveal": "Samson, a judge of Israel under a Nazirite vow never to cut his hair, was betrayed by Delilah, who had his hair cut to strip him of his strength.",
       "historicalNote": null,
       "audioAsset": null,
@@ -625,7 +625,7 @@
         "acceptedAnswers": ["Saul and Samuel"],
         "successValue": 2
       },
-      "clues": ["He was described as standing head and shoulders above the people.", "The prophet Samuel anointed him with oil."],
+      "clues": ["He was described as standing head and shoulders above the people.", "He was out searching for his father's lost donkeys when he first learned he would reign."],
       "teachingReveal": "Saul was anointed by the prophet Samuel to become Israel's first king, at the people's request for a king like other nations.",
       "historicalNote": null,
       "audioAsset": null,
@@ -707,7 +707,7 @@
         "acceptedAnswers": ["Nathan, 'Thou art the man'", "Nathan and 'You are the man'"],
         "successValue": 2
       },
-      "clues": ["He told a story about a rich man who stole a poor man's only lamb.", "He declared, 'You are the man,' directly accusing the king."],
+      "clues": ["He had earlier brought David God's promise that his royal house would endure.", "He later helped secure Solomon's succession to the throne."],
       "teachingReveal": "The prophet Nathan confronted King David with a parable about a poor man's lamb, then declared 'You are the man,' exposing David's sin with Bathsheba.",
       "historicalNote": null,
       "audioAsset": null,
@@ -783,7 +783,7 @@
         "acceptedAnswers": ["Joseph and a coat of many colors", "Joseph, a richly ornamented coat"],
         "successValue": 2
       },
-      "clues": ["His father gave him a special multicolored coat.", "He later rose to become second in command over all of Egypt."],
+      "clues": ["He was his father's favorite, and told his brothers dreams that made them resent him.", "He later rose to become second in command over all of Egypt."],
       "teachingReveal": "Joseph, given a coat of many colors by his father Jacob, was sold into slavery by his jealous brothers, but God later raised him up as second in command over Egypt.",
       "historicalNote": null,
       "audioAsset": null,
@@ -862,7 +862,7 @@
         "acceptedAnswers": ["Pontius Pilate and washing his hands", "Pilate washed his hands"],
         "successValue": 2
       },
-      "clues": ["He was the Roman prefect of Judea at the time.", "He publicly washed his hands to declare himself innocent of Jesus' blood."],
+      "clues": ["He was the Roman prefect of Judea at the time.", "He offered the crowd a choice between Jesus and a prisoner named Barabbas."],
       "teachingReveal": "Pontius Pilate, the Roman governor of Judea, presided over Jesus' trial and, despite finding no fault in Him, gave in to the crowd and ordered His crucifixion.",
       "historicalNote": null,
       "audioAsset": null,
@@ -941,7 +941,7 @@
         "acceptedAnswers": ["Paul and persecuting the church", "Saul, persecuting Christians"],
         "successValue": 2
       },
-      "clues": ["He was originally traveling to Damascus to arrest followers of Jesus.", "He later wrote much of the New Testament."],
+      "clues": ["He was a Pharisee, trained under the respected teacher Gamaliel.", "He later wrote much of the New Testament."],
       "teachingReveal": "Paul, formerly named Saul and a persecutor of the church, was struck blind by a heavenly light on the road to Damascus and became one of the early church's greatest missionaries.",
       "historicalNote": null,
       "audioAsset": null,
@@ -1086,7 +1086,7 @@
         "acceptedAnswers": ["Jacob, his hip", "Jacob and a wrenched hip"],
         "successValue": 2
       },
-      "clues": ["He was Isaac's son and Esau's twin brother.", "He walked with a limp afterward."],
+      "clues": ["He was Isaac's son and Esau's twin brother.", "Earlier in his life he dreamed of a ladder reaching to heaven at Bethel."],
       "teachingReveal": "Jacob wrestled through the night with God, and though his hip was wrenched, he was blessed and given the new name Israel.",
       "historicalNote": null,
       "audioAsset": null,
@@ -1124,7 +1124,7 @@
         "acceptedAnswers": ["Joshua and seven days", "Joshua, 7 days"],
         "successValue": 2
       },
-      "clues": ["He had been one of the twelve spies sent into Canaan years earlier.", "The Israelites marched around the city once a day for six days, then seven times on the seventh."],
+      "clues": ["He had been one of the twelve spies sent into Canaan years earlier.", "Before the city fell, he sent two spies who were hidden by Rahab."],
       "teachingReveal": "Joshua led Israel into the promised land after Moses' death, and the walls of Jericho fell after the people marched around the city as God commanded, for seven days.",
       "historicalNote": null,
       "audioAsset": null,
@@ -1162,7 +1162,7 @@
         "acceptedAnswers": ["Deborah and Barak"],
         "successValue": 2
       },
-      "clues": ["She held court under a palm tree, where the people came to her for judgment.", "She summoned a general named Barak to lead the army."],
+      "clues": ["She held court under a palm tree, where the people came to her for judgment.", "A victory song preserved in the book of Judges carries her name."],
       "teachingReveal": "Deborah, a prophetess and the only female judge recorded in the book of Judges, called the general Barak to lead Israel's army to victory over the Canaanites.",
       "historicalNote": null,
       "audioAsset": null,
@@ -1872,7 +1872,7 @@
         "acceptedAnswers": ["It breaks easily alone, unlike a bundled cord"],
         "successValue": 2
       },
-      "clues": ["Think about how much force it takes to snap one thin strand versus three woven together."],
+      "clues": ["The neighbouring verses picture someone falling with no one there to help him up."],
       "teachingReveal": "Ecclesiastes' image of a three-strand cord teaches that people supporting one another are far more resilient than anyone standing alone.",
       "historicalNote": null,
       "audioAsset": null,
@@ -1954,7 +1954,7 @@
         "acceptedAnswers": ["They put their talents to work and were praised for it"],
         "successValue": 2
       },
-      "clues": ["The other two servants invested their talents and doubled them."],
+      "clues": ["The master answered that the money could at least have been left with the bankers to earn interest."],
       "teachingReveal": "The servant who merely buried his talent was condemned not for losing it, but for failing to use it — showing the master valued faithful, active stewardship over cautious inaction.",
       "historicalNote": null,
       "audioAsset": null,
@@ -2731,7 +2731,7 @@
         "acceptedAnswers": ["Tax collector, seen as a Roman collaborator"],
         "successValue": 2
       },
-      "clues": ["This occupation involved collecting money on behalf of the occupying Roman government."],
+      "clues": ["Jesus told a parable contrasting one of these men praying in the temple with a Pharisee."],
       "teachingReveal": "A publican was a tax collector working under Roman authority, widely resented by fellow Jews both for collaborating with Rome and for the common practice of overcharging for personal profit.",
       "historicalNote": "Widely accepted background: tax collectors in Roman-occupied Judea worked under Roman authority and were widely regarded by fellow Jews as collaborators, partly because the system allowed them to profit by overcharging.",
       "audioAsset": null,
@@ -3223,7 +3223,7 @@
         "acceptedAnswers": ["A rooster crowing, after his third denial"],
         "successValue": 2
       },
-      "clues": ["This sound immediately follows Peter's third denial of knowing Jesus."],
+      "clues": ["The sequence names the sound in its opening words, using an older English term for the bird that made it."],
       "teachingReveal": "The crowing of a rooster marks the moment Peter remembered Jesus' earlier warning, right after denying Him a third time — and he wept bitterly.",
       "historicalNote": null,
       "audioAsset": null,
@@ -4430,8 +4430,8 @@
       "prompt": "Name one group Jesus calls 'blessed' in the Beatitudes, from the Sermon on the Mount.",
       "answer": "Any of the eight: the poor in spirit, those who mourn, the meek, those who hunger and thirst for righteousness, the merciful, the pure in heart, the peacemakers, or those persecuted for righteousness' sake.",
       "acceptedAnswers": ["Any of the eight: the poor in spirit, those who mourn, the meek, those who hunger and thirst for righteousness, the merciful, the pure in heart, the peacemakers, or those persecuted for righteousness' sake."],
-      "hostGuidance": "Accept any true group named in Matthew 5:3-11, stated in the team's own words; no repeats from teams that already answered this round.",
-      "scriptureReferences": ["Matthew 5:3-11"],
+      "hostGuidance": "Accept any true group named in Matthew 5:3-10, stated in the team's own words; no repeats from teams that already answered this round.",
+      "scriptureReferences": ["Matthew 5:3-10"],
       "normalVariant": { "prompt": "Name one group Jesus calls 'blessed' in the Beatitudes, from the Sermon on the Mount.", "successValue": 1 },
       "assistedVariant": null,
       "amplifiedVariant": null,
