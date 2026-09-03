@@ -168,3 +168,14 @@ sessions draw without repeats) and binds the authoring rules.
   `audio-pending`; hymn tasks are text-only until Brian's melody data
   arrives (OPEN_QUESTIONS 23). No placeholder tones ship in a production
   pack — a beep before a real task is worse than no clip.
+- **Variant costs follow the resource's job (Phase 9 review, OPEN_QUESTIONS
+  35).** The assisted form costs **Provision** (design doc §8.2 "reduce an
+  authored challenge to its assisted form", §20.5 "spend Provision for an
+  eligible assisted form"); the amplified form costs **Courage** (§8.3);
+  clues, option elimination and audio replay cost **Insight** (the engine's
+  `insightEffectCost`, not authored per task). The schema leaves
+  `cost.resource` free, and the engine deducts whatever a task declares,
+  but the host's buttons are labelled "Spend Provision for the assisted
+  form" / "Spend Courage to amplify the task" — so a task authored
+  otherwise silently misleads the host. `general-bible.test.ts` enforces
+  this blind; `dev-sample` was corrected to match.

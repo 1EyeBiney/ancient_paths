@@ -25,7 +25,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was the replacement Matthias, Silas, or Barnabas?",
         "options": ["Matthias", "Silas", "Barnabas"],
         "successValue": 1
@@ -104,7 +104,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "The city is one of these three: Antioch, Tarsus, or Joppa. Which one fits all three clues?",
         "successValue": 1
       },
@@ -137,7 +137,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the Appian Way, the Egnatian Way, or the King's Highway?",
         "successValue": 1
       },
@@ -170,7 +170,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Hear the sequence once more, slowly: Caesarea. Sidon. Myra. Name the three ports in order.",
         "successValue": 1
       },

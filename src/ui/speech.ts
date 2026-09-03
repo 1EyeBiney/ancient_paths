@@ -16,6 +16,24 @@ function same(text: string): Composed {
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+/**
+ * The "Also accepted" alternatives for a reveal: `acceptedAnswers` minus
+ * the official answer itself (content rules require the list to CONTAIN
+ * the answer, so without this every reveal read "Answer: X. Also accepted:
+ * X." — Phase 9 review), de-duplicated case-insensitively, order kept.
+ */
+export function acceptedAlternatives(answer: string, acceptedAnswers: readonly string[]): string[] {
+  const seen = new Set<string>([answer.trim().toLowerCase()]);
+  const out: string[] = [];
+  for (const a of acceptedAnswers) {
+    const key = a.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(a);
+  }
+  return out;
+}
+
 export function letterFor(index: number): string {
   const letter = LETTERS[index];
   if (!letter) throw new Error(`speech.letterFor: index ${index} has no letter (max 26 options)`);

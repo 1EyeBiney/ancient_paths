@@ -22,7 +22,7 @@
       "normalVariant": { "prompt": "Who led the Israelites out of slavery in Egypt?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Moses, Aaron, or Joshua?",
         "options": ["Moses", "Aaron", "Joshua"],
         "successValue": 1
@@ -60,7 +60,7 @@
       "normalVariant": { "prompt": "Who built a great boat, or ark, at God's command to survive a flood?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Noah, Abraham, or Lot?",
         "options": ["Noah", "Abraham", "Lot"],
         "successValue": 1
@@ -98,7 +98,7 @@
       "normalVariant": { "prompt": "Which prophet was swallowed by a great fish after running from God's call?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Jonah, Elijah, or Amos?",
         "options": ["Jonah", "Elijah", "Amos"],
         "successValue": 1
@@ -136,7 +136,7 @@
       "normalVariant": { "prompt": "According to Genesis, who was the first man God created?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Adam, Cain, or Seth?",
         "options": ["Adam", "Cain", "Seth"],
         "successValue": 1
@@ -167,7 +167,7 @@
       "normalVariant": { "prompt": "According to Genesis, who was the first woman, formed from the man's rib?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Eve, Sarah, or Rebekah?",
         "options": ["Eve", "Sarah", "Rebekah"],
         "successValue": 1
@@ -198,7 +198,7 @@
       "normalVariant": { "prompt": "Who was the young shepherd who defeated the giant Goliath?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it David, Saul, or Jonathan?",
         "options": ["David", "Saul", "Jonathan"],
         "successValue": 1
@@ -236,7 +236,7 @@
       "normalVariant": { "prompt": "Who was thrown into a den of lions for praying to God, and was kept safe overnight?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Daniel, Ezekiel, or Jeremiah?",
         "options": ["Daniel", "Ezekiel", "Jeremiah"],
         "successValue": 1
@@ -274,7 +274,7 @@
       "normalVariant": { "prompt": "According to Genesis, what did God create on the very first day?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it light, the sun, or the stars?",
         "options": ["Light", "The sun", "The stars"],
         "successValue": 1
@@ -305,7 +305,7 @@
       "normalVariant": { "prompt": "Who was the mother of Jesus?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Mary, Martha, or Elizabeth?",
         "options": ["Mary", "Martha", "Elizabeth"],
         "successValue": 1
@@ -343,7 +343,7 @@
       "normalVariant": { "prompt": "According to the Ten Commandments, how many days were the Israelites told they could work each week?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it six, five, or seven?",
         "options": ["Six", "Five", "Seven"],
         "successValue": 1
@@ -374,7 +374,7 @@
       "normalVariant": { "prompt": "Who was Mary's husband, and the earthly, adoptive father of Jesus?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Joseph, Zechariah, or Simeon?",
         "options": ["Joseph", "Zechariah", "Simeon"],
         "successValue": 1
@@ -412,7 +412,7 @@
       "normalVariant": { "prompt": "In what town was Jesus born?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Bethlehem, Nazareth, or Jerusalem?",
         "options": ["Bethlehem", "Nazareth", "Jerusalem"],
         "successValue": 1
@@ -443,7 +443,7 @@
       "normalVariant": { "prompt": "Which of Jesus' twelve disciples betrayed Him for thirty pieces of silver?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Judas Iscariot, Thomas, or Simon Peter?",
         "options": ["Judas Iscariot", "Thomas", "Simon Peter"],
         "successValue": 1
@@ -474,7 +474,7 @@
       "normalVariant": { "prompt": "According to the Gospels, on which day of the week was Jesus' tomb found empty?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the first day of the week, the sixth day, or the seventh day?",
         "options": ["The first day of the week", "The sixth day", "The seventh day"],
         "successValue": 1
@@ -505,7 +505,7 @@
       "normalVariant": { "prompt": "Which disciple denied knowing Jesus three times on the night of His arrest?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Peter, John, or Andrew?",
         "options": ["Peter", "John", "Andrew"],
         "successValue": 1
@@ -543,7 +543,7 @@
       "normalVariant": { "prompt": "What sea did God part so the Israelites could escape Pharaoh's army on dry ground?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the Red Sea, the Dead Sea, or the Sea of Galilee?",
         "options": ["The Red Sea", "The Dead Sea", "The Sea of Galilee"],
         "successValue": 1
@@ -574,7 +574,7 @@
       "normalVariant": { "prompt": "Which judge of Israel had great strength that was tied to a vow never to cut his hair?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Samson, Gideon, or Ehud?",
         "options": ["Samson", "Gideon", "Ehud"],
         "successValue": 1
@@ -612,7 +612,7 @@
       "normalVariant": { "prompt": "Who was anointed as the first king of Israel, before David?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Saul, David, or Samuel?",
         "options": ["Saul", "David", "Samuel"],
         "successValue": 1
@@ -653,7 +653,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Solomon, David, or Rehoboam?",
         "options": ["Solomon", "David", "Rehoboam"],
         "successValue": 1
@@ -694,7 +694,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Nathan, Gad, or Samuel?",
         "options": ["Nathan", "Gad", "Samuel"],
         "successValue": 1
@@ -732,7 +732,7 @@
       "normalVariant": { "prompt": "Which judge led just three hundred men to defeat the vast army of Midian?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Gideon, Barak, or Othniel?",
         "options": ["Gideon", "Barak", "Othniel"],
         "successValue": 1
@@ -770,7 +770,7 @@
       "normalVariant": { "prompt": "Which son of Jacob was sold into slavery in Egypt by his own jealous brothers?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Joseph, Reuben, or Benjamin?",
         "options": ["Joseph", "Reuben", "Benjamin"],
         "successValue": 1
@@ -811,7 +811,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Hannah, Ruth, or Rachel?",
         "options": ["Hannah", "Ruth", "Rachel"],
         "successValue": 1
@@ -849,7 +849,7 @@
       "normalVariant": { "prompt": "Who was the Roman governor who presided over Jesus' trial and ordered His crucifixion?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Pontius Pilate, Herod, or Caiaphas?",
         "options": ["Pontius Pilate", "Herod", "Caiaphas"],
         "successValue": 1
@@ -887,7 +887,7 @@
       "normalVariant": { "prompt": "Which short tax collector climbed a sycamore tree to see Jesus over the crowd?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Zacchaeus, Matthew, or Nicodemus?",
         "options": ["Zacchaeus", "Matthew", "Nicodemus"],
         "successValue": 1
@@ -928,7 +928,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Paul, Peter, or Barnabas?",
         "options": ["Paul", "Peter", "Barnabas"],
         "successValue": 1
@@ -966,7 +966,7 @@
       "normalVariant": { "prompt": "Who baptized Jesus in the Jordan River?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it John the Baptist, John the Apostle, or Andrew?",
         "options": ["John the Baptist", "John the Apostle", "Andrew"],
         "successValue": 1
@@ -1004,7 +1004,7 @@
       "normalVariant": { "prompt": "Which of Jesus' twelve disciples was a tax collector before Jesus called him to follow?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Matthew, James, or Philip?",
         "options": ["Matthew", "James", "Philip"],
         "successValue": 1
@@ -1035,7 +1035,7 @@
       "normalVariant": { "prompt": "Which Jewish queen of Persia risked her own life to save her people from a plot to destroy them?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Esther, Ruth, or Deborah?",
         "options": ["Esther", "Ruth", "Deborah"],
         "successValue": 1
@@ -1073,7 +1073,7 @@
       "normalVariant": { "prompt": "Which patriarch wrestled through the night with God and was given the new name Israel?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Jacob, Isaac, or Esau?",
         "options": ["Jacob", "Isaac", "Esau"],
         "successValue": 1
@@ -1111,7 +1111,7 @@
       "normalVariant": { "prompt": "Who led the Israelites into the promised land after Moses' death, and saw the walls of Jericho fall?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Joshua, Caleb, or Aaron?",
         "options": ["Joshua", "Caleb", "Aaron"],
         "successValue": 1
@@ -1149,7 +1149,7 @@
       "normalVariant": { "prompt": "Who was the prophetess and judge of Israel who led the people to victory over a Canaanite army?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Deborah, Miriam, or Huldah?",
         "options": ["Deborah", "Miriam", "Huldah"],
         "successValue": 1
@@ -1190,7 +1190,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Caiaphas, Annas, or Gamaliel?",
         "options": ["Caiaphas", "Annas", "Gamaliel"],
         "successValue": 1
@@ -1231,7 +1231,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Mount Carmel, Mount Sinai, or Mount Gilboa?",
         "options": ["Mount Carmel", "Mount Sinai", "Mount Gilboa"],
         "successValue": 1
@@ -1272,7 +1272,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Naomi, Orpah, or Rahab?",
         "options": ["Naomi", "Orpah", "Rahab"],
         "successValue": 1
@@ -1313,7 +1313,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Bezalel, Aaron, or Hur?",
         "options": ["Bezalel", "Aaron", "Hur"],
         "successValue": 1
@@ -1354,7 +1354,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Hosea, Amos, or Joel?",
         "options": ["Hosea", "Amos", "Joel"],
         "successValue": 1
@@ -1395,7 +1395,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Cornelius, Felix, or Festus?",
         "options": ["Cornelius", "Felix", "Festus"],
         "successValue": 1
@@ -1436,7 +1436,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Rhoda, Lydia, or Tabitha?",
         "options": ["Rhoda", "Lydia", "Tabitha"],
         "successValue": 1
@@ -1477,7 +1477,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Onesimus, Timothy, or Titus?",
         "options": ["Onesimus", "Timothy", "Titus"],
         "successValue": 1
@@ -1518,7 +1518,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the seventh day, the sixth day, or the eighth day?",
         "options": ["The seventh day", "The sixth day", "The eighth day"],
         "successValue": 1
@@ -1559,7 +1559,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Is it mainly about worshipping God, or about a relationship between people?",
         "options": ["A relationship between people", "Worshipping God", "Neither"],
         "successValue": 1
@@ -1593,7 +1593,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Which kind had more of them aboard — clean animals, or unclean animals?",
         "options": ["Clean animals", "Unclean animals", "They were equal"],
         "successValue": 1
@@ -1627,7 +1627,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Should good works be hidden away, or plainly visible to others?",
         "options": ["Plainly visible to others", "Hidden away", "Kept a secret"],
         "successValue": 1
@@ -1668,7 +1668,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Is a neighbor only someone from your own group, or anyone who shows mercy?",
         "options": ["Anyone who shows mercy", "Only your own group", "Only close relatives"],
         "successValue": 1
@@ -1709,7 +1709,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Should every believer have the exact same role, or different roles that work together?",
         "options": ["Different roles that work together", "The exact same role", "No role at all"],
         "successValue": 1
@@ -1743,7 +1743,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does this show reluctance, or eagerness to forgive?",
         "options": ["Eagerness to forgive", "Reluctance", "Indifference"],
         "successValue": 1
@@ -1784,7 +1784,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does a good friend make you weaker, or help you improve?",
         "options": ["Help you improve", "Make you weaker", "Have no effect at all"],
         "successValue": 1
@@ -1818,7 +1818,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was Jesus teaching self-reliance, or trust in His provision?",
         "options": ["Trust in His provision", "Self-reliance", "That the crowd should fend for itself"],
         "successValue": 1
@@ -1859,7 +1859,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Is the point that community makes people weaker, or stronger?",
         "options": ["Stronger", "Weaker", "It makes no difference"],
         "successValue": 1
@@ -1900,7 +1900,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Is James arguing that belief alone is sufficient, or that it must be joined by action?",
         "options": ["It must be joined by action", "Belief alone is sufficient", "Neither belief nor action matters"],
         "successValue": 1
@@ -1941,7 +1941,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Did the master value cautious safekeeping, or active, faithful use?",
         "options": ["Active, faithful use", "Cautious safekeeping", "Neither"],
         "successValue": 1
@@ -1982,7 +1982,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does witnessing a past miracle automatically produce lasting trust, or not?",
         "options": ["Not automatically", "Yes, automatically", "It has no connection to trust"],
         "successValue": 1
@@ -2016,7 +2016,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Could contentment based on circumstances stay the same in both plenty and need?",
         "options": ["No, it would change with circumstances", "Yes, easily", "There's no difference either way"],
         "successValue": 1
@@ -2057,7 +2057,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does God's rebuke suggest the friends were right, or wrong?",
         "options": ["Wrong", "Right", "It doesn't say"],
         "successValue": 1
@@ -2091,7 +2091,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does this suggest God's plan only ever includes expected, insider figures, or that it can include outsiders too?",
         "options": ["It can include outsiders too", "Only expected insiders", "Neither"],
         "successValue": 1
@@ -2132,7 +2132,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Did Nicodemus's question suggest he understood Jesus spiritually, or physically?",
         "options": ["Physically", "Spiritually", "He didn't respond at all"],
         "successValue": 1
@@ -2173,7 +2173,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was Paul defending equal standing for Gentile believers, or Jewish dietary customs?",
         "options": ["Equal standing for Gentile believers", "Jewish dietary customs", "Neither; it was a personal dispute"],
         "successValue": 1
@@ -2214,7 +2214,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does this argue Jesus' priesthood depends on the Levitical line, or stands above and apart from it?",
         "options": ["Stands above and apart from it", "Depends entirely on it", "Has no connection to priesthood at all"],
         "successValue": 1
@@ -2255,7 +2255,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does this ruling suggest salvation required full law-keeping, or something else?",
         "options": ["Something else, not full law-keeping", "Full law-keeping was required", "The council reached no conclusion"],
         "successValue": 1
@@ -2296,7 +2296,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the Appian Way, the King's Highway, or the Via Maris?",
         "options": ["The Appian Way", "The King's Highway", "The Via Maris"],
         "successValue": 1
@@ -2337,7 +2337,7 @@
       "normalVariant": { "prompt": "What grain was the main ingredient of the everyday bread eaten in ancient Israel?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it wheat, rice, or corn?",
         "options": ["Wheat", "Rice", "Corn"],
         "successValue": 1
@@ -2368,7 +2368,7 @@
       "normalVariant": { "prompt": "What trade did Jesus most likely learn from Joseph, His earthly father, growing up in Nazareth?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it carpentry, fishing, or farming?",
         "options": ["Carpentry", "Fishing", "Farming"],
         "successValue": 1
@@ -2399,7 +2399,7 @@
       "normalVariant": { "prompt": "What was the most common building material for ordinary houses in the hill-country villages of Judea?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it stone, brick, or wood?",
         "options": ["Stone", "Brick", "Wood"],
         "successValue": 1
@@ -2430,7 +2430,7 @@
       "normalVariant": { "prompt": "What animal did ordinary travelers in Bible times most commonly ride for everyday journeys, rather than a horse?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the donkey, the horse, or the ox?",
         "options": ["The donkey", "The horse", "The ox"],
         "successValue": 1
@@ -2461,7 +2461,7 @@
       "normalVariant": { "prompt": "What body of water was the center of the fishing industry that Peter, Andrew, James, and John worked in before following Jesus?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the Sea of Galilee, the Dead Sea, or the Mediterranean Sea?",
         "options": ["The Sea of Galilee", "The Dead Sea", "The Mediterranean Sea"],
         "successValue": 1
@@ -2492,7 +2492,7 @@
       "normalVariant": { "prompt": "What everyday garment did Jewish men commonly wear that could also double as a blanket for warmth at night?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it a cloak, sandals, or a headscarf?",
         "options": ["A cloak", "Sandals", "A headscarf"],
         "successValue": 1
@@ -2523,7 +2523,7 @@
       "normalVariant": { "prompt": "What language did most ordinary Jewish people in Galilee and Judea speak day to day in Jesus' time?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Aramaic, Latin, or Greek?",
         "options": ["Aramaic", "Latin", "Greek"],
         "successValue": 1
@@ -2561,7 +2561,7 @@
       "normalVariant": { "prompt": "What was the name of the Roman coin, bearing Caesar's image, that Jesus referenced when He said 'Give to Caesar what is Caesar's'?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the denarius, the shekel, or the talent?",
         "options": ["The denarius", "The shekel", "The talent"],
         "successValue": 1
@@ -2595,7 +2595,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it mainly a marketplace, or a center for teaching and community gathering?",
         "options": ["A center for teaching and community gathering", "Mainly a marketplace", "Mainly a courtroom"],
         "successValue": 1
@@ -2636,7 +2636,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was she a seller of purple cloth, a fisherwoman, or a tentmaker?",
         "options": ["A seller of purple cloth", "A fisherwoman", "A tentmaker"],
         "successValue": 1
@@ -2677,7 +2677,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it tetrarch, proconsul, or centurion?",
         "options": ["Tetrarch", "Proconsul", "Centurion"],
         "successValue": 1
@@ -2718,7 +2718,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it a tax collector, a scribe, or a priest?",
         "options": ["A tax collector", "A scribe", "A priest"],
         "successValue": 1
@@ -2759,7 +2759,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it a purely religious ritual, or a practical hospitality custom?",
         "options": ["A practical hospitality custom", "A purely religious ritual", "A legal requirement"],
         "successValue": 1
@@ -2797,7 +2797,7 @@
       "normalVariant": { "prompt": "What was a Roman centurion, the military rank held by Cornelius in the book of Acts?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Did a centurion typically command about 10, 100, or 1,000 soldiers?",
         "options": ["About 100 soldiers", "About 10 soldiers", "About 1,000 soldiers"],
         "successValue": 1
@@ -2828,7 +2828,7 @@
       "normalVariant": { "prompt": "What was the primary source of indoor light in ancient Israelite homes after nightfall?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it oil lamps, candles, or gas lanterns?",
         "options": ["Oil lamps", "Candles", "Gas lanterns"],
         "successValue": 1
@@ -2869,7 +2869,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Did students mainly learn from a rabbi through written exams, or by following him closely day to day?",
         "options": ["By following him closely day to day", "Through written exams", "Neither; rabbis rarely had students"],
         "successValue": 1
@@ -2903,7 +2903,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it the Pool of Bethesda, the Pool of Siloam, or the Pool of Gibeon?",
         "options": ["The Pool of Bethesda", "The Pool of Siloam", "The Pool of Gibeon"],
         "successValue": 1
@@ -2944,7 +2944,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Did it hold Scripture verses, coins, or a written prayer schedule?",
         "options": ["Scripture verses", "Coins", "A written prayer schedule"],
         "successValue": 1
@@ -2985,7 +2985,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it his Roman citizenship, his priestly lineage, or his status as a Pharisee?",
         "options": ["His Roman citizenship", "His priestly lineage", "His status as a Pharisee"],
         "successValue": 1
@@ -3026,7 +3026,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it four, three, or five?",
         "options": ["Four", "Three", "Five"],
         "successValue": 1
@@ -3067,7 +3067,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does the sequence say the voice came from heaven, or from a person standing nearby?",
         "options": ["From heaven", "From a person nearby", "It doesn't say"],
         "successValue": 1
@@ -3101,7 +3101,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was the speaker an angel, a shepherd, or a king?",
         "options": ["An angel", "A shepherd", "A king"],
         "successValue": 1
@@ -3135,7 +3135,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it two speakers, one speaker, or three speakers?",
         "options": ["Two", "One", "Three"],
         "successValue": 1
@@ -3169,7 +3169,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Does the weather go from calm to storm, or from storm to calm?",
         "options": ["Storm to calm", "Calm to storm", "It stays the same throughout"],
         "successValue": 1
@@ -3210,7 +3210,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was the sound a rooster crowing, a trumpet, or thunder?",
         "options": ["A rooster crowing", "A trumpet", "Thunder"],
         "successValue": 1
@@ -3251,7 +3251,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was the sound like rushing wind, distant singing, or falling rain?",
         "options": ["Rushing wind", "Distant singing", "Falling rain"],
         "successValue": 1
@@ -3292,7 +3292,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it because he was still bound in burial cloths, because he was too weak to stand, or because the tomb door was still shut?",
         "options": ["Bound in burial cloths", "Too weak to stand", "The tomb door was shut"],
         "successValue": 1
@@ -3333,7 +3333,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Jonah, Elijah, or Peter?",
         "options": ["Jonah", "Elijah", "Peter"],
         "successValue": 1
@@ -3377,7 +3377,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it David, Saul, or Jonathan?",
         "options": ["David", "Saul", "Jonathan"],
         "successValue": 1
@@ -3421,7 +3421,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Thomas, Philip, or Andrew?",
         "options": ["Thomas", "Philip", "Andrew"],
         "successValue": 1
@@ -3465,7 +3465,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Paul, Barnabas, or Silas?",
         "options": ["Paul", "Barnabas", "Silas"],
         "successValue": 1
@@ -3509,7 +3509,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'me', 'them', or 'us'?",
         "options": ["me", "them", "us"],
         "successValue": 1
@@ -3547,7 +3547,7 @@
       "normalVariant": { "prompt": "Complete this hymn lyric: 'Rock of Ages, cleft for me, let me hide myself in ___.'", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'Thee', 'peace', or 'grace'?",
         "options": ["Thee", "peace", "grace"],
         "successValue": 1
@@ -3585,7 +3585,7 @@
       "normalVariant": { "prompt": "Complete this hymn lyric: 'Whatever my lot, Thou hast taught me to say, it is well, it is well with my ___.'", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'soul', 'heart', or 'life'?",
         "options": ["soul", "heart", "life"],
         "successValue": 1
@@ -3623,7 +3623,7 @@
       "normalVariant": { "prompt": "Complete this hymn lyric: 'Holy, holy, holy, Lord God ___.'", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'Almighty', 'of glory', or 'on high'?",
         "options": ["Almighty", "of glory", "on high"],
         "successValue": 1
@@ -3657,7 +3657,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'A Mighty Fortress Is Our God', 'Rock of Ages', or 'Holy, Holy, Holy'?",
         "options": ["A Mighty Fortress Is Our God", "Rock of Ages", "Holy, Holy, Holy"],
         "successValue": 1
@@ -3698,7 +3698,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'Just As I Am', 'Blessed Assurance', or 'Come Thou Fount'?",
         "options": ["Just As I Am", "Blessed Assurance", "Come Thou Fount"],
         "successValue": 1
@@ -3736,7 +3736,7 @@
       "normalVariant": { "prompt": "Who wrote the hymn 'What a Friend We Have in Jesus,' first published in 1855?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Joseph Scriven, Isaac Watts, or Robert Robinson?",
         "options": ["Joseph Scriven", "Isaac Watts", "Robert Robinson"],
         "successValue": 1
@@ -3770,7 +3770,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Fanny Crosby, Charlotte Elliott, or Katherine Hankey?",
         "options": ["Fanny Crosby", "Charlotte Elliott", "Katherine Hankey"],
         "successValue": 1
@@ -3808,7 +3808,7 @@
       "normalVariant": { "prompt": "Isaac Watts' hymn 'O God, Our Help in Ages Past' is a paraphrase of which Psalm?", "successValue": 1 },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Psalm 90, Psalm 23, or Psalm 100?",
         "options": ["Psalm 90", "Psalm 23", "Psalm 100"],
         "successValue": 1
@@ -3849,7 +3849,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Psalm 98, Psalm 23, or Psalm 51?",
         "options": ["Psalm 98", "Psalm 23", "Psalm 51"],
         "successValue": 1
@@ -3890,7 +3890,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it 'Come, Thou Fount of Every Blessing', 'A Mighty Fortress', or 'Rock of Ages'?",
         "options": ["Come, Thou Fount of Every Blessing", "A Mighty Fortress", "Rock of Ages"],
         "successValue": 1
@@ -3931,7 +3931,7 @@
       },
       "assistedVariant": {
         "available": true,
-        "cost": { "resource": "insight", "amount": 1 },
+        "cost": { "resource": "provision", "amount": 1 },
         "prompt": "Was it Old Irish, Latin, or German?",
         "options": ["Old Irish", "Latin", "German"],
         "successValue": 1

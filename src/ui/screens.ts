@@ -22,6 +22,7 @@ import type { PresentInput } from "./presenter";
 import { CursorList } from "./cursorList";
 import { communityProgress } from "./communityProgress";
 import {
+  acceptedAlternatives,
   buildMultipleChoicePrompt,
   buildEliminateAnnouncement,
   buildEntryAnnouncement,
@@ -418,8 +419,9 @@ export class ScreenRenderer {
     const heading = "Answer revealed.";
     container.appendChild(el("h2", { text: heading }));
     container.appendChild(el("p", { text: `Answer: ${revealed.answer}` }));
-    if (revealed.acceptedAnswers.length > 0) {
-      container.appendChild(el("p", { text: `Also accepted: ${revealed.acceptedAnswers.join(", ")}` }));
+    const alternatives = acceptedAlternatives(revealed.answer, revealed.acceptedAnswers);
+    if (alternatives.length > 0) {
+      container.appendChild(el("p", { text: `Also accepted: ${alternatives.join(", ")}` }));
     }
     if (revealed.hostGuidance) {
       container.appendChild(el("p", { text: `Host guidance: ${revealed.hostGuidance}` }));
@@ -439,7 +441,7 @@ export class ScreenRenderer {
     // pressed Reveal), not an error or interruption (ACCESSIBILITY_PATTERNS
     // §2 reserves assertive for those).
     const guidance = revealed.hostGuidance ? ` Host guidance: ${revealed.hostGuidance}.` : "";
-    const accepted = revealed.acceptedAnswers.length > 0 ? ` Also accepted: ${revealed.acceptedAnswers.join(", ")}.` : "";
+    const accepted = alternatives.length > 0 ? ` Also accepted: ${alternatives.join(", ")}.` : "";
     this.present({ visual: `The answer is ${revealed.answer}.${accepted}${guidance}` });
     return { heading, actions, primaryActionId: null };
   }

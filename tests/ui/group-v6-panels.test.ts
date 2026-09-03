@@ -3,7 +3,7 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import { AudienceView } from "../../src/ui/audience";
-import { makeHarness, driveToResourceWindow, RICH_ANSWER } from "./harness";
+import { makeHarness, driveToResourceWindow, makeRichTask, RICH_ANSWER } from "./harness";
 import { makeApp, beginByMouse, driveToSummary, type AppHarness } from "./appHarness";
 import { journeySchema, taskSchema, type Journey } from "../../src/content/schemas";
 import { createEngine } from "../../src/engine/engine";
@@ -148,8 +148,33 @@ describe("V6 — the reveal panel shows answer, accepted, guidance only after re
     view.render(hh.engine, container);
     const reveal = container.querySelector('[data-audience="reveal"]')!;
     expect(reveal.textContent).toContain(RICH_ANSWER);
-    expect(reveal.textContent).toContain("Also accepted");
+    // Phase 9 review: the rich task's acceptedAnswers is just [answer], and
+    // content rules require the list to contain the answer — so a bare
+    // "Also accepted: <the same answer>" line is noise, not information.
+    expect(reveal.textContent).not.toContain("Also accepted");
     expect(reveal.textContent).toContain("Accept close phonetic spellings");
+    hh.presenter.dispose();
+  });
+
+  it("'Also accepted' lists only genuine alternatives, never the official answer again", () => {
+    const hh = makeHarness({
+      tasks: [makeRichTask({ acceptedAnswers: [RICH_ANSWER, "A Genuine Alternative", RICH_ANSWER.toUpperCase()] })],
+    });
+    const view = new AudienceView({ journey: hh.journey, tasksById: hh.tasksById });
+    const container = document.createElement("div");
+    driveToResourceWindow(hh);
+    hh.engine.dispatch({ type: "acceptAnswer" });
+    hh.engine.dispatch({ type: "reveal" });
+    view.render(hh.engine, container);
+    const reveal = container.querySelector('[data-audience="reveal"]')!;
+    const alsoLine = [...reveal.querySelectorAll("p")].find((p) => p.textContent!.startsWith("Also accepted"))!;
+    expect(alsoLine.textContent).toBe("Also accepted: A Genuine Alternative");
+
+    // The host screen's spoken reveal matches (same helper, same rule).
+    hh.renderer.render(hh.engine, hh.container);
+    const spoken = hh.politeRegion.textContent ?? "";
+    expect(spoken).toContain("Also accepted: A Genuine Alternative.");
+    expect(spoken.match(/Also accepted/g)?.length).toBe(1);
     hh.presenter.dispose();
   });
 });

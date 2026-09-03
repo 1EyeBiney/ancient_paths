@@ -103,6 +103,29 @@ function findStageInJourney(journey: Journey, stageId: string): StageEntry | und
   return undefined;
 }
 
+/**
+ * The taskFocus that governs draws for `stageId` (PHASE3_SPEC planner step
+ * 4: "the team's current stage/route taskFocus"): a stage's own focus if it
+ * declares one, otherwise the focus of the route that contains it. The
+ * schema requires `taskFocus` on every route but makes it optional on a
+ * stage, so a fork route's stages almost never carry their own — the real
+ * journey's don't. Before the Phase 9 review this looked at the stage only,
+ * silently giving every route stage plain rotation and making a route's
+ * "testing X and Y" description untrue.
+ */
+function focusForStage(journey: Journey, stageId: string): TaskCategory[] | undefined {
+  for (const entry of journey.entries) {
+    if (entry.kind === "stage" && entry.id === stageId) return entry.taskFocus;
+    if (entry.kind === "fork") {
+      for (const route of entry.routes) {
+        const stage = route.stages.find((s) => s.id === stageId);
+        if (stage) return stage.taskFocus ?? route.taskFocus;
+      }
+    }
+  }
+  return undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Seeded Fisher-Yates
 // ---------------------------------------------------------------------------
@@ -156,8 +179,7 @@ export class SessionDeck implements TaskSource {
 
   nextTask(teamId: string, stageId: string): Task {
     const team = this.teamState(teamId);
-    const stage = findStageInJourney(this.journey, stageId);
-    const focus = stage?.taskFocus;
+    const focus = focusForStage(this.journey, stageId);
 
     let category: TaskCategory | null = null;
     if (focus && focus.length > 0) {

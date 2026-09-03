@@ -11,7 +11,7 @@ import type { TeamState } from "../engine/types";
 import { findStage } from "./screens";
 import { communityProgress } from "./communityProgress";
 import { renderTeamBadge } from "./teamBadge";
-import { letterFor } from "./speech";
+import { acceptedAlternatives, letterFor } from "./speech";
 import { MapView } from "./mapView";
 import type { MapManifest, MapStyleId } from "./mapProjection";
 
@@ -125,8 +125,9 @@ export class AudienceView {
     if (revealed) {
       const reveal = el("div", { className: "reveal", data: "reveal" });
       reveal.appendChild(el("p", { text: `Answer: ${revealed.answer}`, className: "big" }));
-      if (revealed.acceptedAnswers.length > 0) {
-        reveal.appendChild(el("p", { text: `Also accepted: ${revealed.acceptedAnswers.join(", ")}` }));
+      const alternatives = acceptedAlternatives(revealed.answer, revealed.acceptedAnswers);
+      if (alternatives.length > 0) {
+        reveal.appendChild(el("p", { text: `Also accepted: ${alternatives.join(", ")}` }));
       }
       if (revealed.hostGuidance) reveal.appendChild(el("p", { text: `Host guidance: ${revealed.hostGuidance}` }));
       section.appendChild(reveal);

@@ -185,6 +185,19 @@ describe("N3 — general-bible: per-task blind rules", () => {
       }
     });
 
+    it(`${id}: the assisted form costs Provision and the amplified form costs Courage`, () => {
+      // Phase 9 review (OPEN_QUESTIONS item 35): design doc §8.2/§20.5 —
+      // "spend Provision for an eligible assisted form", Courage amplifies.
+      // The host controls' buttons are labelled for exactly that, so a
+      // task authored otherwise misleads the host.
+      if (task.assistedVariant) {
+        expect(task.assistedVariant.cost?.resource, `task ${id}: assisted cost resource`).toBe("provision");
+      }
+      if (task.amplifiedVariant) {
+        expect(task.amplifiedVariant.cost?.resource, `task ${id}: amplified cost resource`).toBe("courage");
+      }
+    });
+
     it(`${id}: hard tasks have a clue, a 30-90s estimate, and a 40-400 char teaching reveal`, () => {
       if (task.difficulty !== "hard") return;
       expect(task.clues.length >= 1, `task ${id}: hard needs a clue`).toBe(true);
