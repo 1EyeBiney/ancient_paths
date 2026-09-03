@@ -797,10 +797,17 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
       `general-bible.json` is itself a publicly served static file, as
       any static-site content must be; Brian's honor system was always
       the model (CONTENT_AUTHORING §1), this just states it once.
-    - **Content review**: done by a separate, isolated agent so that no
-      task text entered this session's transcript (Brian, that is why
-      the review ran as a background subagent rather than inline). Its
-      findings, by id and kind of change only, are appended below.
+    - **Content review — PENDING (API capacity).** A factual review of
+      all 128 tasks (answers, references, distractors that might also
+      be right, hymn dates, note prefixes, church-setting fit) was set
+      up to run in a separate, isolated agent so that no task text
+      enters Brian's transcript — that is why it is not done inline.
+      Five consecutive attempts (two models) were terminated by
+      server-side overload (HTTP 529) before any edit was made; the
+      pack on disk is exactly the reviewed-code commit's version.
+      Resume when capacity returns: ask Fable to "resume the content
+      review"; the agent's context is preserved. Its findings, by id
+      and kind of change only, will be appended here.
     2734 tests after the code fixes (2602 at Phase 9's completion; the
     difference is the new blind cost rule per task, the route-focus
     tests, and the reveal-alternatives case).
