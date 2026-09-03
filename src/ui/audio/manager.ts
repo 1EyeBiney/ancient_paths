@@ -108,6 +108,10 @@ export class AudioManager {
     this.settings = { ...this.settings, ...partial };
   }
 
+  getSettings(): AudioManagerSettings {
+    return { ...this.settings };
+  }
+
   setSpeechMode(mode: SpeechMode): void {
     this.speechMode = mode;
   }
@@ -118,6 +122,10 @@ export class AudioManager {
 
   isPlaying(): boolean {
     return this.currentItem !== null;
+  }
+
+  isPaused(): boolean {
+    return this.currentItem !== null && this.backend.isClipPaused();
   }
 
   /** Establishes (or resets) the play-cap state for a newly presented task/variant. */

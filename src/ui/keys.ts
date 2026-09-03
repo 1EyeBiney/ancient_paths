@@ -113,9 +113,30 @@ export const KEY_BINDINGS: KeyBinding[] = [
   {
     id: "audioPause",
     keyDisplay: "Space",
-    label: "Pause or resume produced audio (reserved for Phase 6)",
+    label: "Pause or resume the current produced audio clip",
     legalStates: ENGINE_PLAY_STATES,
     match: matchesSpace,
+  },
+  {
+    id: "audioReplay",
+    keyDisplay: "L",
+    label: "Listen again: replay the current task audio",
+    legalStates: ["resourceWindow", "awaitingAnswer"],
+    match: letter("l"),
+  },
+  {
+    id: "audioStop",
+    keyDisplay: "X",
+    label: "Stop the current produced audio clip",
+    legalStates: ENGINE_PLAY_STATES,
+    match: letter("x"),
+  },
+  {
+    id: "audioSkip",
+    keyDisplay: "N",
+    label: "Skip optional narration (never task audio)",
+    legalStates: ENGINE_PLAY_STATES,
+    match: letter("n"),
   },
   {
     id: "undo",

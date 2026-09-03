@@ -13,7 +13,7 @@
 // against SetupWizard directly; Phase 5's visual pass is the natural time
 // to give them their own on-screen controls too.
 
-import type { ContentPack, Journey, Task } from "../content/schemas";
+import type { AudioAsset, ContentPack, Journey, Task } from "../content/schemas";
 import { createEngine, type GameEngine } from "../engine/engine";
 import { createRng } from "../engine/rng";
 import { Presenter, type PresenterOptions } from "./presenter";
@@ -28,6 +28,8 @@ import { buildStatus, buildActionsSummary, buildPositions } from "./speech";
 import type { DeckDifficultySetting } from "../session/builder";
 import type { SessionDuration, SessionPace } from "../session/plan";
 import type { MapManifest, MapStyleId } from "./mapProjection";
+import { BrowserAudioBackend, type AudioBackend } from "./audio/backend";
+import { AudioManager, type SpeechMode } from "./audio/manager";
 
 export type AppMode = "startup" | "setup" | "playing";
 
@@ -42,6 +44,8 @@ export interface AppOptions {
   presenterTimer?: Pick<PresenterOptions, "now" | "setIntervalFn" | "clearIntervalFn" | "idleThresholdMs">;
   /** Injectable so tests can simulate prefers-reduced-motion (jsdom has no matchMedia). */
   matchMedia?: (query: string) => { matches: boolean };
+  /** Injectable so tests exercise the audio system against a fake, never real audio APIs. */
+  audioBackend?: AudioBackend;
 }
 
 function el(tag: string, opts: { text?: string; className?: string } = {}): HTMLElement {
@@ -71,6 +75,8 @@ export class App {
   private readonly presenter: Presenter;
   private readonly modal: ModalManager;
   private readonly wizard: SetupWizard;
+  private readonly audioManager: AudioManager;
+  private audioAssets: Map<string, AudioAsset> = new Map();
 
   private engine: GameEngine | null = null;
   private renderer: ScreenRenderer | null = null;
@@ -122,6 +128,13 @@ export class App {
     });
     this.modal = new ModalManager(this.modalRoot);
     this.wizard = new SetupWizard({ journeys: options.journeys, packs: options.packs });
+    this.audioManager = new AudioManager({
+      backend: options.audioBackend ?? new BrowserAudioBackend(),
+      present: (i) => this.presenter.present(i),
+      settings: { ...this.wizard.audio },
+      getAssets: () => this.audioAssets,
+    });
+    this.presenter.setGate(this.audioManager);
 
     // Enter/Space activates a focused native <button>, stopping the event
     // there so it never also reaches the window-level game ladder (which
@@ -171,6 +184,10 @@ export class App {
   /** Read-only access for tests; the setup screen is the only writer. */
   getSetupWizard(): SetupWizard {
     return this.wizard;
+  }
+
+  getAudioManager(): AudioManager {
+    return this.audioManager;
   }
 
   // -- keyboard attach/detach ------------------------------------------
@@ -403,8 +420,8 @@ export class App {
     }
     this.contentContainer.appendChild(categoriesBox);
 
-    // Audio settings (stored only until Phase 6)
-    this.contentContainer.appendChild(el("h2", { text: "Audio (applies from Phase 6)" }));
+    // Audio settings
+    this.contentContainer.appendChild(el("h2", { text: "Audio" }));
     const audioBox = el("div");
     audioBox.id = "audio";
     for (const key of ["master", "music", "effects", "narration"] as const) {
@@ -416,7 +433,11 @@ export class App {
       input.max = "100";
       input.value = String(this.wizard.audio[key]);
       input.setAttribute("aria-label", `${key} volume`);
-      input.addEventListener("input", () => this.wizard.setAudio({ [key]: clampInt(input.value, 0, 100, 100) }));
+      input.addEventListener("input", () => {
+        const value = clampInt(input.value, 0, 100, 100);
+        this.wizard.setAudio({ [key]: value });
+        this.audioManager.setSettings({ [key]: value });
+      });
       label.appendChild(input);
       audioBox.appendChild(label);
     }
@@ -547,6 +568,12 @@ export class App {
     const allTasks: Task[] = packs.flatMap((p) => p.tasks);
     const tasksById = new Map(allTasks.map((t) => [t.id, t]));
 
+    const assets = new Map<string, AudioAsset>();
+    for (const pack of packs) for (const asset of pack.audioAssets ?? []) assets.set(asset.assetId, asset);
+    for (const asset of journey.audioAssets ?? []) assets.set(asset.assetId, asset);
+    this.audioAssets = assets;
+    this.audioManager.unlock(); // the Begin-journey click IS the user gesture; no audio before this
+
     this.engine = createEngine({
       journey,
       packs,
@@ -597,11 +624,51 @@ export class App {
     // Same pass, same state: this is what keeps host and audience in sync.
     this.audience?.render(this.engine, this.audienceContainer);
     this.lastRender = this.renderer.render(this.engine, this.contentContainer);
+    this.renderAudioControls();
     const heading = this.contentContainer.querySelector<HTMLElement>("h2");
     if (heading) {
       heading.tabIndex = -1;
       heading.focus();
     }
+  }
+
+  /** The dual-modality twin of the audio keys (§22.3): visible, clickable
+   * buttons alongside Space/L/X/N. "Listen again" only appears in the two
+   * states where L is legal — the others are always available. */
+  private renderAudioControls(): void {
+    if (!this.engine) return;
+    this.contentContainer.querySelector(".audio-controls")?.remove();
+    const bar = el("div", { className: "audio-controls" });
+    bar.setAttribute("aria-label", "Audio controls");
+
+    const pauseButton = document.createElement("button");
+    pauseButton.type = "button";
+    pauseButton.textContent = this.audioManager.isPaused() ? "Resume audio" : "Pause audio";
+    pauseButton.addEventListener("click", () => this.dispatchCommand("audioPause"));
+    bar.appendChild(pauseButton);
+
+    const state = this.engine.getState();
+    if (state === "resourceWindow" || state === "awaitingAnswer") {
+      const replayButton = document.createElement("button");
+      replayButton.type = "button";
+      replayButton.textContent = "Listen again";
+      replayButton.addEventListener("click", () => this.dispatchCommand("audioReplay"));
+      bar.appendChild(replayButton);
+    }
+
+    const stopButton = document.createElement("button");
+    stopButton.type = "button";
+    stopButton.textContent = "Stop audio";
+    stopButton.addEventListener("click", () => this.dispatchCommand("audioStop"));
+    bar.appendChild(stopButton);
+
+    const skipButton = document.createElement("button");
+    skipButton.type = "button";
+    skipButton.textContent = "Skip narration";
+    skipButton.addEventListener("click", () => this.dispatchCommand("audioSkip"));
+    bar.appendChild(skipButton);
+
+    this.contentContainer.appendChild(bar);
   }
 
   private dispatchCommand(id: string): void {
@@ -641,7 +708,36 @@ export class App {
         this.renderCurrentScreen();
         return;
       case "audioPause":
-        this.presenter.present({ visual: "Audio controls are not wired up yet." });
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        if (this.audioManager.isPaused()) this.audioManager.resume();
+        else this.audioManager.pause();
+        this.renderAudioControls();
+        return;
+      case "audioStop":
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        this.audioManager.stop();
+        this.renderAudioControls();
+        return;
+      case "audioSkip":
+        if (!this.audioManager.isPlaying()) {
+          this.presenter.present({ visual: "Nothing is playing." });
+          return;
+        }
+        this.audioManager.skip();
+        this.renderAudioControls();
+        return;
+      case "audioReplay":
+        // Deliberately not gated on isPlaying(): its purpose is replaying a
+        // clip that has already finished. replay() itself announces
+        // "Nothing to replay yet." or "No replays left." as appropriate.
+        this.audioManager.replay();
+        this.renderAudioControls();
         return;
       case "confirm": {
         const primaryId = this.lastRender?.primaryActionId;
@@ -686,12 +782,62 @@ export class App {
           if (this.engine) this.presenter.present({ visual: this.engine.statusText() });
         });
 
+        const audio = document.createElement("button");
+        audio.type = "button";
+        audio.textContent = "Audio…";
+        audio.addEventListener("click", () => this.openAudioDialog());
+
         const endSession = document.createElement("button");
         endSession.type = "button";
         endSession.textContent = "End session";
         endSession.addEventListener("click", () => this.openEndSessionConfirm());
 
-        container.append(resume, status, endSession);
+        container.append(resume, status, audio, endSession);
+      },
+    });
+  }
+
+  private openAudioDialog(): void {
+    this.modal.open({
+      title: "Audio",
+      present: (i) => this.presenter.present(i),
+      build: (container) => {
+        for (const key of ["master", "music", "effects", "narration"] as const) {
+          const label = document.createElement("label");
+          label.textContent = `${key} volume (0-100)`;
+          const input = document.createElement("input");
+          input.type = "number";
+          input.min = "0";
+          input.max = "100";
+          input.value = String(this.wizard.audio[key]);
+          input.setAttribute("aria-label", `${key} volume`);
+          input.addEventListener("input", () => {
+            const value = clampInt(input.value, 0, 100, this.wizard.audio[key]);
+            this.wizard.setAudio({ [key]: value });
+            this.audioManager.setSettings({ [key]: value });
+          });
+          label.appendChild(input);
+          container.appendChild(label);
+        }
+
+        const speechLabel = document.createElement("label");
+        speechLabel.textContent = "Interface speech";
+        const select = document.createElement("select");
+        select.setAttribute("aria-label", "Interface speech behavior");
+        const modes: { value: SpeechMode; text: string }[] = [
+          { value: "wait", text: "Wait for audio to finish" },
+          { value: "interrupt", text: "Interrupt audio immediately" },
+        ];
+        for (const mode of modes) {
+          const option = document.createElement("option");
+          option.value = mode.value;
+          option.textContent = mode.text;
+          if (this.audioManager.getSpeechMode() === mode.value) option.selected = true;
+          select.appendChild(option);
+        }
+        select.addEventListener("change", () => this.audioManager.setSpeechMode(select.value as SpeechMode));
+        speechLabel.appendChild(select);
+        container.appendChild(speechLabel);
       },
     });
   }

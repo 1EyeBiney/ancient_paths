@@ -8,6 +8,7 @@ import { expect } from "vitest";
 import { App, type AppOptions } from "../../src/ui/app";
 import type { ContentPack, Journey, Task } from "../../src/content/schemas";
 import { testJourney, bigPack } from "../session/fixtures";
+import { FakeAudioBackend } from "../../src/ui/audio/backend";
 
 export interface AppHarness {
   app: App;
@@ -52,6 +53,7 @@ export function makeApp(
       clearIntervalFn: () => {},
       idleThresholdMs: 12_000,
     },
+    audioBackend: new FakeAudioBackend(),
     ...opts.extra,
   });
   return {

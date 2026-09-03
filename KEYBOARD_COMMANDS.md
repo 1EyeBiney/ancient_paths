@@ -19,7 +19,10 @@ descriptions); update this file whenever a binding there changes.
 | H or F1 | Open/close the help menu (plain aliases; no explorer chaining) | every play state |
 | Enter | Confirm or advance | every play state |
 | Escape | Back or cancel when safe; opens the game menu when there's nothing to cancel | every play state (and text fields) |
-| Space | Reserved for produced-audio pause/resume (Phase 6); announces itself as not yet wired | every play state |
+| Space | Pause or resume the current produced audio clip | every play state |
+| L | Listen again: replay the current task audio (respects its play cap) | resourceWindow, awaitingAnswer |
+| X | Stop the current produced audio clip | every play state |
+| N | Skip optional narration (never task audio) | every play state |
 | Ctrl+Z | Undo the most recent reversible action (press-twice confirm) | every play state (gated further by canUndo()) |
 | C | Rule the current answer correct | answerReveal, communityEvent |
 | I | Rule the current answer incorrect | answerReveal, communityEvent |
