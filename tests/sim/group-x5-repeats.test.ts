@@ -74,11 +74,30 @@ describe("X5 — one-session memory (scenario a)", () => {
   const sessions = runChain(1);
 
   it("sessions 1-3 draw zero tasks repeated from the immediately preceding session", () => {
-    for (let i = 1; i < 4; i++) {
+    // The spec's assertion is sessions 1-3 (4, 2, 8 teams). Phase 10
+    // review: this loop used to run to session 4 as well and passed only
+    // because session 4 (4 teams, right after the 8-team game) failed to
+    // BUILD — "insufficient content", 0 tasks drawn, so "zero repeats" was
+    // vacuously true. The builder now relaxes the oldest exclusions in
+    // aggregate (OPEN_QUESTIONS item 42), session 4 builds, and it
+    // genuinely repeats a handful of the 8-team game's tasks: 128 tasks
+    // minus ~84 drawn by 8 teams leaves fewer than a 4-team session needs.
+    // That is the content-growth finding X5 exists to surface — reported
+    // below, not asserted away.
+    for (let i = 1; i < 3; i++) {
       const previous = new Set(sessions[i - 1]!.ids);
       const repeats = sessions[i]!.ids.filter((id) => previous.has(id));
       expect(repeats, `session ${i + 1} (teams=${sessions[i]!.teamCount}) repeats from session ${i}`).toEqual([]);
     }
+  });
+
+  it("session 4 (4 teams after 8) builds via relaxation and its repeat count is reported, not gated", () => {
+    const previous = new Set(sessions[2]!.ids);
+    const repeats = sessions[3]!.ids.filter((id) => previous.has(id));
+    expect(sessions[3]!.ids.length, "session 4 must build (it used to fail with 'insufficient content')").toBeGreaterThan(0);
+    expect(sessions[3]!.warnings.some((w) => w.includes("exclusion relaxed"))).toBe(true);
+    // Report-only: the number lands in SIMULATION_REPORT.md's X5 table.
+    expect(repeats.length).toBeGreaterThanOrEqual(0);
   });
 
   it("no EXCLUSION-RELAXATION warning appears in sessions 1-3 (an actual excluded task let back in)", () => {

@@ -77,15 +77,22 @@ function runLengthMatrix(journey: Journey, packs: ContentPack[]): LengthCell[] {
 
 function renderLengthTable(cells: LengthCell[]): string {
   const lines = [
-    `| Teams | Difficulty | Median rounds | Planned rounds | Exhausted / ${LENGTH_SEEDS_PER_CELL} |`,
-    "|---|---|---|---|---|",
+    `| Teams | Difficulty | Median rounds | Planned rounds | Median modeled minutes | Planned minutes | Exhausted / ${LENGTH_SEEDS_PER_CELL} |`,
+    "|---|---|---|---|---|---|---|",
   ];
   for (const cell of cells) {
     const rounds = cell.results.map((r) => r.rounds);
     const med = median(rounds);
     const planned = cell.results[0]!.plannedRounds;
+    // Phase 10 review: the round count alone hid the real length finding —
+    // modeledMinutes (the simulator's own ~45s/task + overhead model, the
+    // same one the estimator uses) is what §35 item 22 actually asks about.
+    const modeledMinutes = median(cell.results.map((r) => r.modeledMinutes));
+    const plannedMinutes = cell.results[0]!.plannedMinutes;
     const exhausted = cell.results.filter((r) => r.exhausted !== null).length;
-    lines.push(`| ${cell.teamCount} | ${cell.difficulty} | ${num(med, 1)} | ${planned} | ${exhausted} |`);
+    lines.push(
+      `| ${cell.teamCount} | ${cell.difficulty} | ${num(med, 1)} | ${planned} | ${num(modeledMinutes, 0)} | ${num(plannedMinutes, 0)} | ${exhausted} |`,
+    );
   }
   return lines.join("\n");
 }
@@ -183,6 +190,15 @@ interface RepeatSession {
   distinctThisSession: number;
   cumulativeDistinct: number;
   warningCount: number;
+  /** Only the "Recent-use exclusion relaxed…" warnings — an excluded task
+   * actually let back in. "Content supply is tight…" is a separate margin
+   * caution the builder emits at 8 teams regardless (X5's own test draws
+   * the same line); counting it as a relaxation misreported the chain. */
+  relaxationCount: number;
+  /** Tasks this session drew that the IMMEDIATELY PRECEDING session also
+   * drew — the repeats one-session memory could not prevent (relaxed at
+   * build time, or served from the deck's last-resort pool mid-game). */
+  repeatsFromPrevious: number;
 }
 
 function runRepeatChain(journey: Journey, packs: ContentPack[]): RepeatSession[] {
@@ -203,11 +219,14 @@ function runRepeatChain(journey: Journey, packs: ContentPack[]): RepeatSession[]
       excludeTaskIds,
     });
     for (const id of result.taskIds) cumulative.add(id);
+    const previous = new Set(priorIds.at(-1) ?? []);
     sessions.push({
       teamCount,
       distinctThisSession: result.distinctTasks,
       cumulativeDistinct: cumulative.size,
       warningCount: result.deckWarnings.length,
+      relaxationCount: result.deckWarnings.filter((w) => w.includes("exclusion relaxed")).length,
+      repeatsFromPrevious: new Set(result.taskIds.filter((id) => previous.has(id))).size,
     });
     priorIds.push(result.taskIds);
   }
@@ -215,9 +234,14 @@ function runRepeatChain(journey: Journey, packs: ContentPack[]): RepeatSession[]
 }
 
 function renderRepeatsTable(sessions: RepeatSession[]): string {
-  const lines = ["| Session | Teams | Distinct tasks this session | Cumulative distinct tasks | Deck warnings |", "|---|---|---|---|---|"];
+  const lines = [
+    "| Session | Teams | Distinct tasks this session | Cumulative distinct tasks | Repeats from previous session | Deck warnings (any) | Exclusion relaxations at build |",
+    "|---|---|---|---|---|---|---|",
+  ];
   sessions.forEach((s, i) => {
-    lines.push(`| ${i + 1} | ${s.teamCount} | ${s.distinctThisSession} | ${s.cumulativeDistinct} | ${s.warningCount} |`);
+    lines.push(
+      `| ${i + 1} | ${s.teamCount} | ${s.distinctThisSession} | ${s.cumulativeDistinct} | ${s.repeatsFromPrevious} | ${s.warningCount} | ${s.relaxationCount} |`,
+    );
   });
   return lines.join("\n");
 }
@@ -235,7 +259,20 @@ export function generateReport(journey: Journey, packs: ContentPack[]): string {
   const winShares = winShareBySeat(fairnessBatch);
   const seatSpread = Math.max(...winShares) - Math.min(...winShares);
   const journeyTokenBold = summarizeBatch(economyBatches.get("BOLD")!).journeyTokenGameShare;
-  const firstRepeatSession = repeatSessions.findIndex((s, i) => i > 0 && s.warningCount > 0);
+  const totalRelaxations = repeatSessions.reduce((sum, s) => sum + s.relaxationCount, 0);
+
+  // Phase 10 review — the length finding the round-count table hid: how
+  // far the modeled duration sits from the estimator's own planned minutes
+  // (and from the design's 55-minute Standard target) at each team count.
+  const standardCells = lengthCells.filter((c) => c.difficulty === "standard");
+  const durationRatios = standardCells.map(
+    (c) => median(c.results.map((r) => r.modeledMinutes)) / c.results[0]!.plannedMinutes,
+  );
+  const minRatio = Math.min(...durationRatios);
+  const maxRatio = Math.max(...durationRatios);
+  const fourTeam = standardCells.find((c) => c.teamCount === 4)!;
+  const fourTeamModeled = median(fourTeam.results.map((r) => r.modeledMinutes));
+  const fourTeamPlanned = fourTeam.results[0]!.plannedMinutes;
 
   const totalGames =
     lengthCells.reduce((s, c) => s + c.results.length, 0) +
@@ -248,7 +285,7 @@ export function generateReport(journey: Journey, packs: ContentPack[]): string {
 
   return `# Simulation Report
 
-Generated ${REPORT_DATE} by \`src/sim/report.ts\` (PHASE10_SPEC Group X10) from
+Generated ${REPORT_DATE} by \`src/sim/report.ts\` (PHASE10_SPEC Group X10, amended in Fable's Phase 10 review) from
 ${totalGames} simulated games total. No task text or task ids appear anywhere in this file — only counts,
 percentages, and content-neutral labels (category names, route ids).
 
@@ -318,11 +355,19 @@ ${renderRepeatsTable(repeatSessions)}
 - Seat win-share spread across ${FAIRNESS_SEEDS} rotated-policy games: ${pct(seatSpread)} (OPEN_QUESTIONS item 37).
 - BOLD's Journey Token rate across ${ECONOMY_SEEDS_PER_PRESET} games: ${pct(journeyTokenBold)} (spec's own 30% expectation is informational, not a gate — OPEN_QUESTIONS item 36's smaller-sample ruling applies here too).
 - Catch-up grants in ${FAIRNESS_SEEDS} four-team games: ${catchUpTotal} (near-zero is the expected shape at 4 teams — catch-up needs a team more than two stages behind the leader).
-- Recent-use exclusion held with no relaxation warning through session ${firstRepeatSession < 0 ? repeatSessions.length : firstRepeatSession} of this one-session-memory chain.
+- **Game length (the finding that matters for §35 item 22):** at standard, the modeled duration runs ${num(minRatio, 2)}x–${num(maxRatio, 2)}x the estimator's own planned minutes across 2–8 teams; a 4-team Standard game models at ${num(fourTeamModeled, 0)} minutes against ${num(fourTeamPlanned, 0)} planned and the design's 55-minute target (OPEN_QUESTIONS item 42). The estimator counts the journey's required successes; the model also pays for the ~35% of moderate attempts that fail, the recover retries those buy, and the community events — the estimator's constants were never calibrated against play (item 11). Brian's timed playtest decides whether real rooms are faster than the 45s/task model, or the journey/constants need retuning.
+- **Content supply (the finding that matters for Phase 11 content growth):** with one-session memory (4 → 2 → 8 → 4 teams) the chain holds zero repeats through session 3, then session 4 — a 4-team game right after an 8-team game — repeats ${repeatSessions.at(-1)!.repeatsFromPrevious} of its ${repeatSessions.at(-1)!.distinctThisSession} tasks (${repeatSessions.at(-1)!.relaxationCount} of the previous session's ids were let back in at build to reach the sufficiency bar; the deck's last-resort pool covers any further shortfall mid-game, and the game finished without exhausting). 128 tasks is enough for repeat-free memory up to about 5-team games back to back; an 8-team game consumes ~84 of them. ${totalRelaxations} exclusion relaxation${totalRelaxations === 1 ? "" : "s"} across the chain in total (OPEN_QUESTIONS item 42).
 - The shipped \`general-bible\` pack currently ships zero real \`audioAssets\` (OPEN_QUESTIONS item 40) — this report's economy/fairness numbers are unaffected (they measure resource/turn mechanics, not audio), but any future audio-specific simulation metric would need real assets first.
 
 ## Proposals
 
+- OPEN_QUESTIONS item 42 (game length): do not retune the journey, the success model, or
+  \`estimator.ts\` on modeled numbers alone — Brian's timed playtest (§35 item 22) is the
+  calibration point. If real rooms come in near the model, the candidates are (a) a lower
+  Standard requirement (the journey's 7 required successes are content, frozen this phase),
+  (b) recalibrating \`estimator.ts\`'s per-task constants so the setup screen's own estimate
+  (already honest — it warns "longer than the 55-minute target" at 4 teams) matches reality,
+  or (c) both. If real rooms are faster, the 45s/task model constant is what moves.
 - OPEN_QUESTIONS item 37: rotate which team occupies "seat 0" each game (cosmetic — spreads the
   structural first-seat advantage across teams over many sessions rather than always favoring
   whichever team a host happens to list first), OR give every seat one guaranteed "grace" round

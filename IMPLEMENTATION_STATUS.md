@@ -4,7 +4,7 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
 
 ## Completed
 
-- **Phase 10 — Accessibility and balance audit — DONE.** All 11 groups (X1-X11) are green: 2882 tests project-wide, `npx tsc --noEmit` clean, `npm run build` clean, no new dependency, no frozen file modified. Built against PHASE10_SPEC.md.
+- **Phase 10 — Accessibility and balance audit — DONE + REVIEWED.** All 11 groups (X1-X11) are green: 2882 tests project-wide at completion, 2892 after Fable's review (addendum at the end of this entry, OPEN_QUESTIONS item 42); `npx tsc --noEmit` clean, `npm run build` clean, no new dependency, no frozen file modified. Built against PHASE10_SPEC.md.
   **Group X11 done (2026-09-03):** the manual browser check, real content,
   keyboard only — `npm run dev`, Welcome through a full setup wizard by
   Tab/arrows/Enter (4 teams, General Bible only), 3 real-time rounds
@@ -352,12 +352,38 @@ Tracks the design doc §34 phases. Updated 2026-09-03.
   | 17 | Produced audio can fail without preventing gameplay. | Phase 6 A7 deliverable (whole game completes on fallback text with audio entirely broken), `tests/audit/group-x8-recovery.test.ts` (N/R/L fallback branch) |
   | 18 | The game autosaves and can recover after interruption. | Phase 8 persistence groups, `tests/audit/group-x8-recovery.test.ts` (save + `rebuildFromSave` + undo matrix), X11 manual (reload → Resume) |
   | 19 | Consequential host mistakes can be undone. | Phase 8 undo groups, `tests/audit/group-x8-recovery.test.ts` (4-mistake matrix), `NVDA_CHECKLIST.md` §12, X11 manual (Ctrl+Z twice) |
-  | 20 | All automated tests pass. | `npm test` — 2882 passing, `npx tsc --noEmit` clean, `npm run build` clean |
+  | 20 | All automated tests pass. | `npm test` — 2892 passing, `npx tsc --noEmit` clean, `npm run build` clean |
   | 21 | A keyboard and screen-reader audit finds no blocking issue. | Automated: Group X7 (a-g) found and fixed three real defects, zero remaining. **Pending Brian's own NVDA pass** — `NVDA_CHECKLIST.md`, written and ready. |
   | 22 | A complete Standard game finishes near the intended 50-60-minute target under normal playtest conditions. | `estimator.ts` (OPEN_QUESTIONS item 11's resolved formula) + `SIMULATION_REPORT.md`'s length data model the mechanic; **pending Brian's own timed playtest** under real conditions. |
 
   Items 21 and 22 are Brian's to close — everything else in this table
   is proven by a committed test or report section as of this phase.
+  **Review addendum (Fable, 2026-09-03; OPEN_QUESTIONS item 42; 2892
+  tests):** five fixes and two findings. The setup wizard's cursor lists
+  ignored the wizard's real value (`appendChoiceList` discarded
+  `current`) — every list opened on row 0 and called it selected, so NVDA
+  would have read "short, selected" for a "standard" duration and every
+  list disagreed with the wizard after Resume/End session; `CursorList`
+  gained `selectedId` (`tests/ui/group-x-review-fixes.test.ts`). Recent-use
+  memory could remember the same game twice (summary, then End session
+  from the summary screen); deduplicated by id list. The builder threw
+  "insufficient content" instead of relaxing when the shortfall was
+  aggregate rather than per-category — a 4-team game after an 8-team one
+  could not start with the recent-tasks toggle on — and X5's chain had
+  recorded that session as zero tasks and passed its "zero repeats"
+  assertion vacuously over it; the builder now relaxes the oldest
+  exclusions to the sufficiency bar and keeps the still-excluded tasks as
+  the deck's last-resort pool, drawn only when every rotation pool is
+  empty (`tests/session/group-x-review-relaxation.test.ts`; X5's loop
+  corrected to the spec's sessions 1-3). `SIMULATION_REPORT.md` separated
+  "content supply is tight" cautions from real relaxations and gained
+  modeled/planned minutes. `NVDA_CHECKLIST.md` §2.2 and §10.3 corrected to
+  what the app actually says. Findings, both with numbers in item 42: a
+  4-team Standard game models at 106 minutes against 66 planned and the
+  55-minute target (ruling: nothing retuned until Brian's timed playtest
+  calibrates it), and 128 tasks supports repeat-free one-session memory
+  only up to ~5-team games back to back (Phase 11 targets: ~160 for
+  8-then-4, ~200 for 8-then-8). Deploy confirmed live at the Pages URL.
 
 - **Phase 9 — Version-One Content — DONE.** All 12 test groups (N1-N12)
   are green: `general-bible` (2602 project-wide tests at completion,

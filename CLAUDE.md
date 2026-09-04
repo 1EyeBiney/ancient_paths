@@ -1,9 +1,9 @@
 # CLAUDE.md — Ancient Paths (game title: "The Way: A Journey Through Bible Lands")
 
-## Status: PHASE 9 COMPLETE + REVIEWED, PHASE 10 (ACCESSIBILITY AND BALANCE AUDIT) SPECIFIED (2026-09-03) — implement PHASE10_SPEC.md next
+## Status: PHASE 10 COMPLETE + REVIEWED (2026-09-03) — release candidate; §35 items 21-22 (Brian's NVDA pass, timed playtest) gate it. No agent task until those land.
 
 Repo: https://github.com/1EyeBiney/ancient_paths (PRIVATE), branch main.
-Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (2734/2734
+Stack: TypeScript 7 / Vite 8 / Vitest 4 / Zod 4; `npm test` (2892/2892
 passing), `npx tsc --noEmit` clean, `npm run build` → dist/ (base "./"
 for Pages; map assets under `public/map/` copy through). See
 IMPLEMENTATION_STATUS.md for the full inventory and OPEN_QUESTIONS.md
@@ -138,16 +138,38 @@ answer under "Also accepted", and the assisted form costs Provision as
 blind rule pins it; CONTENT_AUTHORING §5). A factual content review ran
 in an isolated subagent so no task text entered Brian's transcript.
 
-**Phase 10 (accessibility and balance audit) is specified**: see
-**PHASE10_SPEC.md**. A headless simulation harness (`src/sim/`) with a
-committed, test-checked `SIMULATION_REPORT.md`; length, economy,
-fairness and content-repeat analyses as findings plus proposals (no
-agent-side balance tuning); automated accessibility, focus and
-error-recovery audits against the real content; an NVDA checklist for
-Brian's own pass; route difficulty made real in the deck (X4b); recent-use
-memory across games (X6 — Brian ruled yes); and the §35
-Definition of Done walked item by item. Rulings: OPEN_QUESTIONS item 35
-and the spec's "Decisions" section.
+**Phase 10 (accessibility and balance audit) is done** (PHASE10_SPEC.md,
+groups X1-X11 by Sonnet, then Fable's review; 2892 tests): a headless
+simulation harness (`src/sim/`) driving the real engine and deck under
+five documented team-policy presets and a documented success model,
+with a committed, test-checked `SIMULATION_REPORT.md` (the test
+regenerates and fails if it drifts); route difficulty made real in the
+deck (X4b); recent-use memory across games (X6, IndexedDB record,
+"Forget recent tasks", an "Avoid tasks from recent games" toggle);
+automated accessibility/focus/speech audits over full real-content games
+that found and fixed three defects (modal accessible name, duplicate
+cursor-list ids, focus on click/setup entry); Escape now owned by the
+modal itself and menu-child dialogs returning to the menu (X7g); the
+error-recovery matrix (X8); `NVDA_CHECKLIST.md` for Brian's pass (X9);
+a keyboard-only browser check of the dev build and the production
+preview with zero console errors (X11); and the §35 Definition of Done
+table in IMPLEMENTATION_STATUS.md. Fable's review (item 42) fixed five
+more: setup cursor lists ignored the wizard's real value (NVDA would
+have read "short, selected" for "standard"); the same game could be
+remembered twice; the builder threw instead of relaxing when the
+recent-use shortfall was aggregate (a 4-team game after an 8-team one
+could not start), now relaxed to the sufficiency bar plus a last-resort
+pool that only ever serves a repeat instead of a dead game; the report
+conflated "supply is tight" with relaxations; the checklist was wrong
+about unmapped keys. Two findings with numbers, both for Brian: a 4-team
+Standard game models at ~106 minutes against 66 planned and the 55-minute
+target (nothing retuned until his timed playtest calibrates it), and 128
+tasks supports repeat-free one-session memory only up to ~5-team games
+back to back (Phase 11 targets ~160-200 tasks). Rulings: OPEN_QUESTIONS
+items 35-42. The site is live and green at the Pages URL. **Nothing is
+specified for an agent next**: the design doc's §34 ends at Phase 10;
+Brian's NVDA pass and timed playtest come first, and a Phase 11 spec
+(content growth, deferred items, whatever the pass turns up) after them.
 
 ## Rules for unattended coding agents (Sonnet sessions)
 

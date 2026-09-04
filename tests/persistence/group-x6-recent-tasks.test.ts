@@ -195,6 +195,26 @@ describe("X6 — a full App game", () => {
     expect(await h.saveStore.readRecentTasks(), "fewer than 10 attempts: not recorded").toBeNull();
   });
 
+  it("review fix: a game already recorded at gameSummary is not recorded again by End session", async () => {
+    // Phase 10 review (OPEN_QUESTIONS item 42): gameSummary records the
+    // session; the host then opening the menu and pressing End session
+    // (taskHistory is well past 10 by then) used to append the SAME game a
+    // second time, burning one of the five remembered slots on a duplicate.
+    h = makeApp();
+    beginByMouse(h);
+    driveToSummary(h);
+    await flush();
+    await flush();
+    expect(parseRecentTasks(await h.saveStore.readRecentTasks())!.sessions.length).toBe(1);
+
+    keydownOn(window, "Escape"); // game menu, still on the summary screen
+    findButtonByText(h.root, "End session").click();
+    findButtonByText(h.root, "End session").click(); // confirm
+    await flush();
+    await flush();
+    expect(parseRecentTasks(await h.saveStore.readRecentTasks())!.sessions.length, "same game must not be remembered twice").toBe(1);
+  });
+
   it("setup exposes the union it will exclude, in the right order, once recent sessions exist", async () => {
     h = makeApp();
     beginByMouse(h);

@@ -201,6 +201,13 @@ export class SessionDeck implements TaskSource {
     private readonly rng: Rng,
     private readonly weights: Record<Difficulty, number>,
     private readonly difficultySetting: DeckDifficultySetting,
+    /** Phase 10 review (OPEN_QUESTIONS item 42): the recent-use exclusions
+     * still in force after the builder's relaxation, oldest first. Never
+     * drawn while any rotation pool can serve; drawn only when every pool
+     * a draw could fall back to is empty — a repeated task instead of a
+     * dead game. Empty for a build without excludeTaskIds, so decks that
+     * never excluded anything behave exactly as before. */
+    private readonly lastResort: Task[] = [],
   ) {
     this.pools = pools;
     this.communityReserve = communityReserve;
@@ -237,19 +244,49 @@ export class SessionDeck implements TaskSource {
       // every focus category exhausted: fall through to the general cycle
     }
     if (category === null) {
+      // Every rotation pool empty: pickFromCycle() would throw ("every
+      // enabled category pool is exhausted"). The last-resort pool is for
+      // exactly this moment.
+      if (!this.rotationCategories.some((c) => this.poolHasAny(c))) {
+        const rescue = this.takeLastResort(null);
+        if (rescue) {
+          team.categoryHistory.push(rescue.category);
+          return rescue;
+        }
+      }
       category = this.pickFromCycle(team);
     }
 
     // nextReplacement() (recover) is unaffected: it draws by the ORIGINAL
     // attempt's already-fixed category+difficulty via fallbackOrder, not
     // a fresh weighted roll, so route-shifted weights only matter here.
-    const task = this.popFromCategory(category, this.weightsForStage(stageId));
+    const task = this.popFromCategory(category, this.weightsForStage(stageId)) ?? this.takeLastResort(category);
     if (!task) {
       throw new SessionBuildError(
         `SessionDeck.nextTask: category "${category}" is exhausted and no fallback category had supply.`,
       );
     }
     team.categoryHistory.push(category);
+    return task;
+  }
+
+  /** How many draws came from the last-resort (recently-used) pool — the
+   * count of repeats this deck was forced into to keep the game alive. */
+  getLastResortDraws(): number {
+    return this.lastResortDraws;
+  }
+
+  private lastResortDraws = 0;
+
+  /** Oldest first, same category preferred; any category otherwise. */
+  private takeLastResort(category: TaskCategory | null): Task | null {
+    if (this.lastResort.length === 0) return null;
+    let idx = category === null ? -1 : this.lastResort.findIndex((t) => t.category === category);
+    if (idx < 0) idx = 0;
+    const [task] = this.lastResort.splice(idx, 1);
+    if (!task) return null;
+    this.usedIds.add(task.id);
+    this.lastResortDraws++;
     return task;
   }
 
@@ -458,7 +495,75 @@ export function buildSessionDeck(options: BuildOptions): BuildResult {
     }
   }
 
+  // Phase 10 review (OPEN_QUESTIONS item 42): the per-category relaxation
+  // above keeps every category SERVABLE, but a session can still be short
+  // in aggregate — after an 8-team game (~84 drawn ids remembered), a
+  // 4-team session with one-game memory had only 40 usable tasks against
+  // 48 projected draws and the sufficiency check below threw, so "Begin
+  // journey" failed outright for the host until the toggle was turned
+  // off. X5's simulated chain recorded that session as 0 tasks drawn and
+  // nobody noticed. Same rule as the per-category case: relax the OLDEST
+  // exclusions, just enough, and say so with the same warning phrase (the
+  // setup estimate line and X5's filters both key on "exclusion relaxed").
+  const total = totalRequiredSuccesses(journey);
+  const { estimatedRounds } = estimateMinutes({
+    teamCount: teamIds.length,
+    tasksPerTurn: turnTaskLimit,
+    totalRequiredSuccesses: total,
+    communityEventCount: journey.communityEvents.length,
+  });
+  const projectedDraws = teamIds.length * estimatedRounds * turnTaskLimit;
+  const reserveByCategory = new Map<TaskCategory, number>();
+  for (const event of journey.communityEvents) {
+    if (event.kind !== "relay") continue;
+    reserveByCategory.set(event.taskCategory, (reserveByCategory.get(event.taskCategory) ?? 0) + 2);
+  }
+  // Relay reserves are carved out of the pools before anything else and
+  // are a hard requirement, so they get the per-category treatment too
+  // ("community" is never in enabledCategories, so the loop above never
+  // saw it): keep at least the reserve's worth of that category usable.
+  for (const [category, needed] of reserveByCategory) {
+    const inCategory = allTasks.filter((t) => t.category === category);
+    const available = () => inCategory.filter((t) => !excludedSet.has(t.id)).length;
+    if (available() >= needed) continue;
+    for (const id of excludeTaskIds) {
+      if (available() >= needed) break;
+      if (!excludedSet.has(id) || !inCategory.some((t) => t.id === id)) continue;
+      excludedSet.delete(id);
+      warnings.push(`Recent-use exclusion relaxed for task "${id}" to keep category "${category}" servable.`);
+    }
+  }
+  const reserveCount = Array.from(reserveByCategory.values()).reduce((sum, n) => sum + n, 0);
+  // Relax only to the sufficiency bar. Relaxing further (e.g. to the 1.5x
+  // "not tight" margin) was tried in review and over-corrects: an 8-team
+  // game needs ~all 128 tasks, so it let every exclusion back in even
+  // when the un-relaxed deck would have finished. Mid-game safety comes
+  // from the deck's last-resort pool below instead — a repeat only when a
+  // category has genuinely run dry, never pre-emptively.
+  const needUsable = projectedDraws + reserveCount;
+  if (allTasks.length - excludedSet.size < needUsable) {
+    for (const id of excludeTaskIds) {
+      if (allTasks.length - excludedSet.size >= needUsable) break;
+      if (!excludedSet.has(id)) continue;
+      excludedSet.delete(id);
+      warnings.push(
+        `Recent-use exclusion relaxed for task "${id}" to reach this session's projected ${projectedDraws} draws.`,
+      );
+    }
+  }
+
   const usableTasks = allTasks.filter((t) => !excludedSet.has(t.id));
+  // Still-excluded tasks, oldest first and deduplicated, for the deck's
+  // last-resort pool (see SessionDeck's constructor doc). Not in any pool,
+  // so nothing below — sufficiency, the tight-supply warning, previews —
+  // counts them; they exist only to keep a game alive.
+  const lastResortSeen = new Set<string>();
+  const lastResort: Task[] = [];
+  for (const id of excludeTaskIds) {
+    if (!excludedSet.has(id) || lastResortSeen.has(id)) continue;
+    lastResortSeen.add(id);
+    lastResort.push(byId.get(id)!);
+  }
 
   // Build seeded, shuffled per-category/difficulty pools.
   const pools = {} as Record<TaskCategory, Record<Difficulty, Task[]>>;
@@ -494,16 +599,8 @@ export function buildSessionDeck(options: BuildOptions): BuildResult {
     }
   }
 
-  // Sufficiency check.
-  const total = totalRequiredSuccesses(journey);
-  const { estimatedRounds } = estimateMinutes({
-    teamCount: teamIds.length,
-    tasksPerTurn: turnTaskLimit,
-    totalRequiredSuccesses: total,
-    communityEventCount: journey.communityEvents.length,
-  });
-  const projectedDraws = teamIds.length * estimatedRounds * turnTaskLimit;
-
+  // Sufficiency check (projectedDraws computed above, before pooling, so
+  // the aggregate relaxation could use it).
   const perCategoryAvailable = {} as Record<TaskCategory, number>;
   let totalAvailable = 0;
   for (const category of TASK_CATEGORIES) {
@@ -540,6 +637,7 @@ export function buildSessionDeck(options: BuildOptions): BuildResult {
     rng,
     DIFFICULTY_WEIGHTS[difficultySetting],
     difficultySetting,
+    lastResort,
   );
 
   const report: DeckReport = {

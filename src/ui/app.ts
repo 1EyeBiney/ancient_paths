@@ -290,6 +290,22 @@ export class App {
     }
     const existing = raw !== null && raw !== undefined ? parseRecentTasks(raw) : null;
     const sessions = existing ? [...existing.sessions] : [];
+    // Phase 10 review: the same game can reach this more than once — it
+    // records at gameSummary, and again if the host then opens the menu
+    // and presses End session (taskHistory is well past 10 by then), or
+    // undoes back into play and re-reaches the summary, or Resumes a save
+    // taken at the summary. Each would have burned one of the five
+    // remembered slots on a duplicate. A session whose ids are exactly the
+    // last remembered session's is the same game, not a new one.
+    const last = sessions.at(-1);
+    if (
+      last &&
+      last.journeyId === journeyId &&
+      last.taskIds.length === taskIds.length &&
+      last.taskIds.every((id, i) => id === taskIds[i])
+    ) {
+      return;
+    }
     sessions.push({ endedAt: new Date().toISOString(), journeyId, taskIds });
     while (sessions.length > 5) sessions.shift();
     const updated: RecentTasks = { schemaVersion: RECENT_TASKS_SCHEMA_VERSION, sessions };
@@ -725,6 +741,7 @@ export class App {
           this.wizard.setJourney(journey);
           this.updateEstimate();
         },
+        selectedId: this.wizard.journey?.journeyId,
       }),
     );
 
@@ -743,6 +760,7 @@ export class App {
           this.renderTeamNameInputs();
           this.updateEstimate();
         },
+        selectedId: String(this.wizard.teamCount),
       }),
     );
 
@@ -761,7 +779,8 @@ export class App {
     customMinutes.value = typeof this.wizard.duration === "object" ? String(this.wizard.duration.customMinutes) : "55";
     customMinutes.setAttribute("aria-label", "Custom minutes");
     customMinutes.disabled = typeof this.wizard.duration !== "object";
-    this.appendChoiceList("Duration", ["short", "standard", "long", "custom"], this.wizard.duration as string, (id) => {
+    const currentDuration = typeof this.wizard.duration === "string" ? this.wizard.duration : "custom";
+    this.appendChoiceList("Duration", ["short", "standard", "long", "custom"], currentDuration, (id) => {
       if (id === "custom") {
         customMinutes.disabled = false;
         this.wizard.setDuration({ customMinutes: clampInt(customMinutes.value, 15, 180, 55) });
@@ -979,9 +998,12 @@ export class App {
         present: (i) => this.presenter.present(i),
         ariaLabel: heading,
         onConfirm: (item) => onConfirm(item.id),
+        // Phase 10 review: `current` was accepted and then discarded, so
+        // every setup list started on row 0 and marked it "selected"
+        // regardless of the wizard's real value.
+        selectedId: current,
       }),
     );
-    void current;
   }
 
   private updateEstimate(target?: HTMLElement): void {

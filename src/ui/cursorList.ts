@@ -21,6 +21,17 @@ export interface CursorListOptions {
   onConfirm: (item: CursorListItem, index: number) => void;
   onCancel?: () => void;
   ariaLabel?: string;
+  /** The item that is CURRENTLY chosen, if the list edits an existing value
+   * (the setup wizard's lists). When given, the cursor starts on that row
+   * and `aria-selected` marks the chosen row — updated on confirm — while
+   * `aria-activedescendant` follows the cursor as the host browses. When
+   * absent (a decision list with no prior value: fork routes, surplus,
+   * recovery, pledges) selection follows the cursor, as before.
+   * Phase 10 review: without this every setup list started on row 0 and
+   * called it "selected" — NVDA read "short, selected" for Duration while
+   * the wizard held "standard", and after Resume/End session every list
+   * disagreed with the wizard's real values. */
+  selectedId?: string;
 }
 
 export class CursorList {
@@ -34,9 +45,19 @@ export class CursorList {
   private readonly instanceId = CursorList.nextInstanceId++;
 
   private cursor = 0;
+  /** Index of the chosen row when `selectedId` mode is on; null = selection
+   * follows the cursor (decision lists). */
+  private selectedIndex: number | null = null;
   private readonly rowElements: HTMLElement[] = [];
 
   constructor(private readonly options: CursorListOptions) {
+    if (options.selectedId !== undefined) {
+      const idx = options.items.findIndex((item) => item.id === options.selectedId);
+      if (idx >= 0) {
+        this.cursor = idx;
+        this.selectedIndex = idx;
+      }
+    }
     this.render();
     this.options.container.addEventListener("keydown", this.handleKeyDown);
   }
@@ -64,6 +85,7 @@ export class CursorList {
       // arrow-key navigation already does (PHASE10_SPEC Group X7c).
       row.addEventListener("click", () => {
         this.cursor = index;
+        if (this.selectedIndex !== null) this.selectedIndex = index;
         this.applySelection();
         this.options.container.focus();
         this.options.present({ visual: `${item.label} chosen.` });
@@ -76,8 +98,9 @@ export class CursorList {
   }
 
   private applySelection(): void {
+    const selected = this.selectedIndex ?? this.cursor;
     this.rowElements.forEach((row, i) => {
-      row.setAttribute("aria-selected", i === this.cursor ? "true" : "false");
+      row.setAttribute("aria-selected", i === selected ? "true" : "false");
     });
     const current = this.rowElements[this.cursor];
     if (current) this.options.container.setAttribute("aria-activedescendant", current.id);
@@ -108,6 +131,10 @@ export class CursorList {
       event.preventDefault();
       event.stopPropagation();
       const item = items[this.cursor]!;
+      if (this.selectedIndex !== null) {
+        this.selectedIndex = this.cursor;
+        this.applySelection();
+      }
       this.options.present({ visual: `${item.label} chosen.` });
       this.options.onConfirm(item, this.cursor);
       return;

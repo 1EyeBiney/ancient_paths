@@ -52,11 +52,16 @@ Difficulty, Map style) are a **listbox pattern**: DOM focus stays on the
 list's own container the whole time — NVDA's browse-mode cursor and the
 list's own "virtually focused" row can disagree, which is expected. In
 **focus mode** (NVDA switches automatically when you Tab onto the list, or
-press NVDA+Space to force it), Up/Down Arrow moves the selection and NVDA
-announces each option as you move; Enter or Space confirms it. Typing the
-first letter of an option (e.g. "s" for "Standard") should jump to it.
-Confirm: arrowing through a list is audibly distinct from arrowing through
-browse-mode page text — you should hear option names, not paragraph text.
+press NVDA+Space to force it), Up/Down Arrow BROWSES the options and NVDA
+announces each one as you move; Enter (or a click) is what actually
+CHOOSES one — the wizard's value does not change until you confirm. NVDA
+should say "selected" only for the row that is currently chosen (on a
+fresh setup that's "standard" for Duration/Pace/Difficulty and "2 teams";
+after End session or Resume it's whatever you had), and the list should
+OPEN on that row, not on the first one. Typing the first letter of an
+option (e.g. "s" for "Standard") should jump to it. Confirm: arrowing
+through a list is audibly distinct from arrowing through browse-mode page
+text — you should hear option names, not paragraph text.
 
 2.3. Tab to a team-name field and type a name. This is the **input
 firewall**: every global game key (R, S, A, T, Enter-as-confirm, etc.)
@@ -203,12 +208,12 @@ actually DOING it (no game state changes while exploring). Escape exits
 explorer and returns you to normal play.
 
 10.3. Press an unmapped key (e.g. "Q", or a digit not used anywhere) in a
-normal play state — confirm the app doesn't go silent (per the project's
-"silence is a bug" rule): either nothing audible happens because it's a
-genuinely inert key, or NVDA's own "no command" behavior is what you hear
-— there should be no dead keypress that leaves you wondering if the app
-froze. (This checks the browser's own native handling, not a custom app
-message — the app deliberately does NOT intercept truly unmapped keys.)
+normal play state — the app itself answers (the project's "silence is a
+bug" rule): NVDA says "Q does nothing here. Press question mark for
+help." Confirm it's the app's sentence you hear, not just NVDA's own key
+echo, and that nothing on screen changed. (Browser-owned keys — F5, F6,
+F11, Ctrl+R/F/W/T — are deliberately left to the browser and get no such
+message.)
 
 ## 11. Escape → game menu → Game log → Copy
 

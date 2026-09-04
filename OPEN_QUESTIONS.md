@@ -1057,6 +1057,125 @@ Items marked DECIDED were ruled on by Brian and override the design doc.
     bundle), one full turn played end-to-end (present → accept →
     reveal → rule correct → teaching), zero console errors throughout.
 
+42. **Fable's review of Phase 10 (2026-09-03; 2892 tests after review, up
+    from 2882).** Read every source change X1-X11 made, re-ran the
+    simulator for the numbers the report did not show, and drove the
+    findings to fixes where they were small. Five fixes, two findings,
+    four rulings.
+    - **Fix 1 — setup cursor lists ignored the wizard's real value
+      (pre-existing since Phase 4; X7's audit checked names and structure,
+      not selection semantics).** `appendChoiceList` accepted `current`
+      and then discarded it (`void current;`), and the Journey and
+      Number-of-teams lists never passed one, so every setup list opened
+      on row 0 and marked it `aria-selected` — NVDA would read "short,
+      selected" for Duration on a fresh setup whose wizard held
+      "standard", and after End session or Resume every list disagreed
+      with the values actually in force. `CursorList` gained
+      `selectedId`: the cursor opens on the chosen row, `aria-selected`
+      marks the chosen row (updated on confirm), `aria-activedescendant`
+      follows the cursor while browsing; decision lists (fork routes,
+      surplus, recovery, pledges) are unchanged. Regression:
+      `tests/ui/group-x-review-fixes.test.ts`. `NVDA_CHECKLIST.md` §2.2
+      now says what Brian should actually hear.
+    - **Fix 2 — the same game could be remembered twice** by recent-use
+      memory: recorded at `gameSummary`, then again when the host opened
+      the menu and pressed End session from the summary screen (well past
+      the 10-attempt bar), or undid back into play and re-reached the
+      summary, or Resumed a save taken at the summary — each burning one of
+      the five remembered slots on a duplicate. `appendRecentSession` now
+      skips a session whose ids equal the last remembered one's.
+      Regression added to `tests/persistence/group-x6-recent-tasks.test.ts`.
+    - **Fix 3 — the builder threw instead of relaxing when the shortfall
+      was aggregate, and X5's test hid it.** The numbers: an 8-team game
+      draws ~84 of the pack's 128 tasks; the next 4-team session with
+      one-game memory then had 40 usable tasks against 48 projected draws
+      (+4 relay reserve) — the per-category relaxation keeps every
+      category *servable* but nothing relaxed the aggregate — so
+      `buildSessionDeck` threw "insufficient content" and Begin journey
+      would have failed for the host until they turned the toggle off.
+      `simulateGame` records a build failure as `exhausted` at round 0
+      with no tasks drawn; X5's chain recorded session 4 that way,
+      SIMULATION_REPORT.md showed "0 distinct tasks", and X5's "zero
+      repeats" assertion passed *vacuously* over it (its loop also checked
+      session 4, where the spec asserts sessions 1-3). Two designs were
+      tried: relaxing up to the builder's 1.5x "not tight" margin
+      over-corrects (an 8-team game needs ~all 128 tasks, so it let every
+      one of the previous session's 24 ids back in and repeated 18);
+      relaxing only to the sufficiency bar builds, but the deck then ran
+      dry in round 5 (the length finding below: real draws outrun the
+      projection). Final shape, in `src/session/builder.ts`: (a) relay
+      reserves get the same per-category relaxation ("community" is never
+      in `enabledCategories`, so the existing loop never saw it); (b) the
+      oldest exclusions are relaxed in aggregate only as far as the
+      sufficiency bar; (c) the still-excluded tasks become the deck's
+      **last-resort pool**, oldest first, drawn only when every rotation
+      pool a draw could fall back to is empty — a repeated task instead of
+      a dead game, never pre-emptively. A build with no `excludeTaskIds`
+      is byte-for-byte unchanged. Result for the same chain: session 4
+      builds, draws 43 tasks, repeats 7 of the previous session's, 8 let
+      back in at build, finishes without exhausting. Regression:
+      `tests/session/group-x-review-relaxation.test.ts` (4 tests); X5's
+      loop corrected to the spec's sessions 1-3 with a report-only
+      session-4 check added. The setup estimate line's "Some tasks from
+      recent games may return" sentence (X6) now fires for this case too,
+      which is exactly the right thing for the host to hear.
+    - **Fix 4 — the report conflated two warnings.** Its X5 finding
+      counted every `DeckReport` warning as a relaxation, so the 8-team
+      session's "Content supply is tight" caution read as "exclusion held
+      only through session 2" when it held through 3. Separate columns
+      now (any warning / relaxations at build / repeats from the previous
+      session), and the length table gained modeled and planned minutes.
+    - **Fix 5 — `NVDA_CHECKLIST.md` §10.3 was wrong about unmapped keys:**
+      it said the app leaves them to the browser; `keys.ts` answers every
+      unmapped key with "Q does nothing here. Press question mark for
+      help." (the "silence is a bug" rule). Corrected to what Brian should
+      hear.
+    - **Finding A — game length (§35 item 22).** X2 reported rounds
+      against a loose [0.5x, 2x] bound and passed; the minutes tell the
+      real story. Under the documented success model, modeled duration
+      runs 1.26x-1.60x the estimator's own planned minutes at standard
+      across 2-8 teams: **a 4-team Standard game models at 106 minutes
+      against 66 planned and the design's 55-minute target** (2 teams:
+      55 vs 40; 8 teams: 162 vs 129). The estimator counts required
+      successes; the model also pays for the ~35% of moderate attempts
+      that fail, the recover retries those buy, and the community events
+      — and its constants were never calibrated against play (item 11).
+      The setup screen is already honest about the first gap (it warns
+      "longer than the 55-minute target" at 4 teams). **Ruling: no
+      retuning of the journey, the success model, or `estimator.ts` on
+      modeled numbers alone.** Brian's timed playtest is the calibration
+      point: if real rooms land near the model, the candidates are a
+      lower Standard requirement (the journey's 7 required successes are
+      content, frozen this phase), recalibrated estimator constants, or
+      both; if real rooms are faster, the 45s/task model constant moves.
+    - **Finding B — content supply (Phase 11 content-growth target).**
+      128 tasks supports repeat-free one-session memory for games up to
+      about 5 teams back to back (a 5-team game projects 60 draws; ~55
+      drawn leaves 73 ≥ 64). An 8-team game consumes ~84, so any session
+      after it repeats. Targets with numbers: repeat-free 8-then-4 needs
+      ~84 + 52 + margin ≈ **160 tasks**; repeat-free 8-then-8 needs
+      ~84 + 100 + margin ≈ **200 tasks**; three-game memory at 4 teams
+      needs ~3 × 44 + 52 ≈ **185 tasks**. Per category the pressure is
+      on historical-context (20) and the 12-task categories first — the
+      per-category relaxation fired for audio-listening before the
+      aggregate one did.
+    - **Rulings.** Item 37 (seat order) stands as proposed, not
+      implemented. Item 39 (End session's Cancel focus) accepted for
+      Phase 11 as proposed. X4b (route difficulty is real) stands; Brian
+      may still veto. Item 41's tooling caveat (Ctrl+Z arm cancelled
+      between devtools round-trips) is a testing artifact, not a defect —
+      `UndoController.cancel()` on "any other action" is correct.
+    - **Deploy.** The GitHub Pages workflow ran green on every Phase 10
+      push and the site answers at https://1eyebiney.github.io/ancient_paths/
+      (Pages source: workflow; repo public; HTTPS enforced).
+    - **What gates the release candidate now:** §35 items 21 and 22 —
+      Brian's NVDA pass (`NVDA_CHECKLIST.md`, with the five decisions it
+      ends on) and his timed Standard playtest. The design doc's §34 has
+      no phase after 10; a Phase 11 spec (content growth to the targets
+      above, the deferred items, and whatever the NVDA pass turns up)
+      should be written *after* those two, not before, so it can fold
+      their findings in.
+
 ## Open
 
 1. **DECIDED for v1 (2026-09-03, item 32)** — five milestones (Jerusalem,

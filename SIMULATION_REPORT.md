@@ -1,6 +1,6 @@
 # Simulation Report
 
-Generated 2026-09-03 by `src/sim/report.ts` (PHASE10_SPEC Group X10) from
+Generated 2026-09-03 by `src/sim/report.ts` (PHASE10_SPEC Group X10, amended in Fable's Phase 10 review) from
 116 simulated games total. No task text or task ids appear anywhere in this file — only counts,
 percentages, and content-neutral labels (category names, route ids).
 
@@ -32,29 +32,29 @@ about real players — Brian's own playtest timings calibrate the estimator sepa
 
 ## X2 — game length and sufficiency
 
-| Teams | Difficulty | Median rounds | Planned rounds | Exhausted / 2 |
-|---|---|---|---|---|
-| 2 | gentle | 6.5 | 3 | 0 |
-| 2 | standard | 6.0 | 3 | 0 |
-| 2 | challenging | 6.0 | 3 | 0 |
-| 3 | gentle | 6.0 | 4 | 0 |
-| 3 | standard | 6.0 | 4 | 0 |
-| 3 | challenging | 6.0 | 4 | 0 |
-| 4 | gentle | 6.5 | 4 | 0 |
-| 4 | standard | 6.5 | 4 | 0 |
-| 4 | challenging | 6.0 | 4 | 0 |
-| 5 | gentle | 6.0 | 4 | 0 |
-| 5 | standard | 6.0 | 4 | 0 |
-| 5 | challenging | 6.0 | 4 | 0 |
-| 6 | gentle | 7.5 | 6 | 0 |
-| 6 | standard | 7.0 | 6 | 0 |
-| 6 | challenging | 7.0 | 6 | 0 |
-| 7 | gentle | 7.0 | 6 | 0 |
-| 7 | standard | 7.0 | 6 | 0 |
-| 7 | challenging | 7.0 | 6 | 0 |
-| 8 | gentle | 7.0 | 6 | 0 |
-| 8 | standard | 7.0 | 6 | 0 |
-| 8 | challenging | 7.5 | 6 | 0 |
+| Teams | Difficulty | Median rounds | Planned rounds | Median modeled minutes | Planned minutes | Exhausted / 2 |
+|---|---|---|---|---|---|---|
+| 2 | gentle | 6.5 | 3 | 60 | 40 | 0 |
+| 2 | standard | 6.0 | 3 | 55 | 40 | 0 |
+| 2 | challenging | 6.0 | 3 | 58 | 40 | 0 |
+| 3 | gentle | 6.0 | 4 | 70 | 54 | 0 |
+| 3 | standard | 6.0 | 4 | 70 | 54 | 0 |
+| 3 | challenging | 6.0 | 4 | 77 | 54 | 0 |
+| 4 | gentle | 6.5 | 4 | 98 | 66 | 0 |
+| 4 | standard | 6.5 | 4 | 106 | 66 | 0 |
+| 4 | challenging | 6.0 | 4 | 95 | 66 | 0 |
+| 5 | gentle | 6.0 | 4 | 108 | 79 | 0 |
+| 5 | standard | 6.0 | 4 | 114 | 79 | 0 |
+| 5 | challenging | 6.0 | 4 | 116 | 79 | 0 |
+| 6 | gentle | 7.5 | 6 | 129 | 101 | 0 |
+| 6 | standard | 7.0 | 6 | 130 | 101 | 0 |
+| 6 | challenging | 7.0 | 6 | 136 | 101 | 0 |
+| 7 | gentle | 7.0 | 6 | 145 | 115 | 0 |
+| 7 | standard | 7.0 | 6 | 147 | 115 | 0 |
+| 7 | challenging | 7.0 | 6 | 147 | 115 | 0 |
+| 8 | gentle | 7.0 | 6 | 163 | 129 | 0 |
+| 8 | standard | 7.0 | 6 | 162 | 129 | 0 |
+| 8 | challenging | 7.5 | 6 | 180 | 129 | 0 |
 
 ## X3 — resource economy (4 teams, standard)
 
@@ -107,23 +107,31 @@ cost is reported qualitatively here rather than re-deriving X4's own per-route n
 
 ## X5 — content-repeat analysis (one chain: 4, 2, 8, 4 teams; one-session memory)
 
-| Session | Teams | Distinct tasks this session | Cumulative distinct tasks | Deck warnings |
-|---|---|---|---|---|
-| 1 | 4 | 44 | 44 | 0 |
-| 2 | 2 | 24 | 68 | 0 |
-| 3 | 8 | 84 | 110 | 1 |
-| 4 | 4 | 0 | 110 | 0 |
+| Session | Teams | Distinct tasks this session | Cumulative distinct tasks | Repeats from previous session | Deck warnings (any) | Exclusion relaxations at build |
+|---|---|---|---|---|---|---|
+| 1 | 4 | 44 | 44 | 0 | 0 | 0 |
+| 2 | 2 | 24 | 68 | 0 | 0 | 0 |
+| 3 | 8 | 84 | 110 | 0 | 1 | 0 |
+| 4 | 4 | 43 | 122 | 7 | 9 | 8 |
 
 ## Findings
 
 - Seat win-share spread across 30 rotated-policy games: 16.7% (OPEN_QUESTIONS item 37).
 - BOLD's Journey Token rate across 5 games: 100.0% (spec's own 30% expectation is informational, not a gate — OPEN_QUESTIONS item 36's smaller-sample ruling applies here too).
 - Catch-up grants in 30 four-team games: 0 (near-zero is the expected shape at 4 teams — catch-up needs a team more than two stages behind the leader).
-- Recent-use exclusion held with no relaxation warning through session 2 of this one-session-memory chain.
+- **Game length (the finding that matters for §35 item 22):** at standard, the modeled duration runs 1.26x–1.60x the estimator's own planned minutes across 2–8 teams; a 4-team Standard game models at 106 minutes against 66 planned and the design's 55-minute target (OPEN_QUESTIONS item 42). The estimator counts the journey's required successes; the model also pays for the ~35% of moderate attempts that fail, the recover retries those buy, and the community events — the estimator's constants were never calibrated against play (item 11). Brian's timed playtest decides whether real rooms are faster than the 45s/task model, or the journey/constants need retuning.
+- **Content supply (the finding that matters for Phase 11 content growth):** with one-session memory (4 → 2 → 8 → 4 teams) the chain holds zero repeats through session 3, then session 4 — a 4-team game right after an 8-team game — repeats 7 of its 43 tasks (8 of the previous session's ids were let back in at build to reach the sufficiency bar; the deck's last-resort pool covers any further shortfall mid-game, and the game finished without exhausting). 128 tasks is enough for repeat-free memory up to about 5-team games back to back; an 8-team game consumes ~84 of them. 8 exclusion relaxations across the chain in total (OPEN_QUESTIONS item 42).
 - The shipped `general-bible` pack currently ships zero real `audioAssets` (OPEN_QUESTIONS item 40) — this report's economy/fairness numbers are unaffected (they measure resource/turn mechanics, not audio), but any future audio-specific simulation metric would need real assets first.
 
 ## Proposals
 
+- OPEN_QUESTIONS item 42 (game length): do not retune the journey, the success model, or
+  `estimator.ts` on modeled numbers alone — Brian's timed playtest (§35 item 22) is the
+  calibration point. If real rooms come in near the model, the candidates are (a) a lower
+  Standard requirement (the journey's 7 required successes are content, frozen this phase),
+  (b) recalibrating `estimator.ts`'s per-task constants so the setup screen's own estimate
+  (already honest — it warns "longer than the 55-minute target" at 4 teams) matches reality,
+  or (c) both. If real rooms are faster, the 45s/task model constant is what moves.
 - OPEN_QUESTIONS item 37: rotate which team occupies "seat 0" each game (cosmetic — spreads the
   structural first-seat advantage across teams over many sessions rather than always favoring
   whichever team a host happens to list first), OR give every seat one guaranteed "grace" round
